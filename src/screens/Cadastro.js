@@ -18,8 +18,8 @@ import logo from "../../assets/logo.png";
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
     name: "",
-    email: "",
     cpf: "",
+    email:"jp.jp@gmail.com",
     password: "",
     password2: "",
     showPassword: true,
@@ -30,17 +30,17 @@ export default function Cadastro({ navigation }) {
   async function saveToken(token) {
     await SecureStore.setItemAsync("token", token);
   }
-  async function saveCpf(cpf) {
-    await SecureStore.setItemAsync("userId", cpf);
-  }
+  // async function saveCpf(cpf) {
+  //   await SecureStore.setItemAsync("userId", cpf);
+  // }
 
   async function handleCadastro() {
     await api.postCadastro(user).then(
       (response) => {
         Alert.alert(response.data.message);
         saveToken(response.data.token);
-        saveCpf(user.cpf);
-        navigation.navigate("Home", user.cpf);
+        // saveCpf(user.cpf);
+        navigation.navigate("Home");
       },
       (error) => {
         Alert.alert(error.response.data.error);

@@ -8,7 +8,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import IoniconsMenu from "@expo/vector-icons/Ionicons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
-import logo_senai from "../../assets/logo_senai.png";
 
 export default function LayoutMenu({ children, navigation }) {
   const insets = useSafeAreaInsets();
@@ -20,7 +19,6 @@ export default function LayoutMenu({ children, navigation }) {
           <IoniconsMenu name="menu" size={28} color="white" />
         </TouchableOpacity>
 
-        <Image source={logo_senai} style={styles.logosenai} />
 
         <TouchableOpacity
           onPress={() => navigation.navigate("Perfil")}
@@ -47,11 +45,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#215299",
     paddingHorizontal: 20,
     paddingVertical: 12,
-  },
-  logosenai: {
-    width: 150,
-    height: 40,
-    resizeMode: "contain",
   },
   fundoUser: {
     backgroundColor: "#ff0000",
