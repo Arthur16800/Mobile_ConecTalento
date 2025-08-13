@@ -13,13 +13,13 @@ import api from "../axios/axios";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import backgroundLogin from "../../assets/backgroundLogin.png";
+import InputUser from "../components/InputUser";
 import logo from "../../assets/logo.png";
 
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
     name: "",
     cpf: "",
-    email:"jp.jp@gmail.com",
     password: "",
     password2: "",
     showPassword: true,
@@ -54,53 +54,11 @@ export default function Cadastro({ navigation }) {
         <View style={styles.whiteboard}>
             <Text style={styles.title}>Cadastro</Text>
             <Image source={logo} style={styles.logo} />
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nome</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                { borderColor: focusedInput === "name" ? "#215299" : "#ccc" },
-              ]}
-            >
-              <TextInput
-                placeholder="Digite seu nome"
-                value={user.name}
-                onChangeText={(value) => setUser({ ...user, name: value })}
-                style={styles.input}
-                placeholderTextColor="#999"
-                maxLength={255}
-                onFocus={() => setFocusedInput("name")}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-          </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>CPF</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                { borderColor: focusedInput === "cpf" ? "#215299" : "#ccc" },
-              ]}
-            >
-              <TextInput
-                placeholder="Digite seu CPF *"
-                placeholderTextColor="#999"
-                value={user.cpf}
-                onChangeText={(value) => {
-                  const numericValue = value
-                    .replace(/[^0-9]/g, "")
-                    .slice(0, 11);
-                  setUser({ ...user, cpf: numericValue });
-                }}
-                style={styles.input}
-                keyboardType="numeric"
-                maxLength={11}
-                onFocus={() => setFocusedInput("cpf")}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-          </View>
+          <InputUser atributo={"Nome"} variavel={user.name} texto={"Digite seu nome:"} user={user} setuser={setUser} />
+
+          <InputUser atributo={"E-mail"} variavel={user.email} texto={"Digite seu e-mail:"} user={user} setuser={setUser} />
+
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Senha</Text>
@@ -184,6 +142,7 @@ export default function Cadastro({ navigation }) {
             >
               <Text style={styles.buttonBackText}>Voltar</Text>
             </TouchableOpacity>
+            
             <TouchableOpacity
               onPress={handleCadastro}
               style={styles.buttonCreate}
