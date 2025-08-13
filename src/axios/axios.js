@@ -2,7 +2,7 @@ import axios from "axios"
 import * as SecureStore from 'expo-secure-store'
 
 const api = axios.create({
-    baseURL: "http://10.89.240.75:5000/api/reservas/v3/", 
+    baseURL: "http://10.89.240.74:5000/api/v1/", 
     headers: {"accept": "application/json"}
 })
 
@@ -18,18 +18,8 @@ api.interceptors.request.use(
   
 
 const sheets =  {
-    postLogin: (user) => api.post("user/login", user),
+    postLogin: (user) => api.post("login", user),
     postCadastro: (user) => api.post("user", user),
-    getSalas: () => api.get("classroom"),
-    postConsulta: (body) => api.post(`schedule/available/`, body),
-    postReserva: (body) => api.post('schedule/', body),
-    getListaReserva: (userId) => api.get(`schedule/user/${userId}`),
-    deleteReserva: (reservaId) => api.delete(`schedule/${reservaId}`),
-    putAtualizarUsuario: (currentCpf, user) => api.put(`user/${currentCpf}`, user),
-    getUserById: (userId) => api.get(`user/${userId}`),
-    deleteUser: (userId) => api.delete(`user/${userId}`),
-    getUserSchedules: (userId) => api.get(`schedule/user/${userId}`),
-    postDaysWeekSchedule: (daysDate) => api.post(`schedule/days`, daysDate),
 }
 
 export default sheets
