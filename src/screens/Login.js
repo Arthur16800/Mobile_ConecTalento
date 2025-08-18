@@ -9,9 +9,13 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
-import api from "../axios/axios";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
+// axios
+import api from "../axios/axios";
+// Componentes
+import InputUser from "../components/InputUser";
+// Imagens
 import backgroundLogin from "../../assets/backgroundLogin.png";
 import logo from "../../assets/logo.png";
 
@@ -57,80 +61,66 @@ export default function Login({ navigation }) {
           </Text>
 
           <View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Usuário</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                { borderColor: focusedInput === "cpf" ? "#215299" : "#ccc" },
-              ]}
-            >
-              <TextInput
-                placeholder="Digite seu CPF *"
-                placeholderTextColor="#999"
-                value={user.cpf}
-                onChangeText={(value) => {
-                  const numericValue = value
-                    .replace(/[^0-9]/g, "")
-                    .slice(0, 11);
-                  setUser({ ...user, cpf: numericValue });
-                }}
-                style={styles.input}
-                keyboardType="number-pad"
-                maxLength={11}
-                onFocus={() => setFocusedInput("cpf")}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-          </View>
+            <InputUser
+              atributo={"Usuário"}
+              variavel={user.email}
+              texto={"Digite seu E-mail:"}
+              user={user}
+              setuser={setUser}
+            />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                styles.passwordContainer,
-                {
-                  borderColor: focusedInput === "password" ? "#215299" : "#ccc",
-                },
-              ]}
-            >
-              <TextInput
-                placeholder="Digite sua senha *"
-                placeholderTextColor="#999"
-                maxLength={50}
-                secureTextEntry={user.showPassword}
-                value={user.password}
-                onChangeText={(value) => setUser({ ...user, password: value })}
-                style={styles.input}
-                onFocus={() => setFocusedInput("password")}
-                onBlur={() => setFocusedInput(null)}
-              />
-              <TouchableOpacity
-                onPress={() =>
-                  setUser({ ...user, showPassword: !user.showPassword })
-                }
-                style={styles.eyeIcon}
+
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Senha</Text>
+              <View
+                style={[
+                  styles.inputContainer,
+                  styles.passwordContainer,
+                  {
+                    borderColor:
+                      focusedInput === "password" ? "#215299" : "#ccc",
+                  },
+                ]}
               >
-                <Ionicons
-                  name={user.showPassword ? "eye-off" : "eye"}
-                  size={24}
-                  color="#808080"
+                <TextInput
+                  placeholder="Digite sua senha *"
+                  placeholderTextColor="#999"
+                  maxLength={50}
+                  secureTextEntry={user.showPassword}
+                  value={user.password}
+                  onChangeText={(value) =>
+                    setUser({ ...user, password: value })
+                  }
+                  style={styles.input}
+                  onFocus={() => setFocusedInput("password")}
+                  onBlur={() => setFocusedInput(null)}
                 />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    setUser({ ...user, showPassword: !user.showPassword })
+                  }
+                  style={styles.eyeIcon}
+                >
+                  <Ionicons
+                    name={user.showPassword ? "eye-off" : "eye"}
+                    size={24}
+                    color="#808080"
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
           </View>
           <View>
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Entrar</Text>
-          </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Não possui conta?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
-              <Text style={styles.footerLink}>Cadastre-se</Text>
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Não possui conta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
+                <Text style={styles.footerLink}>Cadastre-se</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -158,7 +148,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     padding: "5%",
     flexDirection: "column",
-    justifyContent:"center",
+    justifyContent: "center",
     rowGap: 38,
   },
   inicio: {
