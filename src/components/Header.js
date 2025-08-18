@@ -30,11 +30,11 @@ export default function Header({ children, navigation }) {
         </View>
         <View style={styles.barraBot}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width:"100%"}}
+            behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width:"100%"}} // Tentando fazer o Header não diminuir
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
-                style={styles.barraPesquisa}
+                style={styles.barraPesquisa} 
                 placeholder="..."
                 onChangeText={(newText) => setText(newText)}
                 defaultValue={Text}
