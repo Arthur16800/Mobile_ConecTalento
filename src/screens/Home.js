@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo!</Text>
+      
 
       <TouchableOpacity
         style={styles.button}
@@ -35,17 +35,11 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
     justifyContent: "center",
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#215299",
-    alignSelf: "center",
-    marginBottom: 50,
-  },
+  
   button: {
     backgroundColor: "#215299",
     paddingVertical: 16,
