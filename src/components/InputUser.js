@@ -1,36 +1,37 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 
-export default function InputUser({atributo, variavel, texto, user, setuser}) {
+export default function InputUser({
+  atributo,
+  variavel,
+  texto,
+  user,
+  setuser,
+}) {
   const [focusedInput, setFocusedInput] = useState(null);
   const setUser = setuser;
-    return(
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>{atributo}</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                { borderColor: focusedInput ===  `${variavel}` ? "#215299" : "#ccc" },
-              ]}
-            >
-              <TextInput
-                placeholder={texto}
-                value={user[variavel]}
-                onChangeText={(value) => setUser({ ...user, [variavel]: value })}
-                style={styles.input}
-                placeholderTextColor="#999"
-                maxLength={255}
-                onFocus={() => setFocusedInput(`${variavel}`)}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-          </View>
-    )
+  return (
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>{atributo}</Text>
+      <View
+        style={[
+          styles.inputContainer,
+          { borderColor: focusedInput === `${variavel}` ? "#215299" : "#ccc" },
+        ]}
+      >
+        <TextInput
+          placeholder={texto}
+          value={user[variavel]}
+          onChangeText={(value) => setUser({ ...user, [variavel]: value })}
+          style={styles.input}
+          placeholderTextColor="#999"
+          maxLength={255}
+          onFocus={() => setFocusedInput(`${variavel}`)}
+          onBlur={() => setFocusedInput(null)}
+        />
+      </View>
+    </View>
+  );
 }
 const styles = StyleSheet.create({
   inputGroup: {
