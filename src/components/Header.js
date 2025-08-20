@@ -11,9 +11,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
+import { useState } from "react";
+import Entypo from '@expo/vector-icons/Entypo';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function Header({ children, navigation }) {
   const insets = useSafeAreaInsets();
+  const [text, setText] = useState();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -22,25 +26,29 @@ export default function Header({ children, navigation }) {
           <Text style={styles.title}>ConecTalento</Text>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("Perfil")}
+            onPress={() => navigation.navigate("Login")}
             style={styles.fundoUser}
           >
-            <IoniconsUser name="person" size={28} color="white" />
+            <IoniconsUser name="person" size={40} color="#949599" />
           </TouchableOpacity>
         </View>
         <View style={styles.barraBot}>
+          <View style={styles.barraPesquisa}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width:"100%"}} // Tentando fazer o Header não diminuir
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ width: "80%" }} // Tentando fazer o Header não diminuir
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
-                style={styles.barraPesquisa} 
                 placeholder="..."
                 onChangeText={(newText) => setText(newText)}
-                defaultValue={Text}
+                defaultValue={text}
               />
             </TouchableWithoutFeedback>
           </KeyboardAvoidingView>
+          <Feather name="filter" size={30} color="black" />
+          <Entypo name="magnifying-glass" size={30} color="black" />
+          </View>
         </View>
       </View>
       <View style={styles.conteudo}>{children}</View>
@@ -77,10 +85,10 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   fundoUser: {
-    backgroundColor: "#ff0000",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    backgroundColor: "#d2d3d5",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -91,16 +99,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   barraPesquisa: {
-    height: 30,
-    width: "70%",
+    height: 60,
+    width: "90%",
     margin: 0,
-    borderWidth: 3,
-    borderRadius: 5,
-    padding: 30,
-    backgroundColor: "#FFFFFF",
-    marginBottom: 20,
-    borderColor: "#000000",
+    paddingHorizontal: 10,
+    paddingVertical: 0,
+    backgroundColor: "#ffffff",
+    marginBottom: 10,
+    color:"#000000",
+    fontSize: 90,
     alignSelf: "center",
+    display:"flex",
+    justifyContent:"space-evenly",
+    alignItems:"center",
+    flexDirection:"row",
   },
   conteudo: {
     flex: 1,

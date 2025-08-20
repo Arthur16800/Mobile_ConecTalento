@@ -17,7 +17,7 @@ export default function App() {
         <Stack.Screen name="Home">
           {({ navigation }) => (
             <Header navigation={navigation}>
-              <Home navigation={navigation} />
+              <Home />
             </Header>
           )}
         </Stack.Screen>
