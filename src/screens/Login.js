@@ -1,42 +1,40 @@
-import React, { useState } from "react";
+import {useState} from "react"
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Alert,
   StyleSheet,
   Image,
   ImageBackground,
 } from "react-native";
-import api from "../axios/axios";
-import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
+// axios
+import api from "../axios/axios";
+// Componentes
+import InputUser from "../components/InputUser";
+import InputPassword from "../components/InputPassword";
+// Imagens
 import backgroundLogin from "../../assets/backgroundLogin.png";
 import logo from "../../assets/logo.png";
 
 export default function Login({ navigation }) {
   const [user, setUser] = useState({
-    cpf: "",
+    email: "",
     password: "",
     showPassword: true,
   });
 
-  const [focusedInput, setFocusedInput] = useState(null);
-
   async function saveToken(token) {
     await SecureStore.setItemAsync("token", token);
   }
-  // async function saveCpf(cpf) {
-  //   await SecureStore.setItemAsync("userId", cpf);
-  // }
 
   async function handleLogin() {
+    console.log(user);
     await api.postLogin(user).then(
       (response) => {
         Alert.alert(response.data.message);
         saveToken(response.data.token);
-        // saveCpf(user.cpf);
         navigation.navigate("Home");
       },
       (error) => {
@@ -57,80 +55,33 @@ export default function Login({ navigation }) {
           </Text>
 
           <View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Usuário</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                { borderColor: focusedInput === "cpf" ? "#215299" : "#ccc" },
-              ]}
-            >
-              <TextInput
-                placeholder="Digite seu CPF *"
-                placeholderTextColor="#999"
-                value={user.cpf}
-                onChangeText={(value) => {
-                  const numericValue = value
-                    .replace(/[^0-9]/g, "")
-                    .slice(0, 11);
-                  setUser({ ...user, cpf: numericValue });
-                }}
-                style={styles.input}
-                keyboardType="number-pad"
-                maxLength={11}
-                onFocus={() => setFocusedInput("cpf")}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-          </View>
+            <InputUser
+              atributo={"Usuário"}
+              variavel={"email"}
+              texto={"Digite seu E-mail:"}
+              user={user}
+              setuser={setUser}
+            />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                styles.passwordContainer,
-                {
-                  borderColor: focusedInput === "password" ? "#215299" : "#ccc",
-                },
-              ]}
-            >
-              <TextInput
-                placeholder="Digite sua senha *"
-                placeholderTextColor="#999"
-                maxLength={50}
-                secureTextEntry={user.showPassword}
-                value={user.password}
-                onChangeText={(value) => setUser({ ...user, password: value })}
-                style={styles.input}
-                onFocus={() => setFocusedInput("password")}
-                onBlur={() => setFocusedInput(null)}
-              />
-              <TouchableOpacity
-                onPress={() =>
-                  setUser({ ...user, showPassword: !user.showPassword })
-                }
-                style={styles.eyeIcon}
-              >
-                <Ionicons
-                  name={user.showPassword ? "eye-off" : "eye"}
-                  size={24}
-                  color="#808080"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+            <InputPassword
+              titulo={"Senha"}
+              texto={"Digite sua senha"}
+              variavel={"password"}
+              showpassword={"showPassword"}
+              user={user}
+              setuser={setUser}
+            />
           </View>
           <View>
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Entrar</Text>
-          </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Não possui conta?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
-              <Text style={styles.footerLink}>Cadastre-se</Text>
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Não possui conta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
+                <Text style={styles.footerLink}>Cadastre-se</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -158,13 +109,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     padding: "5%",
     flexDirection: "column",
-    justifyContent:"center",
+    justifyContent: "center",
     rowGap: 38,
-  },
-  inicio: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
   },
   logo: {
     position: "absolute",
@@ -185,42 +131,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 40,
   },
-  inputGroup: {
-    marginBottom: 25,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000000",
-    marginBottom: 8,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    paddingHorizontal: 15,
-    paddingVertical: 6,
-  },
-  passwordContainer: {
-    justifyContent: "space-between",
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-  },
-  eyeIcon: {
-    marginLeft: 10,
-  },
   button: {
-    backgroundColor: "#215299",
+    backgroundColor: "#803AD6",
     borderRadius: 12,
     paddingVertical: 14,
     marginTop: 15,
     alignItems: "center",
-    shadowColor: "#215299",
+    shadowColor: "#803AD6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
