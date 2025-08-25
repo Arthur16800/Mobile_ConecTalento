@@ -12,7 +12,6 @@ export default function InputPassword({
   texto,
   titulo,
   variavel,
-  showpassword,
   user,
   setuser,
 }) {
