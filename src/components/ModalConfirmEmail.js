@@ -1,0 +1,71 @@
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+export default function ModalConfirmEmail({ code, user, setuser, handle }) {
+  const changeUser = (value) => setuser((user) => ({ ...user, code: value }));
+  return (
+    <View>
+      {" "}
+      <Text style={styles.subtitle}>
+        {" "}
+        Um código de 6 caractes foi enviado ao e-mail informado. Insira-o no
+        campo a seguir para prosseguir{" "}
+      </Text>{" "}
+      <View style={styles.inputGroup}>
+        {" "}
+        <Text style={styles.label}>Código</Text>{" "}
+        <View style={styles.inputContainer}>
+          {" "}
+          <TextInput
+            value={user[code]}
+            onChangeText={(value) => changeUser(value)}
+            style={styles.input}
+            maxLength={6}
+          />{" "}
+        </View>{" "}
+      </View>{" "}
+      <TouchableOpacity style={styles.button} onPress={handle}>
+        {" "}
+        <Text style={styles.buttonText}>Confirmar</Text>{" "}
+      </TouchableOpacity>{" "}
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  inputGroup: { marginBottom: 20 },
+  label: { fontSize: 17, fontWeight: "600", color: "#000000", marginBottom: 6 },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 2,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    paddingHorizontal: 15,
+    paddingVertical: 6,
+  },
+  input: { flex: 1, fontSize: 16, color: "#333" },
+  button: {
+    backgroundColor: "#803AD6",
+    borderRadius: 12,
+    paddingVertical: 14,
+    marginTop: 15,
+    alignItems: "center",
+    shadowColor: "#803AD6",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  buttonText: { color: "#fff", fontWeight: "700", fontSize: 18 },
+  subtitle: {
+    fontSize: 25,
+    fontFamily: "serif",
+    color: "000000",
+    textAlign: "center",
+    marginBottom: 40,
+  },
+});

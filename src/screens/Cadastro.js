@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Modal,
   View,
   Text,
   TouchableOpacity,
@@ -14,7 +15,7 @@ import backgroundLogin from "../../assets/backgroundLogin.png";
 import InputUser from "../components/InputUser";
 import InputPassword from "../components/InputPassword";
 import logo from "../../assets/logo.png";
-
+import ModalConfirmEmail from "../components/ModalConfirmEmail";
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
     name: "",
@@ -23,49 +24,58 @@ export default function Cadastro({ navigation }) {
     password2: "",
     showPassword: true,
     showPassword2: true,
+    code: "",
   });
-
+  const [modalConf, setModalConf] = useState(false);
+  const visibModal = () => {
+    setModalConf(true);
+  };
+  const fecharModal = () => {
+    setModalConf(false);
+  };
   async function saveToken(token) {
     await SecureStore.setItemAsync("token", token);
   }
-
   async function handleCadastro() {
     console.log(user);
     await api.postCadastro(user).then(
       (response) => {
-        Alert.alert(response.data.message);
-        saveToken(response.data.token);
-        navigation.navigate("Home");
+        if ((response.valid = false)) {
+          visibModal();
+        } else if ((response.valid = true)) {
+          Alert.alert(response.data.message);
+          saveToken(response.data.token);
+          navigation.navigate("Home");
+        }
       },
       (error) => {
         Alert.alert(error.response.data.error);
       }
     );
   }
-
   return (
     <View style={styles.container}>
+      {" "}
       <ImageBackground source={backgroundLogin} style={styles.background}>
+        {" "}
         <View style={styles.whiteboard}>
-          <Text style={styles.title}>Cadastro</Text>
-          <Image source={logo} style={styles.logo} />
-
+          {" "}
+          <Text style={styles.title}>Cadastro</Text>{" "}
+          <Image source={logo} style={styles.logo} />{" "}
           <InputUser
             atributo={"Nome"}
             variavel={"name"}
             texto={"Digite seu nome:"}
             user={user}
             setuser={setUser}
-          />
-
+          />{" "}
           <InputUser
             atributo={"E-mail"}
             variavel={"email"}
             texto={"Digite seu e-mail:"}
             user={user}
             setuser={setUser}
-          />
-
+          />{" "}
           <InputPassword
             titulo={"Senha"}
             texto={"Digite sua senha"}
@@ -73,8 +83,7 @@ export default function Cadastro({ navigation }) {
             showpassword={"showPassword"}
             user={user}
             setuser={setUser}
-          />
-
+          />{" "}
           <InputPassword
             titulo={"Confirme sua senha"}
             texto={"Digite sua senha novamente"}
@@ -82,32 +91,44 @@ export default function Cadastro({ navigation }) {
             showpassword={"showPassword2"}
             user={user}
             setuser={setUser}
-          />
-
+          />{" "}
           <View>
-            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-              <Text style={styles.buttonText}>Criar Conta</Text>
-            </TouchableOpacity>
-
+            {" "}
+            <TouchableOpacity style={styles.button} onPress={visibModal}>
+              {" "}
+              <Text style={styles.buttonText}>Criar Conta</Text>{" "}
+            </TouchableOpacity>{" "}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Já possui conta?</Text>
+              {" "}
+              <Text style={styles.footerText}>Já possui conta?</Text>{" "}
               <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text style={styles.footerLink}>Faça Login</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </ImageBackground>
+                {" "}
+                <Text style={styles.footerLink}>Faça Login</Text>{" "}
+              </TouchableOpacity>{" "}
+            </View>{" "}
+          </View>{" "}
+        </View>{" "}
+      </ImageBackground>{" "}
+      <Modal
+        visible={modalConf}
+        transparent
+        animationType="slide"
+        onRequestClose={() => fecharModal(false)}
+      >
+        {" "}
+        <ModalConfirmEmail
+          fechamodal={fecharModal}
+          code={"code"}
+          user={user}
+          setuser={setUser}
+          handle={handleCadastro}
+        />{" "}
+      </Modal>{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    width: "100%",
-  },
+  container: { flex: 1, backgroundColor: "#FFFFFF", width: "100%" },
   background: {
     flex: 1,
     alignItems: "center",
@@ -124,11 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     rowGap: 38,
   },
-  logo: {
-    position: "absolute",
-    right: 0,
-    top: 10,
-  },
+  logo: { position: "absolute", right: 0, top: 10 },
   title: {
     fontSize: 50,
     fontFamily: "serif",
@@ -143,7 +160,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 40,
   },
-button: {
+  button: {
     backgroundColor: "#803AD6",
     borderRadius: 12,
     paddingVertical: 14,
@@ -155,20 +172,9 @@ button: {
     shadowRadius: 8,
     elevation: 5,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 18,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 25,
-  },
-  footerText: {
-    color: "#555",
-    fontSize: 16,
-  },
+  buttonText: { color: "#fff", fontWeight: "700", fontSize: 18 },
+  footer: { flexDirection: "row", justifyContent: "center", marginTop: 25 },
+  footerText: { color: "#555", fontSize: 16 },
   footerLink: {
     color: "#215299",
     fontWeight: "600",
