@@ -1,4 +1,4 @@
-# Projeto Base - MOBILE
+# Projeto ConecTalento - MOBILE
 
 Este repositório fornece a estrutura do aplicativo ConecTalento do grupo Arthur Caramori Coutinho, Evelyn Rissio de Andrade, Guilherme Negrijo, João Pedro Alexandre da Silva, João Pedro Vidal, Pedro Lemos Bonini e Rhuan Lima.
 
