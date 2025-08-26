@@ -37,7 +37,6 @@ export default function Cadastro({ navigation }) {
     await SecureStore.setItemAsync("token", token);
   }
   async function handleCadastro() {
-    console.log(user);
     await api.postCadastro(user).then(
       (response) => {
         if ((response.valid = false)) {
@@ -55,27 +54,24 @@ export default function Cadastro({ navigation }) {
   }
   return (
     <View style={styles.container}>
-      {" "}
       <ImageBackground source={backgroundLogin} style={styles.background}>
-        {" "}
         <View style={styles.whiteboard}>
-          {" "}
-          <Text style={styles.title}>Cadastro</Text>{" "}
-          <Image source={logo} style={styles.logo} />{" "}
+          <Text style={styles.title}>Cadastro</Text>
+          <Image source={logo} style={styles.logo} />
           <InputUser
             atributo={"Nome"}
             variavel={"name"}
             texto={"Digite seu nome:"}
             user={user}
             setuser={setUser}
-          />{" "}
+          />
           <InputUser
             atributo={"E-mail"}
             variavel={"email"}
             texto={"Digite seu e-mail:"}
             user={user}
             setuser={setUser}
-          />{" "}
+          />
           <InputPassword
             titulo={"Senha"}
             texto={"Digite sua senha"}
@@ -83,7 +79,7 @@ export default function Cadastro({ navigation }) {
             showpassword={"showPassword"}
             user={user}
             setuser={setUser}
-          />{" "}
+          />
           <InputPassword
             titulo={"Confirme sua senha"}
             texto={"Digite sua senha novamente"}
@@ -91,39 +87,37 @@ export default function Cadastro({ navigation }) {
             showpassword={"showPassword2"}
             user={user}
             setuser={setUser}
-          />{" "}
+          />
           <View>
-            {" "}
             <TouchableOpacity style={styles.button} onPress={visibModal}>
-              {" "}
-              <Text style={styles.buttonText}>Criar Conta</Text>{" "}
-            </TouchableOpacity>{" "}
+              <Text style={styles.buttonText}>Criar Conta</Text>
+            </TouchableOpacity>
             <View style={styles.footer}>
-              {" "}
-              <Text style={styles.footerText}>Já possui conta?</Text>{" "}
+              <Text style={styles.footerText}>Já possui conta?</Text>
               <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                {" "}
-                <Text style={styles.footerLink}>Faça Login</Text>{" "}
-              </TouchableOpacity>{" "}
-            </View>{" "}
-          </View>{" "}
-        </View>{" "}
-      </ImageBackground>{" "}
+                <Text style={styles.footerLink}>Faça Login</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </ImageBackground>
+
       <Modal
         visible={modalConf}
-        transparent
         animationType="slide"
         onRequestClose={() => fecharModal(false)}
+        style={styles.modal}
       >
-        {" "}
-        <ModalConfirmEmail
-          fechamodal={fecharModal}
-          code={"code"}
-          user={user}
-          setuser={setUser}
-          handle={handleCadastro}
-        />{" "}
-      </Modal>{" "}
+        <View style={styles.whitebox}>
+          <ModalConfirmEmail
+            fechamodal={fecharModal}
+            code={"code"}
+            user={user}
+            setuser={setUser}
+            handle={handleCadastro}
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -143,7 +137,7 @@ const styles = StyleSheet.create({
     padding: "5%",
     flexDirection: "column",
     justifyContent: "center",
-    rowGap: 38,
+    rowGap: "2%",
   },
   logo: { position: "absolute", right: 0, top: 10 },
   title: {
@@ -172,7 +166,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
+
   buttonText: { color: "#fff", fontWeight: "700", fontSize: 18 },
+
   footer: { flexDirection: "row", justifyContent: "center", marginTop: 25 },
   footerText: { color: "#555", fontSize: 16 },
   footerLink: {
@@ -180,5 +176,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 6,
     fontSize: 16,
+  },
+  whitebox: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

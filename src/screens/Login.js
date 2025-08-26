@@ -30,7 +30,6 @@ export default function Login({ navigation }) {
   }
 
   async function handleLogin() {
-    console.log(user);
     await api.postLogin(user).then(
       (response) => {
         Alert.alert(response.data.message);
