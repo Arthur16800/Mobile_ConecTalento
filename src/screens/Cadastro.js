@@ -39,9 +39,9 @@ export default function Cadastro({ navigation }) {
   async function handleCadastro() {
     await api.postCadastro(user).then(
       (response) => {
-        if ((response.valid = false)) {
+        if ((response.registered = false && response.status === 202)) {
           visibModal();
-        } else if ((response.valid = true)) {
+        } else if ((response.registered = true && response.status === 201)) {
           Alert.alert(response.data.message);
           saveToken(response.data.token);
           navigation.navigate("Home");
@@ -89,7 +89,7 @@ export default function Cadastro({ navigation }) {
             setuser={setUser}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={visibModal}>
+            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
               <Text style={styles.buttonText}>Criar Conta</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
