@@ -36,6 +36,11 @@ export default function Cadastro({ navigation }) {
   async function saveToken(token) {
     await SecureStore.setItemAsync("token", token);
   }
+
+  async function saveEmail(email) {
+    await SecureStore.setItemAsync("email", email);
+  }
+
   async function handleCadastro() {
     await api.postCadastro(user).then(
       (response) => {
@@ -44,6 +49,7 @@ export default function Cadastro({ navigation }) {
         } else if ((response.data.registered = true)) {
           Alert.alert(response.data.message);
           saveToken(response.data.token);
+          saveEmail(user.email);
           navigation.navigate("Home");
         }
       },

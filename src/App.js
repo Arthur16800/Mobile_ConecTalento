@@ -21,6 +21,14 @@ export default function App() {
             </Header>
           )}
         </Stack.Screen>
+
+        <Stack.Screen name="Perfil">
+          {({navigation, email}) =>(
+            <Header navigation={navigation}>
+              <Perfil navigation={navigation} email={email}/>
+            </Header>
+          )}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
