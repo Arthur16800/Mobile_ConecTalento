@@ -18,10 +18,10 @@ import logo from "../../assets/logo.png";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
-    password2: "",
+    confirmPassword: "",
     showPassword: true,
     showPassword2: true,
     code: "",
@@ -39,9 +39,9 @@ export default function Cadastro({ navigation }) {
   async function handleCadastro() {
     await api.postCadastro(user).then(
       (response) => {
-        if ((response.registered = false && response.status === 202)) {
+        if ((response.data.message === "Email enviado")) {
           visibModal();
-        } else if ((response.registered = true && response.status === 201)) {
+        } else if ((response.data.registered = true)) {
           Alert.alert(response.data.message);
           saveToken(response.data.token);
           navigation.navigate("Home");
@@ -60,7 +60,7 @@ export default function Cadastro({ navigation }) {
           <Image source={logo} style={styles.logo} />
           <InputUser
             atributo={"Nome"}
-            variavel={"name"}
+            variavel={"username"}
             texto={"Digite seu nome:"}
             user={user}
             setuser={setUser}
@@ -83,7 +83,7 @@ export default function Cadastro({ navigation }) {
           <InputPassword
             titulo={"Confirme sua senha"}
             texto={"Digite sua senha novamente"}
-            variavel={"password2"}
+            variavel={"confirmPassword"}
             showpassword={"showPassword2"}
             user={user}
             setuser={setUser}
