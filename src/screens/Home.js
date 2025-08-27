@@ -1,33 +1,13 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
+import Projeto from "../../assets/Projeto.png"
 
-export default function Home({ navigation }) {
+export default function Home() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo!</Text>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ListaReserva")}
-      >
-        <Text style={styles.buttonText}>Minhas Reservas</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ListaSalas")}
-      >
-        <Text style={styles.buttonText}>Nova Reserva</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.button, styles.logoutButton]}
-        onPress={() => {
-          navigation.navigate("Login");
-        }}
-      >
-        <Text style={[styles.buttonText, styles.logoutText]}>Logout</Text>
-      </TouchableOpacity>
+      
+    <Image source={Projeto} style={styles.imagem}/>
+    <Image source={Projeto} style={styles.imagem}/>
+      
     </View>
   );
 }
@@ -35,17 +15,12 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
-    justifyContent: "center",
+    alignItems:"center",
+    justifyContent: "space-evenly",
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#215299",
-    alignSelf: "center",
-    marginBottom: 50,
-  },
+  
   button: {
     backgroundColor: "#215299",
     paddingVertical: 16,
@@ -58,17 +33,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 18,
-  },
-  logoutButton: {
-    backgroundColor: "#fff",
-    borderWidth: 2,
-    borderColor: "#215299",
-  },
-  logoutText: {
-    color: "#215299",
-  },
+  imagem: {
+
+  }
 });
