@@ -1,7 +1,9 @@
 import LoginScreen from "./screens/Login";
 import CadastroScreen from "./screens/Cadastro";
 import Header from "./components/Header";
+import HeaderKeyboard from "./components/HeaderKeyboard";
 import Home from "./screens/Home";
+import Perfil from "./screens/Perfil"
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -16,16 +18,16 @@ export default function App() {
         
         <Stack.Screen name="Home">
           {({ navigation }) => (
-            <Header navigation={navigation}>
+            <HeaderKeyboard navigation={navigation}>
               <Home />
-            </Header>
+            </HeaderKeyboard>
           )}
         </Stack.Screen>
 
         <Stack.Screen name="Perfil">
-          {({navigation, email}) =>(
+          {({navigation}) =>(
             <Header navigation={navigation}>
-              <Perfil navigation={navigation} email={email}/>
+              <Perfil navigation={navigation}/>
             </Header>
           )}
         </Stack.Screen>
