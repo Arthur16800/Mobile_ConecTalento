@@ -15,10 +15,8 @@ export default function App() {
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
         
         <Stack.Screen name="Home">
-          {({ navigation }) => (
-            <Header navigation={navigation}>
+          {() => (
               <Home />
-            </Header>
           )}
         </Stack.Screen>
       </Stack.Navigator>
