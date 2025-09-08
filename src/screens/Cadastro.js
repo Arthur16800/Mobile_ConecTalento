@@ -12,7 +12,7 @@ import {
 import api from "../axios/axios";
 import * as SecureStore from "expo-secure-store";
 import backgroundLogin from "../../assets/backgroundLogin.png";
-import InputUser from "../components/InputUser";
+import InputUser from "../components/InputObj";
 import InputPassword from "../components/InputPassword";
 import logo from "../../assets/logo.png";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
@@ -44,7 +44,7 @@ export default function Cadastro({ navigation }) {
   async function handleCadastro() {
     await api.postCadastro(user).then(
       (response) => {
-        if ((response.data.message === "Email enviado")) {
+        if (response.data.message === "Email enviado") {
           visibModal();
         } else if ((response.data.registered = true)) {
           Alert.alert(response.data.message);
@@ -68,31 +68,31 @@ export default function Cadastro({ navigation }) {
             atributo={"Nome"}
             variavel={"username"}
             texto={"Digite seu nome:"}
-            user={user}
-            setuser={setUser}
+            obj={user}
+            setobj={setUser}
           />
           <InputUser
             atributo={"E-mail"}
             variavel={"email"}
             texto={"Digite seu e-mail:"}
-            user={user}
-            setuser={setUser}
+            obj={user}
+            setobj={setUser}
           />
           <InputPassword
             titulo={"Senha"}
             texto={"Digite sua senha"}
             variavel={"password"}
             showpassword={"showPassword"}
-            user={user}
-            setuser={setUser}
+            obj={user}
+            setobj={setUser}
           />
           <InputPassword
             titulo={"Confirme sua senha"}
             texto={"Digite sua senha novamente"}
             variavel={"confirmPassword"}
             showpassword={"showPassword2"}
-            user={user}
-            setuser={setUser}
+            obj={user}
+            setobj={setUser}
           />
           <View>
             <TouchableOpacity style={styles.button} onPress={handleCadastro}>

@@ -9,21 +9,21 @@ import {
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-export default function Perfil({ navigation }) {
-  const emailAtual = "emailTeste";
-  // SecureStore.getItemAsync("email");
+import InputUser from "../components/InputObj";
+import { useState } from "react";
 
-  const user = {
+export default function PerfilEdit({ navigation }) {
+  const emailAtual = "emailTeste";
+  const [user, setUser] = useState({
     username: "testeUser",
     email: "emailTeste",
-    bibliografia: "Bibliografia"
-  };
-
-  const contatos = {
-    instagram:"insta",
-    facebook:"face",
-    twitter:"x"
-  }
+    bibliografia: "Bibliografia",
+  });
+  const [contatos, setContatos] = useState({
+    instagram: "insta",
+    facebook: "face",
+    twitter: "x",
+  });
 
   return (
     <View style={styles.container}>
@@ -32,13 +32,19 @@ export default function Perfil({ navigation }) {
 
       <View style={styles.nomeEdit}>
         {/* Texto com nome do usuário */}
-        <Text style={styles.title}>{user.username}</Text>
+        <InputUser
+          atributo={"Nome"}
+          variavel={"username"}
+          texto={"Nome anterior(fazer com axios api)"}
+          obj={user}
+          setobj={setUser}
+        />
 
         {/* Ícone de Lápis */}
         {emailAtual === user.email ? (
-          <TouchableOpacity onPress={() => navigation.navigate("PerfilEdit")}>
+          <TouchableOpacity onPress={() => handleSalvar()}>
             <MaterialCommunityIcons
-              name="pencil-outline"
+              name="content-save"
               size={40}
               color="black"
             />
@@ -49,20 +55,26 @@ export default function Perfil({ navigation }) {
       {/* Biografia */}
       <Text style={styles.title}>Perfil do Usuário</Text>
       {user.bibliografia && (
-        <Text style={styles.subtitle}>{user.bibliografia}</Text>
+        <InputUser
+          atributo={"Bibliografia"}
+          variavel={"bibliografia"}
+          texto={"Texto anterior(fazer com axios api)"}
+          obj={user}
+          setobj={setUser}
+        />
       )}
 
       {/* Contatos */}
       <Text style={styles.title}>Contatos</Text>
       <FlatList
         data={contatos}
-        renderItem={(item) => 
-        <View>
-          <Image source={`/rota/da/imagem/${item}`} />
-        <Text style={styles.subtitle}>{contatos[item]}</Text>
-        </View>
-        }
-        keyExtractor={(item)=>Object.keys(item)}
+        renderItem={(item) => (
+          <View>
+            <Image source={`/rota/da/imagem/${item}`} />
+            <Text style={styles.subtitle}>{contatos[item]}</Text>
+          </View>
+        )}
+        keyExtractor={(item) => Object.keys(item)}
       />
     </View>
   );

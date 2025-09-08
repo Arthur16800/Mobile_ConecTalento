@@ -3,7 +3,8 @@ import CadastroScreen from "./screens/Cadastro";
 import Header from "./components/Header";
 import HeaderKeyboard from "./components/HeaderKeyboard";
 import Home from "./screens/Home";
-import Perfil from "./screens/Perfil"
+import Perfil from "./screens/Perfil";
+import PerfilEdit from "./screens/PerfilEdit";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -28,6 +29,13 @@ export default function App() {
           {({navigation}) =>(
             <Header navigation={navigation}>
               <Perfil navigation={navigation}/>
+            </Header>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="PerfilEdit">
+          {({navigation}) =>(
+            <Header navigation={navigation}>
+              <PerfilEdit navigation={navigation}/>
             </Header>
           )}
         </Stack.Screen>

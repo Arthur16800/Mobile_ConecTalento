@@ -12,7 +12,7 @@ import * as SecureStore from "expo-secure-store";
 // axios
 import api from "../axios/axios";
 // Componentes
-import InputUser from "../components/InputUser";
+import InputUser from "../components/InputObj";
 import InputPassword from "../components/InputPassword";
 // Imagens
 import backgroundLogin from "../../assets/backgroundLogin.png";
@@ -58,8 +58,8 @@ export default function Login({ navigation }) {
               atributo={"Usuário"}
               variavel={"email"}
               texto={"Digite seu E-mail:"}
-              user={user}
-              setuser={setUser}
+          obj={user}
+          setobj={setUser}
             />
 
             <InputPassword
@@ -67,8 +67,8 @@ export default function Login({ navigation }) {
               texto={"Digite sua senha"}
               variavel={"password"}
               showpassword={"showPassword"}
-              user={user}
-              setuser={setUser}
+          obj={user}
+          setobj={setUser}
             />
           </View>
           <View>
