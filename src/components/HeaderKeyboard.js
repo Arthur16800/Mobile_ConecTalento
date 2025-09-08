@@ -15,17 +15,18 @@ import { useState } from "react";
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 
-export default function Header({ toggleVisible }) {
+export default function Header({ children, navigation }) {
   const insets = useSafeAreaInsets();
   const [text, setText] = useState();
 
   return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <View style={styles.barraTopo}>
           <Text style={styles.title}>ConecTalento</Text>
 
           <TouchableOpacity
-            onPress={() => toggleVisible()}
+            onPress={() => navigation.navigate("Perfil")}
             style={styles.fundoUser}
           >
             <IoniconsUser name="person" size={40} color="#949599" />
@@ -50,6 +51,8 @@ export default function Header({ toggleVisible }) {
           </View>
         </View>
       </View>
+      <View style={styles.conteudo}>{children}</View>
+    </View>
   );
 }
 

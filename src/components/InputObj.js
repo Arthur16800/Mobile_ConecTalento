@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 
-export default function InputUser({
+export default function InputObj({
   atributo,
   variavel,
   texto,
-  user,
-  setuser,
+  obj,
+  setobj,
 }) {
   const [focusedInput, setFocusedInput] = useState(null);
-  const setUser = setuser;
+  const setObj = setobj;
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>{atributo}</Text>
@@ -21,8 +21,8 @@ export default function InputUser({
       >
         <TextInput
           placeholder={texto}
-          value={user[variavel]}
-          onChangeText={(value) => setUser({ ...user, [variavel]: value })}
+          value={obj[variavel]}
+          onChangeText={(value) => setObj({ ...obj, [variavel]: value })}
           style={styles.input}
           placeholderTextColor="#999"
           maxLength={255}
@@ -32,6 +32,7 @@ export default function InputUser({
       </View>
     </View>
   );
+
 }
 const styles = StyleSheet.create({
   inputGroup: {

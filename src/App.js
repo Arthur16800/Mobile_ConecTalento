@@ -1,7 +1,10 @@
 import LoginScreen from "./screens/Login";
 import CadastroScreen from "./screens/Cadastro";
 import Header from "./components/Header";
+import HeaderKeyboard from "./components/HeaderKeyboard";
 import Home from "./screens/Home";
+import Perfil from "./screens/Perfil";
+import PerfilEdit from "./screens/PerfilEdit";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -13,10 +16,21 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
-        
-        <Stack.Screen name="Home">
-          {() => (
-              <Home />
+
+        <Stack.Screen name="Home">{() => <Home />}</Stack.Screen>
+
+        <Stack.Screen name="Perfil">
+          {({ navigation }) => (
+            <Header navigation={navigation}>
+              <Perfil navigation={navigation} />
+            </Header>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="PerfilEdit">
+          {({ navigation }) => (
+            <Header navigation={navigation}>
+              <PerfilEdit navigation={navigation} />
+            </Header>
           )}
         </Stack.Screen>
       </Stack.Navigator>
