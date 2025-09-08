@@ -18,10 +18,8 @@ export default function App() {
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
         
         <Stack.Screen name="Home">
-          {({ navigation }) => (
-            <HeaderKeyboard navigation={navigation}>
+          {() => (
               <Home />
-            </HeaderKeyboard>
           )}
         </Stack.Screen>
 
