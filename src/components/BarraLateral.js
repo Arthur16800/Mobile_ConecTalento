@@ -7,7 +7,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
-import IoniconsUser from "@expo/vector-icons/Ionicons";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const { width } = Dimensions.get("window");
 
@@ -36,14 +36,15 @@ const BarraLateral = ({ isVisible }) => {
           { key: "Desconectar (Log-out)" },
         ]}
         renderItem={({ item }) => (
-          <Text
+          <View><Text
             style={[
               styles.item,
-              item.key === "Cláudio Ramos" && styles.nomeUsuario,
+              item.key === "Cláudio Ramos" && styles.nomeUsuario, 
             ]}
           >
             {item.key}
-          </Text>
+          </Text > <AntDesign name="right" size={24} color="white" /></View>
+          
         )}
         keyExtractor={(item) => item.key}
       />
