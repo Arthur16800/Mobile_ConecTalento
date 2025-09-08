@@ -16,24 +16,20 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
-        
-        <Stack.Screen name="Home">
-          {() => (
-              <Home />
-          )}
-        </Stack.Screen>
+
+        <Stack.Screen name="Home">{() => <Home />}</Stack.Screen>
 
         <Stack.Screen name="Perfil">
-          {({navigation}) =>(
+          {({ navigation }) => (
             <Header navigation={navigation}>
-              <Perfil navigation={navigation}/>
+              <Perfil navigation={navigation} />
             </Header>
           )}
         </Stack.Screen>
         <Stack.Screen name="PerfilEdit">
-          {({navigation}) =>(
+          {({ navigation }) => (
             <Header navigation={navigation}>
-              <PerfilEdit navigation={navigation}/>
+              <PerfilEdit navigation={navigation} />
             </Header>
           )}
         </Stack.Screen>
