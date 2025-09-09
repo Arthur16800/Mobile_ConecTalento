@@ -12,17 +12,18 @@ export default function InputPassword({
   texto,
   titulo,
   variavel,
-  user,
-  setuser,
+  obj,
+  setobj,
+  showpassword,
 }) {
   const [focusedInput, setFocusedInput] = useState(null);
 
-  const setUser = setuser;
+  const setObj = setobj;
 
   const togglePasswordVis = () => {
-    setuser({
-      ...user,
-      showpassword: !user.showpassword,
+    setObj({
+      ...obj,
+      showpassword: !obj.showpassword,
     });
   };
 
@@ -42,16 +43,16 @@ export default function InputPassword({
           placeholder={texto}
           placeholderTextColor="#999"
           maxLength={50}
-          secureTextEntry={!user.showpassword}
-          value={user[variavel]}
-          onChangeText={(value) => setUser({ ...user, [variavel]: value })}
+          secureTextEntry={!obj.showpassword}
+          value={obj[variavel]}
+          onChangeText={(value) => setObj({ ...obj, [variavel]: value })}
           style={styles.input}
           onFocus={() => setFocusedInput(variavel)}
           onBlur={() => setFocusedInput(null)}
         />
         <TouchableOpacity onPress={togglePasswordVis} style={styles.eyeIcon}>
           <Ionicons
-            name={user.showpassword ? "eye" : "eye-off"}
+            name={obj.showpassword ? "eye" : "eye-off"}
             size={24}
             color="#808080"
           />

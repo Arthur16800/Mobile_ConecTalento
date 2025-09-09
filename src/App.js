@@ -17,22 +17,10 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
 
-        <Stack.Screen name="Home">{() => <Home />}</Stack.Screen>
+        <Stack.Screen name="Home" component={Home} />
 
-        <Stack.Screen name="Perfil">
-          {({ navigation }) => (
-            <Header navigation={navigation}>
-              <Perfil navigation={navigation} />
-            </Header>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="PerfilEdit">
-          {({ navigation }) => (
-            <Header navigation={navigation}>
-              <PerfilEdit navigation={navigation} />
-            </Header>
-          )}
-        </Stack.Screen>
+        <Stack.Screen name="Perfil" component={Perfil} />
+        <Stack.Screen name="PerfilEdit" component={PerfilEdit} />
       </Stack.Navigator>
     </NavigationContainer>
   );

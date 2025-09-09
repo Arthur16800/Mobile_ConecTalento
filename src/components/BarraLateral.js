@@ -7,7 +7,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const { width } = Dimensions.get("window");
 
@@ -36,15 +36,17 @@ const BarraLateral = ({ isVisible }) => {
           { key: "Desconectar (Log-out)" },
         ]}
         renderItem={({ item }) => (
-          <View><Text
-            style={[
-              styles.item,
-              item.key === "Cláudio Ramos" && styles.nomeUsuario, 
-            ]}
-          >
-            {item.key}
-          </Text > <AntDesign name="right" size={24} color="white" /></View>
-          
+          <View>
+            <Text
+              style={[
+                styles.item,
+                item.key === "Cláudio Ramos" && styles.nomeUsuario,
+              ]}
+            >
+              {item.key}
+            </Text>
+            <AntDesign name="right" size={24} color={item.key==="Desconectar (Log-out)"?"red":"white"} />
+          </View>
         )}
         keyExtractor={(item) => item.key}
       />
@@ -70,8 +72,8 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   nomeUsuario: {
-    fontSize: 23
-  }
+    fontSize: 23,
+  },
 });
 
 export default BarraLateral;
