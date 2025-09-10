@@ -1,26 +1,8 @@
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
-import Entypo from "@expo/vector-icons/Entypo";
-import Feather from "@expo/vector-icons/Feather";
-import { mvs } from 'react-native-size-matters'; // A função mvs é útil para escalar tamanhos de fonte.
-
+import { mvs } from "react-native-size-matters"; // A função mvs é útil para escalar tamanhos de fonte.
 
 export default function Header({ toggleVisible }) {
-  const insets = useSafeAreaInsets();
-  const [text, setText] = useState();
-
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>
@@ -44,60 +26,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF", // cor da barra e fundo
   },
   header: {
-    display: "flex",
-    alignItems: "center",
     width: "100%",
-    height: "20%",
-    backgroundColor: "#64058F", // cor da barra e fundo
-  },
+    backgroundColor: "#6a1b9a", 
+    paddingTop: mvs(40), 
+    paddingBottom: mvs(10), 
+    paddingHorizontal: 20, 
+    alignItems: "center", 
+    },
   barraTopo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#64058F",
-    paddingHorizontal: 20,
-    paddingVertical: 0,
-    width: "100%",
-    height: "50%",
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    width: "100%", 
   },
   title: {
-    fontSize: mvs(40),
-    fontWeight: "600",
-    color: "#FFFFFF",
+    fontSize: mvs(35), 
+    fontWeight: "bold",
+    color: "#fff", 
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  barraBot: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  barraPesquisa: {
-    height: 60,
-    width: "90%",
-    margin: 0,
-    paddingHorizontal: 10,
-    paddingVertical: 0,
-    backgroundColor: "#ffffff",
-    marginBottom: 10,
-    color: "#000000",
-    fontSize: 90,
-    alignSelf: "center",
-    display: "flex",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  conteudo: {
-    flex: 1,
-    height: "80%",
-    backgroundColor: "#F5F7FA",
+    width: 50, 
+    height: 50, 
+    borderRadius: 25, 
+    alignItems: "center", 
+    justifyContent: "center", 
   },
 });

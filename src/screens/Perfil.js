@@ -11,6 +11,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Header from "../components/Header";
 
+
 export default function Perfil({ navigation }) {
   const emailAtual = "emailTeste";
   // SecureStore.getItemAsync("email");
@@ -22,21 +23,24 @@ export default function Perfil({ navigation }) {
   };
 
   const contatos = [
-    {tipo: "instagram", valor:"insta"},
-    {tipo: "facebook", valor:"face"},
-    {tipo: "twitter", valor:"x"},
+    {tipo: "instagram", valor:"@instagramteste"},
+    {tipo: "linkedin", valor: "LinkedinTeste"},
+    {tipo: "facebook", valor:"FacebookTeste"},
+    {tipo: "twitter", valor:"Teste"},
   ]
 
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
-        return <AntDesign name="instagram" size={24} color="black" />;
+        return <AntDesign name="instagram" size={50} color="black" />;
       case "facebook":
-        return <AntDesign name="facebook-square" size={24} color="black" />;
+        return <AntDesign name="facebook-square" size={50} color="black" />;
       case "twitter":
-        return <FontAwesome6 name="x-twitter" size={24} color="black" />
+        return <FontAwesome6 name="x-twitter" size={50} color="black" />
+      case "linkedin":
+        return <AntDesign name="linkedin-square" size={50} color="black" />
       default:
-        return <AntDesign name="questioncircleo" size={24} color="gray" />;
+        return <AntDesign name="questioncircleo" size={50} color="gray" />;
     }
   };
 
@@ -73,7 +77,7 @@ export default function Perfil({ navigation }) {
         renderItem={({ item }) => (
           <View style={styles.contatoItem}>
             {renderIcon(item.tipo)}
-            <Text style={styles.subtitle}>{item.valor}</Text>
+            <Text style={styles.title}>{item.valor}</Text>
           </View>
         )}
         keyExtractor={(item) => item.tipo}
@@ -99,5 +103,10 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
+  },
+  contatoItem: {
+    flexDirection:"row",
+    alignItems:"flex-end",
+    padding:12
   },
 });
