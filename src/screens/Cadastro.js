@@ -37,20 +37,13 @@ export default function Cadastro({ navigation }) {
     await SecureStore.setItemAsync("token", token);
   }
   async function handleCadastro() {
-    await api.postCadastro(user).then(
-      (response) => {
-        if (response.data.message === "Email enviado") {
-          visibModal();
-        } else if ((response.data.registered = true)) {
-          Alert.alert(response.data.message);
-          saveToken(response.data.token);
-          navigation.navigate("Home");
-        }
-      },
-      (error) => {
-        Alert.alert(error.response.data.error);
-      }
-    );
+    try{
+      const response = await api.postCadastro(user);
+      saveToken(response.token);
+      gerarCodigo(user.email);
+    }catch(error){
+      alarm
+    }
   }
   return (
     <View style={styles.container}>
@@ -138,6 +131,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     rowGap: "2%",
+    borderRadius:"3%"
   },
   logo: { position: "absolute", right: 0, top: 10 },
   title: {

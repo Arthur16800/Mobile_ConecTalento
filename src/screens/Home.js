@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 import { useState } from 'react';
 
-export default function Home() {
+export default function Home({navigation}) {
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -27,7 +27,8 @@ export default function Home() {
 
     <BarraLateral
     isVisible={isVisible}
-    
+    onClose={toggleVisibleFalse}
+    navigation={navigation}
     />
     </View>
   );
