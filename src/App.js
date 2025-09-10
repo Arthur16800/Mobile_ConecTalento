@@ -1,7 +1,5 @@
 import LoginScreen from "./screens/Login";
 import CadastroScreen from "./screens/Cadastro";
-import Header from "./components/Header";
-import HeaderKeyboard from "./components/HeaderKeyboard";
 import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
 import PerfilEdit from "./screens/PerfilEdit";

@@ -14,6 +14,8 @@ import IoniconsUser from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
+import { mvs } from 'react-native-size-matters'; // A função mvs é útil para escalar tamanhos de fonte.
+
 
 export default function Header({ toggleVisible }) {
   const insets = useSafeAreaInsets();
@@ -30,26 +32,6 @@ export default function Header({ toggleVisible }) {
         >
           <IoniconsUser name="person" size={40} color="#949599" />
         </TouchableOpacity>
-      </View>
-      <View style={styles.barraBot}>
-        <View style={styles.barraPesquisa}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ width: "80%" }} // Tentando fazer o Header não diminuir
-          >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View>
-                <TextInput
-                  placeholder="..."
-                  onChangeText={(newText) => setText(newText)}
-                  defaultValue={text}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </KeyboardAvoidingView>
-          <Feather name="filter" size={30} color="black" />
-          <Entypo name="magnifying-glass" size={30} color="black" />
-        </View>
       </View>
     </View>
   );
@@ -79,7 +61,7 @@ const styles = StyleSheet.create({
     height: "50%",
   },
   title: {
-    fontSize: 55,
+    fontSize: mvs(40),
     fontWeight: "600",
     color: "#FFFFFF",
   },
