@@ -19,14 +19,20 @@ import BarraLateral from "../components/BarraLateral";
 
 export default function PerfilEdit({ navigation }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [contatosVisible, setContatosVisible] = useState(false);
 
   const toggleVisibleFalse = () => {
     setIsVisible(false);
   };
-
   const toggleVisibleTrue = () => {
     setIsVisible(true);
   };
+  const toggleContatosModalFalse = ()=>{
+    setContatosVisible(false);
+  }
+  const toggleContatosModalTrue = ()=>{
+    setContatosVisible(true);
+  }
 
   const emailAtual = "emailTeste";
   const [user, setUser] = useState({
@@ -61,7 +67,7 @@ export default function PerfilEdit({ navigation }) {
 
           <TouchableOpacity
             style={[styles.button, { marginBottom: "2%", width: "95%" }]}
-            onPress=""
+            onPress={()=>navigation.navigate("Perfil")}
           >
             <Text style={styles.buttonText}>Salvar Perfil</Text>
           </TouchableOpacity>
@@ -121,20 +127,19 @@ export default function PerfilEdit({ navigation }) {
         </View>
 
         <View style={styles.botView}>
-          <TouchableOpacity style={styles.button} onPress="">
+          <TouchableOpacity style={styles.button} onPress={()=>toggleContatosModalTrue()}>
             <Text style={styles.buttonText}>Adicionar Contatos</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress="">
+          <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Projetos")}>
             <Text style={styles.buttonText}>Ver meus projetos</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <BarraLateral
-        isVisible={isVisible}
-        onClose={toggleVisibleFalse}
-        navigation={navigation}
-      />
+
+      <BarraLateral isVisible={isVisible} onClose={toggleVisibleFalse} navigation={navigation}/>
+
+      <ModalContatos  />
     </KeyboardAvoidingView>
   );
 }

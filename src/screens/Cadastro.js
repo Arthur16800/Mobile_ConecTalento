@@ -42,7 +42,6 @@ export default function Cadastro({ navigation }) {
       saveToken(response.token);
       gerarCodigo(user.email);
     }catch(error){
-      alarm
     }
   }
   return (
@@ -82,7 +81,7 @@ export default function Cadastro({ navigation }) {
             setobj={setUser}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+            <TouchableOpacity style={styles.button} onPress={()=>visibModal()}>
               <Text style={styles.buttonText}>Criar Conta</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
@@ -95,22 +94,15 @@ export default function Cadastro({ navigation }) {
         </View>
       </ImageBackground>
 
-      <Modal
-        visible={modalConf}
-        animationType="slide"
-        onRequestClose={() => fecharModal(false)}
-        style={styles.modal}
-      >
-        <View style={styles.whitebox}>
+        
           <ModalConfirmEmail
             fechamodal={fecharModal}
             code={"code"}
             user={user}
             setuser={setUser}
             handle={handleCadastro}
+            modal={modalConf}
           />
-        </View>
-      </Modal>
     </View>
   );
 }

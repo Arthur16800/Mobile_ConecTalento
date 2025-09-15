@@ -4,36 +4,64 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Modal,
 } from "react-native";
-export default function ModalConfirmEmail({ code, user, setuser, handle, fechamodal }) {
+export default function ModalConfirmEmail({
+  code,
+  user,
+  setuser,
+  handle,
+  fechamodal,
+  modal,
+}) {
   const changeUser = (value) => setuser((user) => ({ ...user, code: value }));
   return (
-    <View style={styles.whitebox}>
-      <Text style={styles.subtitle}>
-        Um código de 6 caractes foi enviado ao e-mail informado. Insira-o no
-        campo a seguir para prosseguir
-      </Text>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Código</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            value={user[code]}
-            onChangeText={(value) => changeUser(value)}
-            style={styles.input}
-            maxLength={6}
-          />
+    <Modal
+      visible={modal}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => fechamodal()}
+      style={styles.modal}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.whitebox}>
+          <Text style={styles.subtitle}>
+            Um código de 6 caracteres foi enviado ao e-mail informado. Insira-o no
+            campo a seguir para prosseguir
+          </Text>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Código</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={user[code]}
+                onChangeText={(value) => changeUser(value)}
+                style={styles.input}
+                maxLength={6}
+              />
+            </View>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handle}>
+            <Text style={styles.buttonText}>Confirmar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonBack}
+            onPress={() => fechamodal()}
+          >
+            <Text style={styles.buttonBackText}>Cancelar</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handle}>
-        <Text style={styles.buttonText}>Confirmar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonBack} onPress={fechamodal}>
-        <Text style={styles.buttonBackText}>Cancelar</Text>
-      </TouchableOpacity>
-    </View>
+    </Modal>
   );
 }
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
   whitebox: {
     backgroundColor: "#ffffff",
     borderRadius: "5%",

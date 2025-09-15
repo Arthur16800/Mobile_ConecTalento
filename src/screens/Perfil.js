@@ -27,7 +27,7 @@ export default function Perfil({ navigation }) {
   // SecureStore.getItemAsync("email");
 
   const user = {
-    username: "testeUser",
+    username: "Cláudio Ramos",
     email: "emailTeste",
     bibliografia: "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
   };
