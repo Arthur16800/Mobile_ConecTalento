@@ -5,29 +5,39 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
-
+import { useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Header from "../components/Header";
-
+import BarraLateral from "../components/BarraLateral";
 
 export default function Perfil({ navigation }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibleFalse = () => {
+    setIsVisible(false);
+  };
+
+  const toggleVisibleTrue = () => {
+    setIsVisible(true);
+  };
+
   const emailAtual = "emailTeste";
   // SecureStore.getItemAsync("email");
 
   const user = {
     username: "testeUser",
     email: "emailTeste",
-    bibliografia: "Bibliografia"
+    bibliografia: "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
   };
 
   const contatos = [
-    {tipo: "instagram", valor:"@instagramteste"},
-    {tipo: "linkedin", valor: "LinkedinTeste"},
-    {tipo: "facebook", valor:"FacebookTeste"},
-    {tipo: "twitter", valor:"Teste"},
-  ]
+    { tipo: "instagram", valor: "@instagramteste" },
+    { tipo: "linkedin", valor: "LinkedinTeste" },
+    { tipo: "facebook", valor: "FacebookTeste" },
+    { tipo: "twitter", valor: "Teste" },
+  ];
 
   const renderIcon = (tipo) => {
     switch (tipo) {
@@ -36,9 +46,9 @@ export default function Perfil({ navigation }) {
       case "facebook":
         return <AntDesign name="facebook-square" size={50} color="black" />;
       case "twitter":
-        return <FontAwesome6 name="x-twitter" size={50} color="black" />
+        return <FontAwesome6 name="x-twitter" size={50} color="black" />;
       case "linkedin":
-        return <AntDesign name="linkedin-square" size={50} color="black" />
+        return <AntDesign name="linkedin-square" size={50} color="black" />;
       default:
         return <AntDesign name="questioncircleo" size={50} color="gray" />;
     }
@@ -46,7 +56,10 @@ export default function Perfil({ navigation }) {
 
   return (
     <View style={styles.container}>
-      < Header/>
+
+    <Header
+    toggleVisible={toggleVisibleTrue}
+    />
 
       <View style={styles.nomeEdit}>
         {/* Texto com nome do usuário */}
@@ -70,7 +83,7 @@ export default function Perfil({ navigation }) {
         <Text style={styles.subtitle}>{user.bibliografia}</Text>
       )}
 
-       {/* Contatos */}
+      {/* Contatos */}
       <Text style={styles.title}>Contatos</Text>
       <FlatList
         data={contatos}
@@ -81,6 +94,11 @@ export default function Perfil({ navigation }) {
           </View>
         )}
         keyExtractor={(item) => item.tipo}
+      />
+      <BarraLateral
+        isVisible={isVisible}
+        onClose={toggleVisibleFalse}
+        navigation={navigation}
       />
     </View>
   );
@@ -103,10 +121,11 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
+    paddingHorizontal:"5%",
   },
   contatoItem: {
-    flexDirection:"row",
-    alignItems:"flex-end",
-    padding:12
+    flexDirection: "row",
+    alignItems: "flex-end",
+    padding: 12,
   },
 });

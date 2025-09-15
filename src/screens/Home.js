@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     alignItems:"center",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
   },
   
   button: {

@@ -83,8 +83,8 @@ export default function Login({ navigation }) {
               </TouchableOpacity>
             </View>
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Perfil</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Perfil")}>
+              <Text style={styles.footerText}>Home</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                 <Text style={styles.footerLink}>Home</Text>
               </TouchableOpacity>
             </View>

@@ -1,17 +1,38 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
+} from "react-native";
+import { useState } from "react";
 import Header from "../components/Header";
 import InputUser from "../components/InputObj";
 import InputPassword from "../components/InputPassword";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState } from "react";
+import BarraLateral from "../components/BarraLateral";
 
 export default function PerfilEdit({ navigation }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibleFalse = () => {
+    setIsVisible(false);
+  };
+
+  const toggleVisibleTrue = () => {
+    setIsVisible(true);
+  };
+
   const emailAtual = "emailTeste";
   const [user, setUser] = useState({
-    username: "testeUser",
+    username: "Cláudio Ramos",
     email: "emailTeste",
-    bibliografia: "Bibliografia",
+    bibliografia: "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
     password: "",
     confirmPassword: "",
     showPassword: true,
@@ -19,151 +40,149 @@ export default function PerfilEdit({ navigation }) {
   });
 
   return (
-    <View style={styles.container}>
-      <Header />
+    <KeyboardAvoidingView
+      style={styles.wrapper}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <ScrollView contentContainerStyle={styles.container}>
+        <Header toggleVisible={toggleVisibleTrue} />
 
-      {/* Painel do usuário */}
-      <View style={styles.painel}>
-        {/* Barrinha colorida */}
-        <Image style={styles.colorBar} />
+        <View style={styles.painel}>
+          <Image style={styles.colorBar} />
 
-        {/* Linha do usuário */}
-        <View style={styles.lineUser}>
-          {/*Ícone Usuário */}
-          <View style={styles.backIcon}>
-            <IoniconsUser name="person" size={45} color="#949599" />
+          <View style={styles.lineUser}>
+            <View style={styles.backIcon}>
+              <IoniconsUser name="person" size={45} color="#949599" />
+            </View>
+            <Text style={styles.title}>{user.username} </Text>
+            <MaterialIcons name="do-not-disturb-on" size={35} color="red" />
           </View>
 
-          {/*Nome do Usuário */}
-          <Text style={styles.title}>{user.username} </Text>
-
-          {/*Botão Deletar */}
-          <MaterialIcons name="do-not-disturb-on" size={35} color="red" />
+          <TouchableOpacity
+            style={[styles.button, { marginBottom: "2%", width: "95%" }]}
+            onPress=""
+          >
+            <Text style={styles.buttonText}>Salvar Perfil</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Botão para salvar Perfil */}
-        <TouchableOpacity
-          style={[styles.button, { marginBottom: "2%", width: "95%" }]}
-          onPress=""
-        >
-          <Text style={styles.buttonText}>Salvar Perfil</Text>
-        </TouchableOpacity>
-      </View>
+        <Text style={styles.title}>Perfil do Usuário</Text>
 
-      <Text style={styles.title}>Perfil do Usuário</Text>
-
-      <View style={styles.nomeEdit}>
-        {/* Campo com nome do usuário */}
-        <InputUser
-          atributo={"Nome"}
-          variavel={"username"}
-          texto={"Nome anterior(fazer com axios api)"}
-          obj={user}
-          setobj={setUser}
-          style={styles.input}
-        />
-
-        {/* Campo com email do usuário */}
-        <InputUser
-          atributo={"Email"}
-          variavel={"email"}
-          texto={"Email anterior(fazer com axios api)"}
-          obj={user}
-          setobj={setUser}
-          style={styles.input}
-        />
-
-        {/* Campo da senha do usuário */}
-        <InputPassword
-          titulo={"Senha"}
-          texto={"********"}
-          variavel={"password"}
-          showpassword={"showPassword"}
-          obj={user}
-          setobj={setUser}
-          style={styles.input}
-        />
-
-        {/* Campo de confirmação da senha do usuário */}
-        <InputPassword
-          titulo={"Confirme sua senha"}
-          texto={"********"}
-          variavel={"ConfirmPassword"}
-          showpassword={"showPassword2"}
-          obj={user}
-          setobj={setUser}
-          style={styles.input}
-        />
-
-        {/* Biografia */}
-        {user.bibliografia && (
+        <View style={styles.nomeEdit}>
           <InputUser
-            atributo={"Bibliografia"}
-            variavel={"bibliografia"}
-            texto={"Texto anterior(fazer com axios api)"}
+            atributo={"Nome"}
+            variavel={"username"}
+            texto={"Nome anterior(fazer com axios api)"}
             obj={user}
             setobj={setUser}
             style={styles.input}
           />
-        )}
-      </View>
 
-      <TouchableOpacity style={styles.button} onPress="">
-        {/* Botão para Adicionar Contatos */}
-        <Text style={styles.buttonText}>Adicionar Contatos</Text>
-      </TouchableOpacity>
+          <InputUser
+            atributo={"Email"}
+            variavel={"email"}
+            texto={"Email anterior(fazer com axios api)"}
+            obj={user}
+            setobj={setUser}
+            style={styles.input}
+          />
 
-      <TouchableOpacity style={styles.button} onPress="">
-        {/* Botão para Ver projetos */}
-        <Text style={styles.buttonText}>Ver meus projetos</Text>
-      </TouchableOpacity>
-    </View>
+          <InputPassword
+            titulo={"Senha"}
+            texto={"********"}
+            variavel={"password"}
+            showpassword={"showPassword"}
+            obj={user}
+            setobj={setUser}
+            style={styles.input}
+          />
+
+          <InputPassword
+            titulo={"Confirme sua senha"}
+            texto={"********"}
+            variavel={"ConfirmPassword"}
+            showpassword={"showPassword2"}
+            obj={user}
+            setobj={setUser}
+            style={styles.input}
+          />
+
+          {user.bibliografia && (
+            <InputUser
+              atributo={"Bibliografia"}
+              variavel={"bibliografia"}
+              texto={"Texto anterior(fazer com axios api)"}
+              obj={user}
+              setobj={setUser}
+              style={styles.input}
+            />
+          )}
+        </View>
+
+        <View style={styles.botView}>
+          <TouchableOpacity style={styles.button} onPress="">
+            <Text style={styles.buttonText}>Adicionar Contatos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress="">
+            <Text style={styles.buttonText}>Ver meus projetos</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <BarraLateral
+        isVisible={isVisible}
+        onClose={toggleVisibleFalse}
+        navigation={navigation}
+      />
+    </KeyboardAvoidingView>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    display:"flex",
-    justifyContent:"space-evenly",
-    alignItems: "center",
-    width:"100%",
 
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff", // mesmo fundo do header, se quiser
+  },
+  wrapper: {
+    flex: 1,
+  },
+  container: {
+    paddingTop: 0,
+    paddingVertical: 20,
+    alignItems: "center",
+    width: "100%",
+    gap: 20,
   },
   painel: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "70%",
-    height: "20%",
+    width: "85%",
+    minHeight: 160,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: "black",
     backgroundColor: "white",
   },
   colorBar: {
-    height: "25%",
+    height: 40,
     width: "100%",
-    borderWidth: 2,
-    borderBottomWidth: 2,
-    borderBottomColor: "black",
-    borderTopWidth: 0,
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
+    backgroundColor: "#ccc",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   lineUser: {
-    flex: 1,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 10,
+    width: "90%",
+    paddingVertical: 10,
   },
   backIcon: {
-    display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: "100%",
+    borderRadius: 9999,
     backgroundColor: "grey",
     height: 65,
     width: 65,
@@ -172,13 +191,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#803AD6",
     borderRadius: 12,
     paddingVertical: 14,
-    marginTop: 15,
+    paddingHorizontal: 20,
     alignItems: "center",
     shadowColor: "#803AD6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
+    width: "100%",
   },
   buttonText: {
     color: "#fff",
@@ -186,17 +206,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   title: {
-    fontSize: 40,
+    fontSize: 30,
+    marginBottom: 10,
   },
   nomeEdit: {
-    flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width:"85%",
-    maxHeight: "10%",
+    width: "85%",
+    gap: 12,
   },
-  input:{
-    width:"100%",
+  botView: {
+    width: "85%",
+    gap: 15,
+    marginBottom: 30,
+  },
+  input: {
+    width: "100%",
   },
 });
