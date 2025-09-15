@@ -1,6 +1,5 @@
 import {
   View,
-  Image,
   Text,
   TouchableOpacity,
   FlatList,
@@ -8,6 +7,10 @@ import {
 } from "react-native";
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Header from "../components/Header";
+
 
 export default function Perfil({ navigation }) {
   const emailAtual = "emailTeste";
@@ -19,16 +22,31 @@ export default function Perfil({ navigation }) {
     bibliografia: "Bibliografia"
   };
 
-  const contatos = {
-    instagram:"insta",
-    facebook:"face",
-    twitter:"x"
-  }
+  const contatos = [
+    {tipo: "instagram", valor:"@instagramteste"},
+    {tipo: "linkedin", valor: "LinkedinTeste"},
+    {tipo: "facebook", valor:"FacebookTeste"},
+    {tipo: "twitter", valor:"Teste"},
+  ]
+
+  const renderIcon = (tipo) => {
+    switch (tipo) {
+      case "instagram":
+        return <AntDesign name="instagram" size={50} color="black" />;
+      case "facebook":
+        return <AntDesign name="facebook-square" size={50} color="black" />;
+      case "twitter":
+        return <FontAwesome6 name="x-twitter" size={50} color="black" />
+      case "linkedin":
+        return <AntDesign name="linkedin-square" size={50} color="black" />
+      default:
+        return <AntDesign name="questioncircleo" size={50} color="gray" />;
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Imagem do usuário */}
-      <Image source={"../../assets/Projeto.png"} size="30%" />
+      < Header/>
 
       <View style={styles.nomeEdit}>
         {/* Texto com nome do usuário */}
@@ -52,17 +70,17 @@ export default function Perfil({ navigation }) {
         <Text style={styles.subtitle}>{user.bibliografia}</Text>
       )}
 
-      {/* Contatos */}
+       {/* Contatos */}
       <Text style={styles.title}>Contatos</Text>
       <FlatList
         data={contatos}
-        renderItem={(item) => 
-        <View>
-          <Image source={`/rota/da/imagem/${item}`} />
-        <Text style={styles.subtitle}>{contatos[item]}</Text>
-        </View>
-        }
-        keyExtractor={(item)=>Object.keys(item)}
+        renderItem={({ item }) => (
+          <View style={styles.contatoItem}>
+            {renderIcon(item.tipo)}
+            <Text style={styles.title}>{item.valor}</Text>
+          </View>
+        )}
+        keyExtractor={(item) => item.tipo}
       />
     </View>
   );
@@ -85,5 +103,10 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
+  },
+  contatoItem: {
+    flexDirection:"row",
+    alignItems:"flex-end",
+    padding:12
   },
 });
