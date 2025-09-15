@@ -13,6 +13,7 @@ import { useState } from "react";
 import Header from "../components/Header";
 import InputUser from "../components/InputObj";
 import InputPassword from "../components/InputPassword";
+import ModalContatos from "../components/ModalContatos";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
@@ -27,18 +28,26 @@ export default function PerfilEdit({ navigation }) {
   const toggleVisibleTrue = () => {
     setIsVisible(true);
   };
-  const toggleContatosModalFalse = ()=>{
+  const toggleContatosModalFalse = () => {
     setContatosVisible(false);
-  }
-  const toggleContatosModalTrue = ()=>{
+  };
+  const toggleContatosModalTrue = () => {
     setContatosVisible(true);
+  };
+
+  const contatos = [
+    {platform:"gmail", value:"emailTeste"},
+  ]
+
+  const addcont = (plataforma, valor) => {
+    contatos.append({platform:plataforma, value:valor});
   }
 
-  const emailAtual = "emailTeste";
   const [user, setUser] = useState({
     username: "Cláudio Ramos",
     email: "emailTeste",
-    bibliografia: "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
+    bibliografia:
+      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
     password: "",
     confirmPassword: "",
     showPassword: true,
@@ -67,7 +76,7 @@ export default function PerfilEdit({ navigation }) {
 
           <TouchableOpacity
             style={[styles.button, { marginBottom: "2%", width: "95%" }]}
-            onPress={()=>navigation.navigate("Perfil")}
+            onPress={() => navigation.navigate("Perfil")}
           >
             <Text style={styles.buttonText}>Salvar Perfil</Text>
           </TouchableOpacity>
@@ -127,19 +136,34 @@ export default function PerfilEdit({ navigation }) {
         </View>
 
         <View style={styles.botView}>
-          <TouchableOpacity style={styles.button} onPress={()=>toggleContatosModalTrue()}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => toggleContatosModalTrue()}
+          >
             <Text style={styles.buttonText}>Adicionar Contatos</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Projetos")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Projetos")}
+          >
             <Text style={styles.buttonText}>Ver meus projetos</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      <BarraLateral isVisible={isVisible} onClose={toggleVisibleFalse} navigation={navigation}/>
+      <BarraLateral
+        isVisible={isVisible}
+        onClose={toggleVisibleFalse}
+        navigation={navigation}
+      />
 
-      <ModalContatos  />
+      <ModalContatos
+        modal={contatosVisible}
+        fechamodal={toggleContatosModalFalse}
+        contatos={contatos}
+        addcont={addcont}
+      />
     </KeyboardAvoidingView>
   );
 }
