@@ -34,7 +34,7 @@ const Curtidas = ({ onPress }) => {
         />
         {liked && <Text style={styles.countText}>1</Text>} 
       </Animated.View>
-      <Text style={styles.title}>design sapato</Text>
+      
     </TouchableOpacity>
   );
 };

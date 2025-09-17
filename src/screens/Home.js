@@ -1,31 +1,29 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
-import Projeto from "../../assets/Projeto";
 import BarraLateral from "../components/BarraLateral";
-import ImagemProjeto from "../components/ImagemProjeto"; 
+import ProjetoImagem from '../../assets/ProjetoImagem.png'; 
 import Header from '../components/HeaderKeyboard';
+import Card from '../components/Card';
 
 export default function Home({ navigation }) {
-
-  const [isVisible, setIsVisible] = useState(false);
-  const [liked, setLiked] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
 
   const handleLike = (newLikedState) => {
-    setLiked(newLikedState);
+    console.log('Curtido:', newLikedState);
   };
 
   return (
     <View style={styles.container}>
-      <Header toggleVisible={toggleVisibleTrue} />
+      <Header toggleVisible={toggleVisibleTrue} navigation={navigation} />
       
       <View style={styles.headerContent}> 
         <View style={styles.card}>
           <View style={styles.imageContainer}>
-            <Image source={Projeto} style={styles.imagem} />
-            <ImagemProjeto onPress={handleLike} />
+            <Image source={ProjetoImagem} style={styles.imagem} />
+            <Card onPress={handleLike} />
           </View>
         </View>
       </View>
