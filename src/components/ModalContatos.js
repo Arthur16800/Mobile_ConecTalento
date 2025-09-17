@@ -7,12 +7,18 @@ import {
   StyleSheet,
   Modal,
 } from "react-native";
-export default function ModalContatos({
-  modal,
-  fechamodal,
-  addcont,
-}) {
+import DropDownPicker from "react-native-dropdown-picker";
+export default function ModalContatos({ modal, fechamodal, addcont }) {
   const [novoValor, setValor] = useState("");
+  const [novaPlat, setNovaPlat] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const optionsPlat = [
+    {label:"Instagram", value:"instagram"},
+    {label:"Facebook", value:"facebook"},
+    {label:"Twitter / X", value:"twitter"},
+  ]
+
   return (
     <Modal
       visible={modal}
@@ -23,14 +29,27 @@ export default function ModalContatos({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.whitebox}>
-          <Text>Adicionar Contato:</Text>
+          <Text style={styles.subtitle}>Adicionar Contato:</Text>
 
           <View>
-            <Text>Selecione a plataforma:</Text>
+            <Text style={styles.subtitle}>Selecione a plataforma:</Text>
+            <DropDownPicker
+              open={open}
+              value={novaPlat}
+              items={optionsPlat}
+              setOpen={setOpen}
+              setValue={setNovaPlat}
+              closeAfterSelecting={true}
+              closeOnBackPressed={true}
+              textStyle={{
+                marginLeft:10,
+                fontSize: 20
+              }}
+            />
           </View>
 
           <View>
-            <Text>Digite o contato (@, Nome de Usuário, etc...):</Text>
+            <Text style={styles.subtitle}>Digite o contato (@, Nome de Usuário, etc...):</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 value={novoValor}
@@ -40,14 +59,19 @@ export default function ModalContatos({
             </View>
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={() => addcont(novaPlat, novoValor)}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => addcont(novaPlat, novoValor)}
+          >
             <Text style={styles.buttonText}>Confirmar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.buttonBack} onPress={() => fechamodal()}>
+          <TouchableOpacity
+            style={styles.buttonBack}
+            onPress={() => fechamodal()}
+          >
             <Text style={styles.buttonBackText}>Cancelar</Text>
           </TouchableOpacity>
-
         </View>
       </View>
     </Modal>
@@ -66,6 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: "5%",
     width: "100%",
     padding: "20",
+    gap:10
   },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 17, fontWeight: "600", color: "#000000", marginBottom: 6 },
@@ -78,7 +103,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 6,
   },
-  input: { flex: 1, fontSize: 16, color: "#333" },
+  input: { flex: 1, fontSize: 20, color: "#333" },
   button: {
     backgroundColor: "#803AD6",
     borderRadius: 12,
@@ -116,6 +141,6 @@ const styles = StyleSheet.create({
     fontFamily: "serif",
     color: "000000",
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom:10
   },
 });

@@ -20,14 +20,14 @@ import BarraLateral from "../components/BarraLateral";
 
 export default function PerfilEdit({ navigation }) {
   const [isVisible, setIsVisible] = useState(false);
-  const [contatosVisible, setContatosVisible] = useState(false);
-
   const toggleVisibleFalse = () => {
     setIsVisible(false);
   };
   const toggleVisibleTrue = () => {
     setIsVisible(true);
   };
+
+  const [contatosVisible, setContatosVisible] = useState(false);
   const toggleContatosModalFalse = () => {
     setContatosVisible(false);
   };
@@ -35,13 +35,17 @@ export default function PerfilEdit({ navigation }) {
     setContatosVisible(true);
   };
 
-  const contatos = [
-    {platform:"gmail", value:"emailTeste"},
-  ]
+  const [contatos, setContatos] = useState([
+    { platform: "email", value: "emailTeste" },
+  ]);
 
   const addcont = (plataforma, valor) => {
-    contatos.append({platform:plataforma, value:valor});
-  }
+     setContatos((contatos) => [
+      ...contatos,
+      { platform: plataforma, value: valor },
+    ]);
+    toggleContatosModalFalse();
+  };
 
   const [user, setUser] = useState({
     username: "Cláudio Ramos",
@@ -145,7 +149,7 @@ export default function PerfilEdit({ navigation }) {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Projetos")}
+            onPress={() => navigation.navigate("Portifolio")}
           >
             <Text style={styles.buttonText}>Ver meus projetos</Text>
           </TouchableOpacity>
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
   colorBar: {
     height: 40,
     width: "100%",
-    backgroundColor: "#ccc",
+    backgroundColor: "magenta", // PLACEHOLDER
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

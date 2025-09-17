@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Image
 } from "react-native";
 import { useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -24,7 +25,6 @@ export default function Perfil({ navigation }) {
   };
 
   const emailAtual = "emailTeste";
-  // SecureStore.getItemAsync("email");
 
   const user = {
     username: "Cláudio Ramos",

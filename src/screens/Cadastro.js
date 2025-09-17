@@ -18,6 +18,7 @@ import logo from "../../assets/logo.png";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
+    name:"",
     username: "",
     email: "",
     password: "",
@@ -33,15 +34,23 @@ export default function Cadastro({ navigation }) {
   const fecharModal = () => {
     setModalConf(false);
   };
-  async function saveToken(token) {
+  async function saveInfo(token, user) {
     await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync("user", user);
   }
   async function handleCadastro() {
     try{
+      console.log("aaa");
       const response = await api.postCadastro(user);
-      saveToken(response.token);
-      gerarCodigo(user.email);
+      console.log("lkj");
+      if(response.data.message === "Código válido. Usuário autenticado."){
+        saveInfo(response.data.token, response.data.user);
+        navigation.navigate("Home");
+      }else if(response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail."){
+        visibModal();
+      }
     }catch(error){
+      Alert.alert("Erro no cadastro", error.data.message.error)
     }
   }
   return (
@@ -52,8 +61,15 @@ export default function Cadastro({ navigation }) {
           <Image source={logo} style={styles.logo} />
           <InputUser
             atributo={"Nome"}
-            variavel={"username"}
+            variavel={"name"}
             texto={"Digite seu nome:"}
+            obj={user}
+            setobj={setUser}
+          />
+          <InputUser
+            atributo={"Nome de Usuário"}
+            variavel={"username"}
+            texto={"Digite seu nome de usuário:"}
             obj={user}
             setobj={setUser}
           />
@@ -81,7 +97,7 @@ export default function Cadastro({ navigation }) {
             setobj={setUser}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={()=>visibModal()}>
+            <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()}>
               <Text style={styles.buttonText}>Criar Conta</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
