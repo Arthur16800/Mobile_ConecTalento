@@ -1,35 +1,40 @@
-import { View, StyleSheet, Image } from "react-native";
-import Projeto from "../../assets/Projeto.png"
-import Header from "../components/Header";
+import React, { useState } from 'react';
+import { View, StyleSheet, Image, Text } from 'react-native';
+import Projeto from "../../assets/Projeto";
 import BarraLateral from "../components/BarraLateral";
-import { useState } from 'react';
+import ImagemProjeto from "../components/ImagemProjeto"; 
+import Header from '../components/HeaderKeyboard';
 
-export default function Home({navigation}) {
+export default function Home({ navigation }) {
 
   const [isVisible, setIsVisible] = useState(false);
+  const [liked, setLiked] = useState(false);
 
-  const toggleVisibleFalse = ()=>{
-    setIsVisible(false);
-  }
+  const toggleVisibleFalse = () => setIsVisible(false);
+  const toggleVisibleTrue = () => setIsVisible(true);
 
-  const toggleVisibleTrue = ()=>{
-    setIsVisible(true);
-  }
+  const handleLike = (newLikedState) => {
+    setLiked(newLikedState);
+  };
+
   return (
+    <View style={styles.container}>
+      <Header toggleVisible={toggleVisibleTrue} />
+      
+      <View style={styles.headerContent}> 
+        <View style={styles.card}>
+          <View style={styles.imageContainer}>
+            <Image source={Projeto} style={styles.imagem} />
+            <ImagemProjeto onPress={handleLike} />
+          </View>
+        </View>
+      </View>
 
-    <View style={styles.container}> 
-    <Header
-    toggleVisible={toggleVisibleTrue}
-    />
-
-    <Image source={Projeto} style={styles.imagem}/>
-    <Image source={Projeto} style={styles.imagem}/>
-
-    <BarraLateral
-    isVisible={isVisible}
-    onClose={toggleVisibleFalse}
-    navigation={navigation}
-    />
+      <BarraLateral
+        isVisible={isVisible}
+        onClose={toggleVisibleFalse}
+        navigation={navigation}
+      />
     </View>
   );
 }
@@ -38,23 +43,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    alignItems:"center",
-    justifyContent: "space-between",
-  },
-  
-  button: {
-    backgroundColor: "#215299",
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 20,
     alignItems: "center",
-    shadowColor: "#215299",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+  },
+  headerContent: {
+    width: '100%',
+    height: 200, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 250, 
+    zIndex: 1,
+  },
+  card: {
+    backgroundColor: "#DADADA", 
+    width: 280, 
+    height: 250, 
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  imageContainer: {
+    position: 'relative', 
+    width: 250, 
+    height: 170, 
   },
   imagem: {
-
-  }
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  heartButton: {
+    position: 'absolute', 
+    top: 20, 
+    right: 20,
+  },
+  title: {
+    marginTop: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
