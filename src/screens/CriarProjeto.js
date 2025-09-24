@@ -1,89 +1,117 @@
 import {
   View,
+  ScrollView,
   Text,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   Image,
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 import Header from "../components/Header";
 import InputObj from "../components/InputObj";
 import BarraLateral from "../components/BarraLateral";
+import AddImagem from "../components/AddImagem";
 
 export default function CriarProjeto({ navigation }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [image, setImage] = useState("");
   const [project, setProject] = useState({
     name: "",
     desc: "",
-    imgUri: "",
+    imgs: images,
   });
 
-  const toggleVisibleFalse = () => {
-    setIsVisible(false);
-  };
+  {/* Lógica imagem */}
 
-  const toggleVisibleTrue = () => {
-    setIsVisible(true);
-  };
+    let images = [];
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+    const pushImage = (imagem) => {
+        images.push(imagem);
+        console.log(images);
     }
-  };
+
+    const deleteImage = (index) => {
+        images.splice(index, 1);
+        console.log(images);
+    }
+
+    function TesteTotalDeletar() {
+        pushImage("Teste");
+        deleteImage("Teste");
+    }
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ["images"],
+          allowsEditing: true,
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          if (images.length < 5) {
+            pushImage(result.assets[0].uri);
+          } else{
+            Alert.alert( "Imagens Demais", "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas.")
+          }
+          console.log(images);
+        }
+      };
+  {/* Fim lógica imagem */}
+  
+  {/* Lógica visible */}
+    const [isVisible, setIsVisible] = useState(false);
+    const toggleVisibleFalse = () => {
+        setIsVisible(false);
+    };
+
+    const toggleVisibleTrue = () => {
+        setIsVisible(true);
+    };
+  {/* Fim lógica visible */}
+
+  function renderImages() {
+    images.forEach((image, index) => {
+        console.log(image, index)
+      return <AddImagem image={image} delimage={deleteImage} index={index} />;
+    });
+  }
 
   return (
     <View style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
-
-      <View style={styles.nomeEdit}>
-        {/* Texto com nome do usuário */}
-        <Text style={styles.title}> Criar um Projeto: </Text>
-      </View>
-
-      <View style={styles.settingEdit}>
-        <InputObj
-          atributo={"Nome do Projeto:"}
-          variavel={"name"}
-          texto={"Digite o nome do projeto:"}
-          obj={project}
-          setobj={setProject}
-        />
-
-        <InputObj
-          atributo={"Descrição:"}
-          variavel={"desc"}
-          texto={"Digite a descrição do projeto:"}
-          obj={project}
-          setobj={setProject}
-        />
-
-        <TouchableOpacity style={styles.button} onPress={pickImage}>
-          <Text style={styles.buttonText}>Inserir Imagem</Text>
-        </TouchableOpacity>
-        {image !== "" && (
-            <View>
-                <Text style={styles.title}> Imagem Selecionada: </Text>
-        <Image source={{ uri: image }} style={styles.image} />
+      <ScrollView
+        contentContainerStyle={{
+          alignItems: "center",
+        }}
+      >
+        <View style={styles.nomeEdit}>
+          {/* Texto com nome do usuário */}
+          <Text style={styles.title}> Criar um Projeto: </Text>
         </View>
-        )}
-      </View>
+
+        <View style={styles.settingEdit}>
+          <InputObj
+            atributo={"Nome do Projeto:"}
+            variavel={"name"}
+            texto={"Digite o nome do projeto:"}
+            obj={project}
+            setobj={setProject}
+          />
+
+          <InputObj
+            atributo={"Descrição:"}
+            variavel={"desc"}
+            texto={"Digite a descrição do projeto:"}
+            obj={project}
+            setobj={setProject}
+          />
+
+          <TouchableOpacity style={styles.button} onPress={TesteTotalDeletar}>
+            <Text style={styles.buttonText}>Inserir Imagem</Text>
+          </TouchableOpacity>
+        </View>
+        {images !== [] && renderImages()}
+      </ScrollView>
 
       <BarraLateral
         isVisible={isVisible}
@@ -138,5 +166,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 18,
+  },
+  photo: {
+    width: "100%",
+    height: 400,
   },
 });
