@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   Modal,
   View,
@@ -22,10 +22,12 @@ export default function Cadastro({ navigation }) {
     email: "",
     password: "",
     confirmPassword: "",
-    showPassword: true,
-    showPassword2: true,
     code: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+
   const [modalConf, setModalConf] = useState(false);
   const visibModal = () => {
     setModalConf(true);
@@ -37,12 +39,11 @@ export default function Cadastro({ navigation }) {
     await SecureStore.setItemAsync("token", token);
   }
   async function handleCadastro() {
-    try{
+    try {
       const response = await api.postCadastro(user);
       saveToken(response.token);
       gerarCodigo(user.email);
-    }catch(error){
-    }
+    } catch (error) {}
   }
   return (
     <View style={styles.container}>
@@ -68,20 +69,25 @@ export default function Cadastro({ navigation }) {
             titulo={"Senha"}
             texto={"Digite sua senha"}
             variavel={"password"}
-            showpassword={"showPassword"}
+            show={showPassword}
+            setShow={setShowPassword}
             obj={user}
             setobj={setUser}
           />
           <InputPassword
-            titulo={"Confirme sua senha"}
-            texto={"Digite sua senha novamente"}
-            variavel={"confirmPassword"}
-            showpassword={"showPassword2"}
+            titulo="Confirme sua senha"
+            texto="Digite sua senha novamente"
+            variavel="confirmPassword"
             obj={user}
             setobj={setUser}
+            show={showPassword2}
+            setShow={setShowPassword2}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={()=>visibModal()}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => visibModal()}
+            >
               <Text style={styles.buttonText}>Criar Conta</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
@@ -94,15 +100,14 @@ export default function Cadastro({ navigation }) {
         </View>
       </ImageBackground>
 
-        
-          <ModalConfirmEmail
-            fechamodal={fecharModal}
-            code={"code"}
-            user={user}
-            setuser={setUser}
-            handle={handleCadastro}
-            modal={modalConf}
-          />
+      <ModalConfirmEmail
+        fechamodal={fecharModal}
+        code={"code"}
+        user={user}
+        setuser={setUser}
+        handle={handleCadastro}
+        modal={modalConf}
+      />
     </View>
   );
 }
@@ -123,7 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     rowGap: "2%",
-    borderRadius:"3%"
+    borderRadius: "3%",
   },
   logo: { position: "absolute", right: 0, top: 10 },
   title: {

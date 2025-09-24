@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Text } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import BarraLateral from "../components/BarraLateral";
 import ProjetoImagem from '../../assets/ProjetoImagem.png'; 
 import Header from '../components/HeaderKeyboard';
 import Card from '../components/Card';
 
 export default function Home({ navigation }) {
-    const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
 
+  // Função handleLike que será passada para o Card
   const handleLike = (newLikedState) => {
     console.log('Curtido:', newLikedState);
   };
@@ -20,13 +21,17 @@ export default function Home({ navigation }) {
       <Header toggleVisible={toggleVisibleTrue} navigation={navigation} />
       
       <View style={styles.headerContent}> 
-        <View style={styles.card}>
-          <View style={styles.imageContainer}>
-            <Image source={ProjetoImagem} style={styles.imagem} />
-            <Card onPress={handleLike} />
-          </View>
+      <Card 
+              imageSource={ProjetoImagem} 
+              title="design sapato" 
+              onLike={handleLike}
+            />            
+            <Card 
+              imageSource={ProjetoImagem} 
+              title="design sapato" 
+              onLike={handleLike}
+            />
         </View>
-      </View>
 
       <BarraLateral
         isVisible={isVisible}
@@ -41,26 +46,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    justifyContent:'center',
     alignItems: "center",
   },
   headerContent: {
     width: '100%',
-    height: 200, 
+    height: 400, 
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    top: 250, 
-    zIndex: 1,
-  },
-  card: {
-    backgroundColor: "#DADADA", 
-    width: 280, 
-    height: 250, 
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    bottom: 170,
   },
   imageContainer: {
     position: 'relative', 

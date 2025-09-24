@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
-import ImagemProjeto from '../components/ImagemProjeto'; // Importando o componente Curtidas
+import ImagemProjeto from '../components/ImagemProjeto'; 
 
 const Card = ({ imageSource, title, onLike }) => {
   const [liked, setLiked] = useState(false);
 
   const handleLike = (newLikedState) => {
     setLiked(newLikedState);
-    onLike(newLikedState); // Passando a lógica para o componente pai (Home)
+    if (onLike) {
+    onLike(newLikedState); 
+    }
   };
 
+  
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
@@ -26,7 +29,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#DADADA", 
     width: 270, 
-    height: 250, 
+    height: 270, 
     padding: 16,
     borderRadius: 12,
     shadowColor: "#000",
@@ -37,11 +40,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    marginBottom: 60,
+    bottom: 40,
   },
   imageContainer: {
     position: 'relative',
     width: 200,
     height: 150,
+    marginBottom: 20,
   },
   imagem: {
     width: '100%',
