@@ -18,6 +18,16 @@ export default function InputPassword({
 }) {
   const [focusedInput, setFocusedInput] = useState(null);
 
+
+  const setObj = setobj;
+
+  const togglePasswordVis = () => {
+    setObj({
+      ...obj,
+      [showpassword]: !obj[showpassword],
+    });
+  };
+
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>{titulo}</Text>
@@ -34,7 +44,7 @@ export default function InputPassword({
           placeholder={texto}
           placeholderTextColor="#999"
           maxLength={50}
-          secureTextEntry={!show}
+          secureTextEntry={!obj[showpassword]}
           value={obj[variavel]}
           onChangeText={(value) => setObj({ ...obj, [variavel]: value })}
           style={styles.input}
@@ -43,7 +53,7 @@ export default function InputPassword({
         />
         <TouchableOpacity onPress={() => setShow(!show)} style={styles.eyeIcon}>
           <Ionicons
-            name={show ? "eye" : "eye-off"}
+            name={obj[showpassword] ? "eye" : "eye-off"}
             size={24}
             color="#808080"
           />
