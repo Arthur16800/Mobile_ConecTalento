@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
-import Entypo from '@expo/vector-icons/Entypo';
+import Entypo from "@expo/vector-icons/Entypo";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 
@@ -29,7 +29,7 @@ export default function Perfil({ navigation }) {
     username: "Cláudio Ramos",
     email: "emailTeste",
     bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
+      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
   };
 
   const contatos = [
@@ -42,13 +42,13 @@ export default function Perfil({ navigation }) {
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
-        return <Entypo name="instagram" size={50} color="black" />
+        return <Entypo name="instagram" size={20} color="black" />;
       case "facebook":
-        return <Entypo name="facebook" size={50} color="black" />
+        return <Entypo name="facebook" size={20} color="black" />;
       case "twitter":
-        return <Entypo name="twitter" size={50} color="black" />
+        return <Entypo name="twitter" size={20} color="black" />;
       case "linkedin":
-        return <Entypo name="linkedin" size={50} color="black" />
+        return <Entypo name="linkedin" size={20} color="black" />;
     }
   };
 
@@ -56,25 +56,29 @@ export default function Perfil({ navigation }) {
     <View style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
 
-      <View style={styles.nomeEdit}>
-        {/* Texto com nome do usuário */}
-         <IoniconsUser name="person" size={40} color="#949599" />
-        <Text style={styles.title}>{user.username}</Text>
+      {/* Ícone de usuário */}
+      <View style={styles.fundoUser}>
+        <IoniconsUser name="person" size={80} color="#949599" />
+      </View>
 
-        {/* Ícone de Lápis */}
-        {emailAtual === user.email ? (
-          <TouchableOpacity onPress={() => navigation.navigate("PerfilEdit")}>
+      {/* Nome do usuário e ícone de lápis ao lado */}
+      <View style={styles.nomeWrapper}>
+        <Text style={styles.name}>{user.username}</Text>
+        {emailAtual === user.email && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("PerfilEdit")}
+            style={styles.editIconWrapper}
+          >
             <MaterialCommunityIcons
               name="pencil-outline"
-              size={40}
+              size={30}
               color="black"
             />
           </TouchableOpacity>
-        ) : null}
+        )}
       </View>
 
       {/* Biografia */}
-      <Text style={styles.title}>Perfil do Usuário</Text>
       {user.bibliografia && (
         <Text style={styles.subtitle}>{user.bibliografia}</Text>
       )}
@@ -86,12 +90,13 @@ export default function Perfil({ navigation }) {
         renderItem={({ item }) => (
           <View style={styles.contatoItem}>
             {renderIcon(item.tipo)}
-            <Text style={styles.title}>{item.valor}</Text>
+            <Text style={styles.contactText}>{item.valor}</Text>
           </View>
         )}
         keyExtractor={(item) => item.tipo}
       />
 
+      {/* Botão para ver projetos */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Portifolio")}
@@ -107,32 +112,67 @@ export default function Perfil({ navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: 'center',
-    paddingTop: 30,
+    justifyContent: "flex-start",
+    paddingTop: 10,
+    paddingBottom: 20, 
   },
-  nomeEdit: {
-    flex: 1,
-    flexDirection: "row",
+  fundoUser: {
+    backgroundColor: "#d2d3d5",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: "center",
-    justifyContent: "space-between",
-    maxHeight: "10%",
-    gap: 15,
+    justifyContent: "center",
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  icon: {
+    position: "absolute",
+  },
+  nomeWrapper: {
+    flexDirection: "row", 
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+  },
+  editIconWrapper: {
+    marginLeft: 5,
+    marginTop: -10,
+  },
+  editIcon: {
+    marginTop: 10,
   },
   title: {
-    fontSize: 40,
+    fontSize: 30,
+    textAlign: "center",
+    marginTop: 10,
+    fontWeight: 'bold',
+  },
+  name: {
+    fontSize: 30,
+    textAlign: "center",
+    marginBottom: 20,
   },
   subtitle: {
+    display: 'flex',
     fontSize: 20,
     paddingHorizontal: "5%",
+    textAlign: 'center',
+    justifyContent:'center',
   },
   contatoItem: {
     flexDirection: "row",
-    alignItems: "flex-end",
-    padding: 12,
+    alignItems: "flex-start",
+    padding: 10,
+  },
+  contactText: {
+    fontSize: 20,
+    marginLeft: 10, 
   },
   button: {
     backgroundColor: "#803AD6",
@@ -146,9 +186,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     width: "80%",
-    marginTop: 10,
-    position: 'absolute',
-    bottom: 30,
+    position: "absolute",
+    bottom: 70, 
   },
   buttonText: {
     color: "#fff",
