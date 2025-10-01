@@ -13,10 +13,11 @@ export default function InputPassword({
   titulo,
   variavel,
   obj,
-  setobj,
-  showpassword,
+  show,
+  setShow
 }) {
   const [focusedInput, setFocusedInput] = useState(null);
+
 
   const setObj = setobj;
 
@@ -50,7 +51,7 @@ export default function InputPassword({
           onFocus={() => setFocusedInput(variavel)}
           onBlur={() => setFocusedInput(null)}
         />
-        <TouchableOpacity onPress={togglePasswordVis} style={styles.eyeIcon}>
+        <TouchableOpacity onPress={() => setShow(!show)} style={styles.eyeIcon}>
           <Ionicons
             name={obj[showpassword] ? "eye" : "eye-off"}
             size={24}

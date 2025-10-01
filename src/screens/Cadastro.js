@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   Modal,
   View,
@@ -18,14 +18,17 @@ import logo from "../../assets/logo.png";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
+    name:"",
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    showPassword: true,
-    showPassword2: true,
     code: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+
   const [modalConf, setModalConf] = useState(false);
   const visibModal = () => {
     setModalConf(true);
@@ -33,24 +36,24 @@ export default function Cadastro({ navigation }) {
   const fecharModal = () => {
     setModalConf(false);
   };
-  async function saveToken(token) {
+  async function saveInfo(token, user) {
     await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync("user", user);
   }
   async function handleCadastro() {
-    await api.postCadastro(user).then(
-      (response) => {
-        if (response.data.message === "Email enviado") {
-          visibModal();
-        } else if ((response.data.registered = true)) {
-          Alert.alert(response.data.message);
-          saveToken(response.data.token);
-          navigation.navigate("Home");
-        }
-      },
-      (error) => {
-        Alert.alert(error.response.data.error);
+    try{
+      console.log("aaa");
+      const response = await api.postCadastro(user);
+      console.log("lkj");
+      if(response.data.message === "Código válido. Usuário autenticado."){
+        saveInfo(response.data.token, response.data.user);
+        navigation.navigate("Home");
+      }else if(response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail."){
+        visibModal();
       }
-    );
+    }catch(error){
+      Alert.alert("Erro no cadastro", error.data.message.error)
+    }
   }
   return (
     <View style={styles.container}>
@@ -60,8 +63,15 @@ export default function Cadastro({ navigation }) {
           <Image source={logo} style={styles.logo} />
           <InputUser
             atributo={"Nome"}
-            variavel={"username"}
+            variavel={"name"}
             texto={"Digite seu nome:"}
+            obj={user}
+            setobj={setUser}
+          />
+          <InputUser
+            atributo={"Nome de Usuário"}
+            variavel={"username"}
+            texto={"Digite seu nome de usuário:"}
             obj={user}
             setobj={setUser}
           />
@@ -76,20 +86,22 @@ export default function Cadastro({ navigation }) {
             titulo={"Senha"}
             texto={"Digite sua senha"}
             variavel={"password"}
-            showpassword={"showPassword"}
+            show={showPassword}
+            setShow={setShowPassword}
             obj={user}
             setobj={setUser}
           />
           <InputPassword
-            titulo={"Confirme sua senha"}
-            texto={"Digite sua senha novamente"}
-            variavel={"confirmPassword"}
-            showpassword={"showPassword2"}
+            titulo="Confirme sua senha"
+            texto="Digite sua senha novamente"
+            variavel="confirmPassword"
             obj={user}
             setobj={setUser}
+            show={showPassword2}
+            setShow={setShowPassword2}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+            <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()}>
               <Text style={styles.buttonText}>Criar Conta</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
@@ -102,22 +114,14 @@ export default function Cadastro({ navigation }) {
         </View>
       </ImageBackground>
 
-      <Modal
-        visible={modalConf}
-        animationType="slide"
-        onRequestClose={() => fecharModal(false)}
-        style={styles.modal}
-      >
-        <View style={styles.whitebox}>
-          <ModalConfirmEmail
-            fechamodal={fecharModal}
-            code={"code"}
-            user={user}
-            setuser={setUser}
-            handle={handleCadastro}
-          />
-        </View>
-      </Modal>
+      <ModalConfirmEmail
+        fechamodal={fecharModal}
+        code={"code"}
+        user={user}
+        setuser={setUser}
+        handle={handleCadastro}
+        modal={modalConf}
+      />
     </View>
   );
 }
@@ -138,6 +142,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     rowGap: "2%",
+    borderRadius: "3%",
   },
   logo: { position: "absolute", right: 0, top: 10 },
   title: {

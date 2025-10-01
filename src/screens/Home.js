@@ -1,34 +1,43 @@
-import { View, StyleSheet, Image } from "react-native";
-import Projeto from "../../assets/Projeto.png"
-import Header from "../components/Header";
+import React, { useState } from 'react';
+import { View, StyleSheet, Image } from 'react-native';
 import BarraLateral from "../components/BarraLateral";
-import { useState } from 'react';
+import ProjetoImagem from '../../assets/ProjetoImagem.png'; 
+import Header from '../components/HeaderKeyboard';
+import Card from '../components/Card';
 
-export default function Home() {
-
+export default function Home({ navigation }) {
   const [isVisible, setIsVisible] = useState(false);
 
-  const toggleVisibleFalse = ()=>{
-    setIsVisible(false);
-  }
+  const toggleVisibleFalse = () => setIsVisible(false);
+  const toggleVisibleTrue = () => setIsVisible(true);
 
-  const toggleVisibleTrue = ()=>{
-    setIsVisible(true);
-  }
+  // Função handleLike que será passada para o Card
+  const handleLike = (newLikedState) => {
+    console.log('Curtido:', newLikedState);
+  };
+
   return (
+    <View style={styles.container}>
+      <Header toggleVisible={toggleVisibleTrue} navigation={navigation} />
+      
+      <View style={styles.headerContent}> 
+      <Card 
+              imageSource={ProjetoImagem} 
+              title="design sapato" 
+              onLike={handleLike}
+            />            
+            <Card 
+              imageSource={ProjetoImagem} 
+              title="design sapato" 
+              onLike={handleLike}
+            />
+        </View>
 
-    <View style={styles.container}> 
-    <Header
-    toggleVisible={toggleVisibleTrue}
-    />
-
-    <Image source={Projeto} style={styles.imagem}/>
-    <Image source={Projeto} style={styles.imagem}/>
-
-    <BarraLateral
-    isVisible={isVisible}
-    
-    />
+      <BarraLateral
+        isVisible={isVisible}
+        onClose={toggleVisibleFalse}
+        navigation={navigation}
+      />
     </View>
   );
 }
@@ -37,23 +46,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    alignItems:"center",
-    justifyContent: "space-evenly",
-  },
-  
-  button: {
-    backgroundColor: "#215299",
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 20,
+    justifyContent:'center',
     alignItems: "center",
-    shadowColor: "#215299",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+  },
+  headerContent: {
+    width: '100%',
+    height: 400, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 170,
+  },
+  imageContainer: {
+    position: 'relative', 
+    width: 250, 
+    height: 170, 
   },
   imagem: {
-
-  }
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  heartButton: {
+    position: 'absolute', 
+    top: 20, 
+    right: 20,
+  },
+  title: {
+    marginTop: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
