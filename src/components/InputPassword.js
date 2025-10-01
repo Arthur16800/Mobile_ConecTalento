@@ -23,7 +23,7 @@ export default function InputPassword({
   const togglePasswordVis = () => {
     setObj({
       ...obj,
-      showpassword: !obj.showpassword,
+      [showpassword]: !obj[showpassword],
     });
   };
 
@@ -43,7 +43,7 @@ export default function InputPassword({
           placeholder={texto}
           placeholderTextColor="#999"
           maxLength={50}
-          secureTextEntry={!obj.showpassword}
+          secureTextEntry={!obj[showpassword]}
           value={obj[variavel]}
           onChangeText={(value) => setObj({ ...obj, [variavel]: value })}
           style={styles.input}
@@ -52,7 +52,7 @@ export default function InputPassword({
         />
         <TouchableOpacity onPress={togglePasswordVis} style={styles.eyeIcon}>
           <Ionicons
-            name={obj.showpassword ? "eye" : "eye-off"}
+            name={obj[showpassword] ? "eye" : "eye-off"}
             size={24}
             color="#808080"
           />
