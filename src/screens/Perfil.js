@@ -4,12 +4,11 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  Image,
 } from "react-native";
 import { useState } from "react";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import IoniconsUser from "@expo/vector-icons/Ionicons";
+import Entypo from '@expo/vector-icons/Entypo';
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 
@@ -37,21 +36,19 @@ export default function Perfil({ navigation }) {
     { tipo: "instagram", valor: "@instagramteste" },
     { tipo: "linkedin", valor: "LinkedinTeste" },
     { tipo: "facebook", valor: "FacebookTeste" },
-    { tipo: "twitter", valor: "Teste" },
+    { tipo: "twitter", valor: "TwitterTeste" },
   ];
 
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
-        return <AntDesign name="instagram" size={50} color="black" />;
+        return <Entypo name="instagram" size={50} color="black" />
       case "facebook":
-        return <AntDesign name="facebook-square" size={50} color="black" />;
+        return <Entypo name="facebook" size={50} color="black" />
       case "twitter":
-        return <FontAwesome6 name="x-twitter" size={50} color="black" />;
+        return <Entypo name="twitter" size={50} color="black" />
       case "linkedin":
-        return <AntDesign name="linkedin-square" size={50} color="black" />;
-      default:
-        return <AntDesign name="questioncircleo" size={50} color="gray" />;
+        return <Entypo name="linkedin" size={50} color="black" />
     }
   };
 
@@ -61,6 +58,7 @@ export default function Perfil({ navigation }) {
 
       <View style={styles.nomeEdit}>
         {/* Texto com nome do usuário */}
+         <IoniconsUser name="person" size={40} color="#949599" />
         <Text style={styles.title}>{user.username}</Text>
 
         {/* Ícone de Lápis */}
@@ -93,6 +91,7 @@ export default function Perfil({ navigation }) {
         )}
         keyExtractor={(item) => item.tipo}
       />
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Portifolio")}
@@ -112,6 +111,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    justifyContent: 'center',
+    paddingTop: 30,
   },
   nomeEdit: {
     flex: 1,
@@ -136,15 +137,18 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#803AD6",
     borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 22,
     alignItems: "center",
     shadowColor: "#803AD6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
-    width: "100%",
+    width: "80%",
+    marginTop: 10,
+    position: 'absolute',
+    bottom: 30,
   },
   buttonText: {
     color: "#fff",

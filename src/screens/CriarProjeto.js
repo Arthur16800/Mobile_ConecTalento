@@ -21,57 +21,68 @@ export default function CriarProjeto({ navigation }) {
     imgs: images,
   });
 
-  {/* Lógica imagem */}
+  {
+    /* Lógica imagem */
+  }
 
-    let images = [];
+  let images = [];
 
-    const pushImage = (imagem) => {
-        images.push(imagem);
-        console.log(images);
+  const pushImage = (imagem) => {
+    images.push(imagem);
+    console.log(images);
+  };
+
+  const deleteImage = (index) => {
+    images.splice(index, 1);
+    console.log(images);
+  };
+
+  function TesteTotalDeletar() {
+    pushImage("Teste");
+    deleteImage("Teste");
+  }
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      if (images.length < 5) {
+        pushImage(result.assets[0].uri);
+      } else {
+        Alert.alert(
+          "Imagens Demais",
+          "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas."
+        );
+      }
+      console.log(images);
     }
+  };
+  {
+    /* Fim lógica imagem */
+  }
 
-    const deleteImage = (index) => {
-        images.splice(index, 1);
-        console.log(images);
-    }
+  {
+    /* Lógica visible */
+  }
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibleFalse = () => {
+    setIsVisible(false);
+  };
 
-    function TesteTotalDeletar() {
-        pushImage("Teste");
-        deleteImage("Teste");
-    }
-
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ["images"],
-          allowsEditing: true,
-          quality: 1,
-        });
-    
-        if (!result.canceled) {
-          if (images.length < 5) {
-            pushImage(result.assets[0].uri);
-          } else{
-            Alert.alert( "Imagens Demais", "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas.")
-          }
-          console.log(images);
-        }
-      };
-  {/* Fim lógica imagem */}
-  
-  {/* Lógica visible */}
-    const [isVisible, setIsVisible] = useState(false);
-    const toggleVisibleFalse = () => {
-        setIsVisible(false);
-    };
-
-    const toggleVisibleTrue = () => {
-        setIsVisible(true);
-    };
-  {/* Fim lógica visible */}
+  const toggleVisibleTrue = () => {
+    setIsVisible(true);
+  };
+  {
+    /* Fim lógica visible */
+  }
 
   function renderImages() {
     images.forEach((image, index) => {
-        console.log(image, index)
+      console.log(image, index);
       return <AddImagem image={image} delimage={deleteImage} index={index} />;
     });
   }
@@ -110,7 +121,6 @@ export default function CriarProjeto({ navigation }) {
             <Text style={styles.buttonText}>Inserir Imagem</Text>
           </TouchableOpacity>
         </View>
-        {images !== [] && renderImages()}
       </ScrollView>
 
       <BarraLateral
