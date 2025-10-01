@@ -41,9 +41,8 @@ export default function Cadastro({ navigation }) {
   }
   async function handleCadastro() {
     try{
-      console.log("aaa");
       const response = await api.postCadastro(user);
-      console.log("lkj");
+      console.log(response.data.message);
       if(response.data.message === "Código válido. Usuário autenticado."){
         saveInfo(response.data.token, response.data.user);
         navigation.navigate("Home");

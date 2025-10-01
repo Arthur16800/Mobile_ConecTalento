@@ -20,36 +20,31 @@ export default function Header({ toggleVisible, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF", // cor da barra e fundo
-  },
   header: {
     width: "100%",
-    backgroundColor: "#6a1b9a", 
-    paddingTop: mvs(20), 
-    paddingBottom: mvs(10), 
-    paddingHorizontal: 20, 
-    alignItems: "center", 
-    },
+    backgroundColor: "#6a1b9a",
+    paddingTop: mvs(20),
+    paddingBottom: mvs(10),
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
   barraTopo: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
-    width: "100%", 
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
   },
   title: {
-    fontSize: mvs(35), 
+    fontSize: mvs(35),
     fontWeight: "bold",
-    color: "#fff", 
+    color: "#fff",
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
-    width: 50, 
-    height: 50, 
-    borderRadius: 25, 
-    alignItems: "center", 
-    justifyContent: "center", 
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
