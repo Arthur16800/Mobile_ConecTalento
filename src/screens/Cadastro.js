@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Image,
   ImageBackground,
+  ActivityIndicator
 } from "react-native";
 import api from "../axios/axios";
 import * as SecureStore from "expo-secure-store";
@@ -16,6 +17,7 @@ import InputUser from "../components/InputObj";
 import InputPassword from "../components/InputPassword";
 import logo from "../../assets/logo.png";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
+
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
     name:"",
@@ -27,7 +29,7 @@ export default function Cadastro({ navigation }) {
     showPassword2: false,
     code: "",
   });
-  
+  const [controlLoad, setControlLoad] = useState(false);
   const [modalConf, setModalConf] = useState(false);
   const visibModal = () => {
     setModalConf(true);
@@ -41,13 +43,16 @@ export default function Cadastro({ navigation }) {
   }
   async function handleCadastro() {
     try{
+      setControlLoad(true);
       const response = await api.postCadastro(user);
       console.log(response.data.message);
       if(response.data.message === "Código válido. Usuário autenticado."){
         saveInfo(response.data.token, response.data.user);
+        setControlLoad(false);
         navigation.navigate("Home");
       }else if(response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail."){
         visibModal();
+        setControlLoad(false);        
       }
     }catch(error){
       Alert.alert("Erro no cadastro", error.data.message.error)
@@ -98,7 +103,7 @@ export default function Cadastro({ navigation }) {
           />
           <View>
             <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()}>
-              <Text style={styles.buttonText}>Criar Conta</Text>
+            {!controlLoad?<Text style={styles.buttonText}>Criar Conta</Text>:<ActivityIndicator color="black" />}
             </TouchableOpacity>
             <View style={styles.footer}>
               <Text style={styles.footerText}>Já possui conta?</Text>
