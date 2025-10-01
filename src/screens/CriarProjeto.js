@@ -110,7 +110,6 @@ export default function CriarProjeto({ navigation }) {
             <Text style={styles.buttonText}>Inserir Imagem</Text>
           </TouchableOpacity>
         </View>
-        {images !== [] && renderImages()}
       </ScrollView>
 
       <BarraLateral

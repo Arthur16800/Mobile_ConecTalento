@@ -1,77 +1,116 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Image, Text } from 'react-native';
-import ImagemProjeto from '../components/ImagemProjeto'; 
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const Card = ({ imageSource, title, onLike }) => {
+const Card = ({ imageSource, title, onLike, styleCard }) => {
   const [liked, setLiked] = useState(false);
+  const [scale] = useState(new Animated.Value(1));
+  const [count, setCount] = useState(0); // Para contar as curtidas
 
-  const handleLike = (newLikedState) => {
+  const handleLike = () => {
+    const newLikedState = !liked;
     setLiked(newLikedState);
-    if (onLike) {
-    onLike(newLikedState); 
+    if (newLikedState) {
+      setCount(count + 1); // Incrementa o contador quando curtir
+    } else {
+      setCount(count - 1); // Decrementa o contador se desfizer o like
     }
+
+    // Chama a função onLike se fornecida
+    if (onLike) {
+      onLike(newLikedState);
+    }
+
+    // Animação do coração
+    Animated.spring(scale, {
+      toValue: 1.2,
+      friction: 3,
+      useNativeDriver: true,
+    }).start(() => {
+      Animated.spring(scale, {
+        toValue: 1,
+        friction: 3,
+        useNativeDriver: true,
+      }).start();
+    });
   };
 
-  
   return (
-    <View style={styles.card}>
+    <View style={styleCard}>
       <View style={styles.imageContainer}>
-        <Image source={imageSource} style={styles.imagem} />
-        <ImagemProjeto onPress={handleLike} /> {/* Coração */}
-        {liked && <Text style={styles.countText}>1</Text>} {/* Número de curtidas */}
+        <Image source={{ uri: imageSource }} style={styles.imagem} />
+
+        <TouchableOpacity onPress={handleLike} style={styles.heartButton}>
+          <Animated.View style={[styles.circle, { transform: [{ scale }] }]}>
+            <Ionicons
+              name={liked ? "heart" : "heart-outline"}
+              size={20}
+              color={liked ? "red" : "black"}
+            />
+          </Animated.View>
+        </TouchableOpacity>
       </View>
+
       <Text style={styles.title}>{title}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#DADADA", 
-    width: 270, 
-    height: 270, 
-    padding: 16,
+  imageContainer: {
+    width: "80%",
+    height: "75%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#DADADA",
+    marginBottom: 10,
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    marginBottom: 60,
-    bottom: 40,
-  },
-  imageContainer: {
-    position: 'relative',
-    width: 200,
-    height: 150,
-    marginBottom: 20,
+    marginTop:15
   },
   imagem: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 8,
   },
   heartButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+    position: "absolute",
+    top: -15,
+    right: -20,
+    zIndex: 2,
+  },
+  circle: {
+    backgroundColor: "white",
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: "black",
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
   },
   countText: {
-    position: 'absolute',
-    top: 30,
-    right: 10,
+    position: "absolute",
+    bottom: -1,
     fontSize: 12,
-    fontWeight: 'bold',
-    color: "#fff",
+    color: "#000",
   },
   title: {
     marginTop: 10,
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
