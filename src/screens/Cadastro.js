@@ -23,12 +23,11 @@ export default function Cadastro({ navigation }) {
     email: "",
     password: "",
     confirmPassword: "",
+    showPassword: false,
+    showPassword2: false,
     code: "",
   });
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
-
+  
   const [modalConf, setModalConf] = useState(false);
   const visibModal = () => {
     setModalConf(true);
@@ -42,9 +41,8 @@ export default function Cadastro({ navigation }) {
   }
   async function handleCadastro() {
     try{
-      console.log("aaa");
       const response = await api.postCadastro(user);
-      console.log("lkj");
+      console.log(response.data.message);
       if(response.data.message === "Código válido. Usuário autenticado."){
         saveInfo(response.data.token, response.data.user);
         navigation.navigate("Home");
@@ -86,8 +84,7 @@ export default function Cadastro({ navigation }) {
             titulo={"Senha"}
             texto={"Digite sua senha"}
             variavel={"password"}
-            show={showPassword}
-            setShow={setShowPassword}
+            showpassword={"showPassword"}
             obj={user}
             setobj={setUser}
           />
@@ -97,8 +94,7 @@ export default function Cadastro({ navigation }) {
             variavel="confirmPassword"
             obj={user}
             setobj={setUser}
-            show={showPassword2}
-            setShow={setShowPassword2}
+            showpassword={"showPassword2"}
           />
           <View>
             <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()}>

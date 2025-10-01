@@ -4,12 +4,11 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  Image,
 } from "react-native";
 import { useState } from "react";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import IoniconsUser from "@expo/vector-icons/Ionicons";
+import Entypo from "@expo/vector-icons/Entypo";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 
@@ -30,28 +29,26 @@ export default function Perfil({ navigation }) {
     username: "Cláudio Ramos",
     email: "emailTeste",
     bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
+      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
   };
 
   const contatos = [
     { tipo: "instagram", valor: "@instagramteste" },
     { tipo: "linkedin", valor: "LinkedinTeste" },
     { tipo: "facebook", valor: "FacebookTeste" },
-    { tipo: "twitter", valor: "Teste" },
+    { tipo: "twitter", valor: "TwitterTeste" },
   ];
 
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
-        return <AntDesign name="instagram" size={50} color="black" />;
+        return <Entypo name="instagram" size={20} color="black" />;
       case "facebook":
-        return <AntDesign name="facebook-square" size={50} color="black" />;
+        return <Entypo name="facebook" size={20} color="black" />;
       case "twitter":
-        return <FontAwesome6 name="x-twitter" size={50} color="black" />;
+        return <Entypo name="twitter" size={20} color="black" />;
       case "linkedin":
-        return <AntDesign name="linkedin-square" size={50} color="black" />;
-      default:
-        return <AntDesign name="questioncircleo" size={50} color="gray" />;
+        return <Entypo name="linkedin" size={20} color="black" />;
     }
   };
 
@@ -59,24 +56,29 @@ export default function Perfil({ navigation }) {
     <View style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
 
-      <View style={styles.nomeEdit}>
-        {/* Texto com nome do usuário */}
-        <Text style={styles.title}>{user.username}</Text>
+      {/* Ícone de usuário */}
+      <View style={styles.fundoUser}>
+        <IoniconsUser name="person" size={80} color="#949599" />
+      </View>
 
-        {/* Ícone de Lápis */}
-        {emailAtual === user.email ? (
-          <TouchableOpacity onPress={() => navigation.navigate("PerfilEdit")}>
+      {/* Nome do usuário e ícone de lápis ao lado */}
+      <View style={styles.nomeWrapper}>
+        <Text style={styles.name}>{user.username}</Text>
+        {emailAtual === user.email && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("PerfilEdit")}
+            style={styles.editIconWrapper}
+          >
             <MaterialCommunityIcons
               name="pencil-outline"
-              size={40}
+              size={30}
               color="black"
             />
           </TouchableOpacity>
-        ) : null}
+        )}
       </View>
 
       {/* Biografia */}
-      <Text style={styles.title}>Perfil do Usuário</Text>
       {user.bibliografia && (
         <Text style={styles.subtitle}>{user.bibliografia}</Text>
       )}
@@ -88,11 +90,13 @@ export default function Perfil({ navigation }) {
         renderItem={({ item }) => (
           <View style={styles.contatoItem}>
             {renderIcon(item.tipo)}
-            <Text style={styles.title}>{item.valor}</Text>
+            <Text style={styles.contactText}>{item.valor}</Text>
           </View>
         )}
         keyExtractor={(item) => item.tipo}
       />
+
+      {/* Botão para ver projetos */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Portifolio")}
@@ -108,43 +112,82 @@ export default function Perfil({ navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 10,
+    paddingBottom: 20, 
   },
-  nomeEdit: {
-    flex: 1,
-    flexDirection: "row",
+  fundoUser: {
+    backgroundColor: "#d2d3d5",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: "center",
-    justifyContent: "space-between",
-    maxHeight: "10%",
-    gap: 15,
+    justifyContent: "center",
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  icon: {
+    position: "absolute",
+  },
+  nomeWrapper: {
+    flexDirection: "row", 
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+  },
+  editIconWrapper: {
+    marginLeft: 5,
+    marginTop: -10,
+  },
+  editIcon: {
+    marginTop: 10,
   },
   title: {
-    fontSize: 40,
+    fontSize: 30,
+    textAlign: "center",
+    marginTop: 10,
+    fontWeight: 'bold',
+  },
+  name: {
+    fontSize: 30,
+    textAlign: "center",
+    marginBottom: 20,
   },
   subtitle: {
+    display: 'flex',
     fontSize: 20,
     paddingHorizontal: "5%",
+    textAlign: 'center',
+    justifyContent:'center',
   },
   contatoItem: {
     flexDirection: "row",
-    alignItems: "flex-end",
-    padding: 12,
+    alignItems: "flex-start",
+    padding: 10,
+  },
+  contactText: {
+    fontSize: 20,
+    marginLeft: 10, 
   },
   button: {
     backgroundColor: "#803AD6",
     borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 22,
     alignItems: "center",
     shadowColor: "#803AD6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
-    width: "100%",
+    width: "80%",
+    position: "absolute",
+    bottom: 70, 
   },
   buttonText: {
     color: "#fff",

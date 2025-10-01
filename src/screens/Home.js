@@ -1,38 +1,68 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import Header from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
-import ProjetoImagem from '../../assets/ProjetoImagem.png'; 
-import Header from '../components/HeaderKeyboard';
-import Card from '../components/Card';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Dimensions, FlatList } from "react-native";
+import Card from "../components/Card";
+import api from "../axios/axios";
+
+// Obter altura da tela para o cálculo
+const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width; // Para pegar a largura da tela
 
 export default function Home({ navigation }) {
+  const [projects, setProjects] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
 
-  // Função handleLike que será passada para o Card
   const handleLike = (newLikedState) => {
-    console.log('Curtido:', newLikedState);
+    console.log("Curtido:", newLikedState);
   };
+
+  useEffect(() => {
+    async function getProjects() {
+      try {
+        const response = await api.getProjects();
+        console.log(response.data.profile_projeto);
+        setProjects(response.data.profile_projeto);
+        
+      } catch (error) {
+        console.log("Erro no cadastro", error.data.message.error);
+      }
+    }
+    getProjects();
+    console.log(projects);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Header toggleVisible={toggleVisibleTrue} navigation={navigation} />
+      <Header toggleVisible={toggleVisibleTrue}/>
       
-      <View style={styles.headerContent}> 
-      <Card 
-              imageSource={ProjetoImagem} 
-              title="design sapato" 
-              onLike={handleLike}
-            />            
-            <Card 
-              imageSource={ProjetoImagem} 
-              title="design sapato" 
-              onLike={handleLike}
-            />
-        </View>
+      <FlatList
+        data={projects}
+        keyExtractor={(item) => item.ID_projeto}
+        renderItem={({ item }) =>{
 
+          const uriImage =
+              "data:" + item.tipo_imagem + ";base64," + item.imagem;
+
+          return (
+            <Card 
+              imageSource={uriImage} 
+              title={item.titulo} 
+              onLike={handleLike}
+              styleCard={styles.card}
+            />
+          )
+        } }
+        contentContainerStyle={{
+          flexGrow: 1,
+          alignItems: "center",
+          paddingHorizontal: 10, 
+        }}
+      />
+      
       <BarraLateral
         isVisible={isVisible}
         onClose={toggleVisibleFalse}
@@ -45,36 +75,28 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    justifyContent:'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    width: "100%", 
+  },
+  card: {
+    width: screenWidth * 0.80, 
+    height: screenHeight * 0.3, 
+    justifyContent: "center",
     alignItems: "center",
-  },
-  headerContent: {
-    width: '100%',
-    height: 400, 
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    bottom: 170,
-  },
-  imageContainer: {
-    position: 'relative', 
-    width: 250, 
-    height: 170, 
-  },
-  imagem: {
-    width: '100%',
-    height: '100%',
+    backgroundColor: "#DADADA",
+    marginBottom: 10,
     borderRadius: 8,
-  },
-  heartButton: {
-    position: 'absolute', 
-    top: 20, 
-    right: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+    marginTop:75
   },
   title: {
-    marginTop: 10,
-    fontSize: 16,
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
