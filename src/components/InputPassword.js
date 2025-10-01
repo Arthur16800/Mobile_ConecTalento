@@ -13,21 +13,17 @@ export default function InputPassword({
   titulo,
   variavel,
   obj,
-  show,
-  setShow
+  setobj,
+  showpassword,
 }) {
   const [focusedInput, setFocusedInput] = useState(null);
 
-
-  const setObj = setobj;
-
-  const togglePasswordVis = () => {
-    setObj({
+   const togglePasswordVis = () => {
+    setobj({
       ...obj,
       [showpassword]: !obj[showpassword],
     });
   };
-
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>{titulo}</Text>
@@ -46,12 +42,12 @@ export default function InputPassword({
           maxLength={50}
           secureTextEntry={!obj[showpassword]}
           value={obj[variavel]}
-          onChangeText={(value) => setObj({ ...obj, [variavel]: value })}
+          onChangeText={(value) => setobj({ ...obj, [variavel]: value })}
           style={styles.input}
           onFocus={() => setFocusedInput(variavel)}
           onBlur={() => setFocusedInput(null)}
         />
-        <TouchableOpacity onPress={() => setShow(!show)} style={styles.eyeIcon}>
+        <TouchableOpacity onPress={(togglePasswordVis)} style={styles.eyeIcon}>
           <Ionicons
             name={obj[showpassword] ? "eye" : "eye-off"}
             size={24}
