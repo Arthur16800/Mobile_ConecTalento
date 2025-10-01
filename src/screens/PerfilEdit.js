@@ -19,29 +19,47 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
 
 export default function PerfilEdit({ navigation }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [contatosVisible, setContatosVisible] = useState(false);
+  const [contatos, setContatos] = useState([
+    { platform: "email", value: "emailTeste" },
+  ]);
 
-  const toggleVisibleFalse = () => {
-    setIsVisible(false);
-  };
-  const toggleVisibleTrue = () => {
-    setIsVisible(true);
-  };
+  // Modal BarraLateral;
+    const [isVisible, setIsVisible] = useState(false);
+    const toggleVisibleFalse = () => {
+      setIsVisible(false);
+    };
+    const toggleVisibleTrue = () => {
+      setIsVisible(true);
+    };
+  // Fim Modal
+
+  // Modal AddContatos
+  const [contatosVisible, setContatosVisible] = useState(false);
   const toggleContatosModalFalse = () => {
     setContatosVisible(false);
   };
   const toggleContatosModalTrue = () => {
     setContatosVisible(true);
   };
+  // Fim Modal;
 
-  const contatos = [
-    {platform:"gmail", value:"emailTeste"},
-  ]
+  // Modal MudarSenha
+  const [senhaModal, setSenhaModal] = useState(false);
+  const toggleSenhaModalFalse = () => {
+    setSenhaModal(false);
+  };
+  const toggleSenhaModalTrue = () => {
+    setSenhaModal(true);
+  };
+  // Fim Modal
 
   const addcont = (plataforma, valor) => {
-    contatos.append({platform:plataforma, value:valor});
-  }
+     setContatos((contatos) => [
+      ...contatos,
+      { platform: plataforma, value: valor },
+    ]);
+    toggleContatosModalFalse();
+  };
 
   const [user, setUser] = useState({
     username: "Cláudio Ramos",
@@ -145,9 +163,9 @@ export default function PerfilEdit({ navigation }) {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Projetos")}
+            onPress={() => toggleSenhaModalTrue()}
           >
-            <Text style={styles.buttonText}>Ver meus projetos</Text>
+            <Text style={styles.buttonText}>Mudar minha senha</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -197,7 +215,7 @@ const styles = StyleSheet.create({
   colorBar: {
     height: 40,
     width: "100%",
-    backgroundColor: "#ccc",
+    backgroundColor: "magenta", // PLACEHOLDER
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

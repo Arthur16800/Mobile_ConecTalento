@@ -3,6 +3,8 @@ import CadastroScreen from "./screens/Cadastro";
 import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
 import PerfilEdit from "./screens/PerfilEdit";
+import Portifolio from "./screens/Portifolio";
+import CriarProjeto from "./screens/CriarProjeto";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -19,6 +21,8 @@ export default function App() {
 
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="PerfilEdit" component={PerfilEdit} />
+        <Stack.Screen name="Portifolio" component={Portifolio} />
+        <Stack.Screen name="CriarProjeto" component={CriarProjeto} />        
       </Stack.Navigator>
     </NavigationContainer>
   );

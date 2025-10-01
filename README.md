@@ -29,9 +29,9 @@ Rode o comando para iniciar a aplicação:
    npx expo start
    ```
 
-4. Abra o aplicativo "Android Studio", vá em "More Actions" e selecione "Virtual Device Manager" e clique na opção "Galaxy Mini API 33".
+4. Abra o aplicativo "Android Studio", vá em "More Actions", selecione "Virtual Device Manager" e clique na opção "Galaxy Mini API 33".
 
-5. Após ligar o emulador, clique no botão de ligar para o aparelho começar a funcionar.
+5. Após ligar o emulador, clique no primeiro botão da barra para o aparelho começar a funcionar.
 
 - Abra novamente o Terminal e pressione a tecla "a" para abrir a aplicação no Android. 
 

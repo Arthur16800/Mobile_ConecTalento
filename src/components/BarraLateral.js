@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from '@expo/vector-icons/Feather';
 
 const { width } = Dimensions.get("window");
 
@@ -59,21 +60,29 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
       <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
         <FlatList
           data={[
+            { key: ""},
             { key: "Cláudio Ramos" },
             { key: "Página Inicial", page: "Home" },
             { key: "Meu perfil", page: "Perfil" },
-            { key: "Portifólio", page: "Portfolio" },
-            { key: "Criar um novo objeto", page: "CreateProj" },
+            { key: "Portifólio", page: "Portifolio" },
+            { key: "Criar um novo Projeto", page: "CriarProjeto" },
             { key: "Desconectar (Log-out)" },
           ]}
           renderItem={({ item }) => {
             if (item.key === "Cláudio Ramos") {
               return (
-                <TouchableOpacity style={styles.styleRender} onPress={onClose}>
+                <TouchableOpacity style={[styles.styleRender, {justifyContent:"space-between"}]} onPress={onClose}>
                   <Text style={[styles.item, styles.nomeUsuario]}>
                     {item.key}
                   </Text>
-                  <AntDesign name="right" size={36} color="white" />
+                </TouchableOpacity>
+              );
+            }
+
+            if (item.key === "") {
+              return (
+                <TouchableOpacity style={[styles.styleRender, {justifyContent:"flex-end", padding:"10"}]} onPress={onClose}>
+                  <Feather name="x" size={32} color="white" />
                 </TouchableOpacity>
               );
             }

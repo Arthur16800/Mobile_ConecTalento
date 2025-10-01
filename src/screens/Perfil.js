@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Image,
 } from "react-native";
 import { useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -24,12 +25,12 @@ export default function Perfil({ navigation }) {
   };
 
   const emailAtual = "emailTeste";
-  // SecureStore.getItemAsync("email");
 
   const user = {
     username: "Cláudio Ramos",
     email: "emailTeste",
-    bibliografia: "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
+    bibliografia:
+      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
   };
 
   const contatos = [
@@ -56,10 +57,7 @@ export default function Perfil({ navigation }) {
 
   return (
     <View style={styles.container}>
-
-    <Header
-    toggleVisible={toggleVisibleTrue}
-    />
+      <Header toggleVisible={toggleVisibleTrue} />
 
       <View style={styles.nomeEdit}>
         {/* Texto com nome do usuário */}
@@ -95,6 +93,13 @@ export default function Perfil({ navigation }) {
         )}
         keyExtractor={(item) => item.tipo}
       />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Portifolio")}
+      >
+        <Text style={styles.buttonText}>Ver meus projetos</Text>
+      </TouchableOpacity>
+
       <BarraLateral
         isVisible={isVisible}
         onClose={toggleVisibleFalse}
@@ -121,11 +126,29 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    paddingHorizontal:"5%",
+    paddingHorizontal: "5%",
   },
   contatoItem: {
     flexDirection: "row",
     alignItems: "flex-end",
     padding: 12,
+  },
+  button: {
+    backgroundColor: "#803AD6",
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    shadowColor: "#803AD6",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 5,
+    width: "100%",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 18,
   },
 });
