@@ -1,4 +1,4 @@
-import {useState} from "react"
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,8 @@ import {
   StyleSheet,
   Image,
   ImageBackground,
-  StatusBar
+  StatusBar,
+  ActivityIndicator
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 // axios
@@ -24,21 +25,26 @@ export default function Login({ navigation }) {
     email: "",
     password: "",
     showPassword: true,
-  });
+  });  
+  const [controlLoad, setControlLoad] = useState(false);
+
 
   async function saveToken(token) {
     await SecureStore.setItemAsync("token", token);
   }
 
   async function handleLogin() {
+    setControlLoad(true);
     await api.postLogin(user).then(
       (response) => {
         Alert.alert(response.data.message);
         saveToken(response.data.token);
+        setControlLoad(false);
         navigation.navigate("Home");
       },
       (error) => {
         Alert.alert(error.response.data.error);
+        setControlLoad(false);
       }
     );
   }
@@ -60,8 +66,8 @@ export default function Login({ navigation }) {
               atributo={"Usuário"}
               variavel={"email"}
               texto={"Digite seu E-mail:"}
-          obj={user}
-          setobj={setUser}
+              obj={user}
+              setobj={setUser}
             />
 
             <InputPassword
@@ -69,13 +75,21 @@ export default function Login({ navigation }) {
               texto={"Digite sua senha"}
               variavel={"password"}
               showpassword={"showPassword"}
-          obj={user}
-          setobj={setUser}
+              obj={user}
+              setobj={setUser}
             />
           </View>
           <View>
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Entrar</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleLogin}
+              disabled={controlLoad}
+            >
+              {controlLoad ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.buttonText}>Entrar</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.footer}>
@@ -118,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     rowGap: "3%",
-    borderRadius:"8px"
+    borderRadius: "8px",
   },
   logo: {
     position: "absolute",

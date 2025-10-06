@@ -102,8 +102,8 @@ export default function Cadastro({ navigation }) {
             showpassword={"showPassword2"}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()}>
-            {!controlLoad?<Text style={styles.buttonText}>Criar Conta</Text>:<ActivityIndicator color="black" />}
+            <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()} disabled={controlLoad}>
+            {controlLoad?<ActivityIndicator color="white" />:<Text style={styles.buttonText}>Criar Conta</Text>}
             </TouchableOpacity>
             <View style={styles.footer}>
               <Text style={styles.footerText}>Já possui conta?</Text>
@@ -122,6 +122,7 @@ export default function Cadastro({ navigation }) {
         setuser={setUser}
         handle={handleCadastro}
         modal={modalConf}
+        clickable={controlLoad}
       />
     </View>
   );

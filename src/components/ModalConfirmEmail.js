@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  ActivityIndicator
 } from "react-native";
 export default function ModalConfirmEmail({
   code,
@@ -13,6 +14,7 @@ export default function ModalConfirmEmail({
   handle,
   fechamodal,
   modal,
+  clickable
 }) {
   const changeUser = (value) => setuser((user) => ({ ...user, code: value }));
   return (
@@ -40,8 +42,8 @@ export default function ModalConfirmEmail({
               />
             </View>
           </View>
-          <TouchableOpacity style={styles.button} onPress={handle}>
-            <Text style={styles.buttonText}>Confirmar</Text>
+          <TouchableOpacity style={styles.button} onPress={handle} disabled={clickable}>
+          {clickable?<ActivityIndicator color="white" />:<Text style={styles.buttonText}>Confirmar</Text>}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.buttonBack}
