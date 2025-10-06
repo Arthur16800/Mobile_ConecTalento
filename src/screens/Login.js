@@ -51,7 +51,7 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <ImageBackground source={backgroundLogin} style={styles.background}>
         <View style={styles.whiteboard}>
           <Text style={styles.title}>Login</Text>

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  StatusBar
 } from "react-native";
 import { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -54,6 +55,7 @@ export default function Perfil({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
 
       {/* Ícone de usuário */}

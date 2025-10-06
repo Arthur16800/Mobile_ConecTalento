@@ -8,7 +8,8 @@ import {
   StyleSheet,
   Image,
   ImageBackground,
-  ActivityIndicator
+  ActivityIndicator,
+  StatusBar
 } from "react-native";
 import api from "../axios/axios";
 import * as SecureStore from "expo-secure-store";
@@ -60,6 +61,7 @@ export default function Cadastro({ navigation }) {
   }
   return (
     <View style={styles.container}>
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <ImageBackground source={backgroundLogin} style={styles.background}>
         <View style={styles.whiteboard}>
           <Text style={styles.title}>Cadastro</Text>

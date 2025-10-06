@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  StatusBar
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -29,18 +30,11 @@ export default function CriarProjeto({ navigation }) {
 
   const pushImage = (imagem) => {
     images.push(imagem);
-    console.log(images);
   };
 
   const deleteImage = (index) => {
     images.splice(index, 1);
-    console.log(images);
   };
-
-  function TesteTotalDeletar() {
-    pushImage("Teste");
-    deleteImage("Teste");
-  }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -48,7 +42,6 @@ export default function CriarProjeto({ navigation }) {
       allowsEditing: true,
       quality: 1,
     });
-
     if (!result.canceled) {
       if (images.length < 5) {
         pushImage(result.assets[0].uri);
@@ -61,6 +54,18 @@ export default function CriarProjeto({ navigation }) {
       console.log(images);
     }
   };
+
+  function renderImages() {
+    if ((images.length = 0)) {
+      return <Text>Nenhuma imagem anexada.</Text>;
+    } else {
+      images.map((image, index) => {
+        console.log(image, index);
+        return <AddImagem image={image} delimage={deleteImage} index={index} />;
+      });
+    }
+  }
+
   {
     /* Fim lógica imagem */
   }
@@ -72,7 +77,6 @@ export default function CriarProjeto({ navigation }) {
   const toggleVisibleFalse = () => {
     setIsVisible(false);
   };
-
   const toggleVisibleTrue = () => {
     setIsVisible(true);
   };
@@ -80,15 +84,9 @@ export default function CriarProjeto({ navigation }) {
     /* Fim lógica visible */
   }
 
-  function renderImages() {
-    images.forEach((image, index) => {
-      console.log(image, index);
-      return <AddImagem image={image} delimage={deleteImage} index={index} />;
-    });
-  }
-
   return (
     <View style={styles.container}>
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
       <ScrollView
         contentContainerStyle={{
@@ -117,7 +115,7 @@ export default function CriarProjeto({ navigation }) {
             setobj={setProject}
           />
 
-          <TouchableOpacity style={styles.button} onPress={TesteTotalDeletar}>
+          <TouchableOpacity style={styles.button} onPress={pickImage}>
             <Text style={styles.buttonText}>Inserir Imagem</Text>
           </TouchableOpacity>
         </View>
@@ -138,14 +136,11 @@ const styles = StyleSheet.create({
   },
   nomeEdit: {
     flex: 1,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    maxHeight: "10%",
-    gap: 15,
+    marginVertical: "5%",
   },
   settingEdit: {
-    width: "85%",
+    width: "100%",
     gap: 12,
   },
   title: {

@@ -24,13 +24,13 @@ export default function PerfilEdit({ navigation }) {
   ]);
 
   // Modal BarraLateral;
-    const [isVisible, setIsVisible] = useState(false);
-    const toggleVisibleFalse = () => {
-      setIsVisible(false);
-    };
-    const toggleVisibleTrue = () => {
-      setIsVisible(true);
-    };
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibleFalse = () => {
+    setIsVisible(false);
+  };
+  const toggleVisibleTrue = () => {
+    setIsVisible(true);
+  };
   // Fim Modal
 
   // Modal AddContatos
@@ -54,7 +54,7 @@ export default function PerfilEdit({ navigation }) {
   // Fim Modal
 
   const addcont = (plataforma, valor) => {
-     setContatos((contatos) => [
+    setContatos((contatos) => [
       ...contatos,
       { platform: plataforma, value: valor },
     ]);
@@ -77,7 +77,7 @@ export default function PerfilEdit({ navigation }) {
       style={styles.wrapper}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <ScrollView contentContainerStyle={styles.container}>
         <Header toggleVisible={toggleVisibleTrue} />
 

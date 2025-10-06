@@ -1,7 +1,7 @@
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, FlatList } from "react-native";
+import { View, StyleSheet, Dimensions, FlatList, StatusBar } from "react-native";
 import Card from "../components/Card";
 import api from "../axios/axios";
 
@@ -43,6 +43,7 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <HeaderK
         toggleVisible={toggleVisibleTrue}
         text={search}
