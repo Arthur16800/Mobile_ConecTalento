@@ -10,7 +10,12 @@ import Feather from "@expo/vector-icons/Feather";
 import Entypo from "@expo/vector-icons/Entypo";
 import { mvs } from "react-native-size-matters"; // A função mvs é útil para escalar tamanhos de fonte.
 
-export default function Header({ toggleVisible, navigation }) {
+export default function Header({
+  toggleVisible,
+  text,
+  setText,
+  getFunction,
+}) {
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>
@@ -26,13 +31,30 @@ export default function Header({ toggleVisible, navigation }) {
       <View style={styles.barraBot}>
         <View style={styles.barraPesquisa}>
           <TextInput
+            style={{ flex: 1 }}
             placeholder="Pesquise Projetos:"
             onChangeText={(newText) => setText(newText)}
-            value={"ola"}
+            value={text}
+            enterKeyHint={"search"}
+            onSubmitEditing={(text) => {
+              getFunction(text);
+            }}
           />
+
           <View style={styles.icons}>
-            <Feather name="filter" size={30} color="black" />
-            <Entypo name="magnifying-glass" size={30} color="black" />
+            <TouchableOpacity
+
+            >
+              <Feather name="filter" size={30} color="black" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={(text) => {
+                getFunction(text);
+              }}
+            >
+              <Entypo name="magnifying-glass" size={30} color="black" />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -48,7 +70,7 @@ const styles = StyleSheet.create({
     paddingBottom: mvs(10),
     paddingHorizontal: 20,
     alignItems: "center",
-    justifyContent:"space-evenly"
+    justifyContent: "space-evenly",
   },
   barraTopo: {
     flexDirection: "row",
@@ -92,9 +114,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  icons:{
-    display:"flex",
-    flexDirection:"row",
-    gap:10,
-  }
+  icons: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+  },
 });

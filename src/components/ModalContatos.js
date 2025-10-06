@@ -25,7 +25,6 @@ export default function ModalContatos({ modal, fechamodal, addcont }) {
       animationType="slide"
       transparent={true}
       onRequestClose={() => fechamodal()}
-      style={styles.modal}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.whitebox}>

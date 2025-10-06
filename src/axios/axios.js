@@ -21,7 +21,7 @@ const sheets = {
   postLogin: (user) => api.post("login", user),
   postCadastro: (user) => api.post("user", user),
   getProjects:()=> api.get("projects"),
-  
+  searchProjects:(text)=>api.post("ROTA AINDA NÃO DESENVOLVIDA"),
 };
 
 export default sheets;
