@@ -38,9 +38,11 @@ export default function Cadastro({ navigation }) {
   const fecharModal = () => {
     setModalConf(false);
   };
-  async function saveInfo(token, user) {
+  async function saveInfo(token, userP) {
     await SecureStore.setItemAsync("token", token);
-    await SecureStore.setItemAsync("user", user);
+    await SecureStore.setItemAsync("username", userP.username);
+    await SecureStore.setItemAsync("email", userP.email);
+    await SecureStore.setItemAsync("id", userP.ID_user.toString());
   }
   async function handleCadastro() {
     try{
@@ -50,6 +52,7 @@ export default function Cadastro({ navigation }) {
       if(response.data.message === "Código válido. Usuário autenticado."){
         saveInfo(response.data.token, response.data.user);
         setControlLoad(false);
+        Alert.alert("Usuário criado com sucesso!");
         navigation.navigate("Home");
       }else if(response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail."){
         visibModal();

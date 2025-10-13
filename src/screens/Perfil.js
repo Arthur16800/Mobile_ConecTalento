@@ -4,16 +4,22 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  StatusBar
+  StatusBar,
 } from "react-native";
-import { useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import { useState, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
+import { ScrollView } from "react-native-gesture-handler";
+import api from "../axios/axios";
+
 
 export default function Perfil({ navigation }) {
+  const [emailAtual, setEmail] = useState("");
+  const [user, setUser] = useState({});
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => {
@@ -24,21 +30,40 @@ export default function Perfil({ navigation }) {
     setIsVisible(true);
   };
 
-  const emailAtual = "emailTeste";
+  async function getEmail() {
+    setEmail(await SecureStore.getItemAsync("email"));
+  }
 
-  const user = {
-    username: "Cláudio Ramos",
-    email: "emailTeste",
-    bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
-  };
+  async function getUser(){
+    try{
+      const name = await SecureStore.getItemAsync("username");
+      const response = await api.getUserByName(name);
+      setUser(response.data.profile);
+    }catch(error){
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
+  async function getContatos() {
+    try {
+      const response = await api.getContacts(userStore.username);
+      setContatos(response.data.contacts);
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
 
-  const contatos = [
+  useEffect(() => {
+    getEmail();
+    getUser();
+    // getContatos();
+  }, []);
+
+  const [contatos, setContatos] = useState([
     { tipo: "instagram", valor: "@instagramteste" },
     { tipo: "linkedin", valor: "LinkedinTeste" },
     { tipo: "facebook", valor: "FacebookTeste" },
     { tipo: "twitter", valor: "TwitterTeste" },
-  ];
+  ]);
 
   const renderIcon = (tipo) => {
     switch (tipo) {
@@ -55,8 +80,10 @@ export default function Perfil({ navigation }) {
 
   return (
     <View style={styles.container}>
+      
       <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 80 }}>
 
       {/* Ícone de usuário */}
       <View style={styles.fundoUser}>
@@ -81,22 +108,18 @@ export default function Perfil({ navigation }) {
       </View>
 
       {/* Biografia */}
-      {user.bibliografia && (
-        <Text style={styles.subtitle}>{user.bibliografia}</Text>
+      {user.biografia && (
+        <Text style={styles.subtitle}>{user.biografia}</Text>
       )}
 
       {/* Contatos */}
       <Text style={styles.title}>Contatos</Text>
-      <FlatList
-        data={contatos}
-        renderItem={({ item }) => (
-          <View style={styles.contatoItem}>
+        {contatos.map((item) => (
+          <View key={item.tipo} style={styles.contatoItem}>
             {renderIcon(item.tipo)}
-            <Text style={styles.contactText}>{item.valor}</Text>
+          <Text style={styles.contactText}>{item.valor}</Text>
           </View>
-        )}
-        keyExtractor={(item) => item.tipo}
-      />
+        ))}
 
       {/* Botão para ver projetos */}
       <TouchableOpacity
@@ -105,7 +128,7 @@ export default function Perfil({ navigation }) {
       >
         <Text style={styles.buttonText}>Ver meus projetos</Text>
       </TouchableOpacity>
-
+      </ScrollView>
       <BarraLateral
         isVisible={isVisible}
         onClose={toggleVisibleFalse}
@@ -118,85 +141,90 @@ export default function Perfil({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 180,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingBottom: 20, 
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
     width: 170,
     height: 170,
-    borderRadius: 200,
+    borderRadius: 85,
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
     marginBottom: 15,
-    marginTop: 15,
-  },
-  icon: {
-    position: "absolute",
   },
   nomeWrapper: {
-    flexDirection: "row", 
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    position:'relative',
-    gap: 8,
+    position: "relative",
+
+    marginBottom: 15,
   },
   editIconWrapper: {
-    position: 'absolute',
-    right: -35,
+    position: "absolute",
+    right: 5,
     top: "50%",
-    transform: [{ translateY: -26 }],
+    transform: [{ translateY: -13 }],
   },
-  editIcon: {
-    marginTop: 0,
-  },
+
   title: {
     fontSize: 30,
     textAlign: "center",
     marginTop: 2,
-   },
+  },
   name: {
-    fontSize: 50,
+    fontSize: 40,
+    fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30,
   },
   subtitle: {
-    fontSize: 22,
-    paddingHorizontal: "20",
-    textAlign: 'justify',
-    lineHeight: 26,
+    fontSize: 20,
+    textAlign: "justify",
+    lineHeight: 24,
     marginBottom: 20,
-    justifyContent:'center',
-    flexDirection:'row',
+  },
+  contatosContainer: {
+    marginBottom: 20,
   },
   contatoItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 4,
+    marginBottom: 10,
   },
   contactText: {
-    fontSize: 30,
-    marginLeft: 10, 
+
+    fontSize: 18,
+
+    marginLeft: 10,
   },
   button: {
     backgroundColor: "#803AD6",
     borderRadius: 12,
     paddingVertical: 12,
-    paddingHorizontal: 22,
+    paddingHorizontal: 25,
     alignItems: "center",
     shadowColor: "#803AD6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
+    marginTop: 40,     
+    marginBottom: 60,  
     width: "80%",
     position: "absolute",
-    bottom: 30, 
+    bottom: 30,
   },
   buttonText: {
     color: "#fff",
     fontWeight: "700",
-    fontSize: 23,
+    fontSize: 20,
   },
 });
