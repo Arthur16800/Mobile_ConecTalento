@@ -25,7 +25,7 @@ export default function CriarProjeto({ navigation }) {
   });
 
   useLayoutEffect(() => {
-    StatusBar.setBarStyle("dark-content"); // Define o conteúdo escuro
+    StatusBar.setBarStyle("dark-content"); 
     StatusBar.setBackgroundColor("transparent"); 
   }, []);
 

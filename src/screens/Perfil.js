@@ -147,8 +147,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 180,
-    alignItems: "center",
-    justifyContent: "flex-start",
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",

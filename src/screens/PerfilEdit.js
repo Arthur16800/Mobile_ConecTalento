@@ -21,10 +21,12 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
 import ModalMudarSenha from "../components/ModalMudarSenha";
 import * as SecureStore from "expo-secure-store";
-import {Image as RNImage} from "react-native";
+import { Image as RNImage } from "react-native";
 
 export default function PerfilEdit({ navigation }) {
-  const imageDefaultUri = RNImage.resolveAssetSource(require("../../assets/logo.png")).uri;
+  const imageDefaultUri = RNImage.resolveAssetSource(
+    require("../../assets/logo.png")
+  ).uri;
   const [email, setEmail] = useState("");
   const [contatos, setContatos] = useState([
     { id: 0, type: "instagram", value: "@instagramteste" },
@@ -34,7 +36,13 @@ export default function PerfilEdit({ navigation }) {
     { id: 4, type: "twitter", value: "TwitterTeste" },
   ]);
 
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    email: "",
+    biografia: "",
+    username: "",
+    name: "",
+    imagem: null
+  });
   const [passwords, setPasswords] = useState({
     passwordNow: "",
     passwordNew: "",
@@ -112,12 +120,26 @@ export default function PerfilEdit({ navigation }) {
   async function putUser() {
     try {
       const userId = SecureStore.getItemAsync("id");
-      const response = await api.putUser(userId, {email:user.email, biografia:user.biografia, username:user.username, name:user.name}, imageDefaultUri);
+      const response = await api.putUser(
+        userId,
+        {
+          email: user.email,
+          biografia: user.biografia,
+          username: user.username,
+          name: user.name,
+          imagens:user.imagem
+        },
+      );
       Alert.alert(response.data.message);
       navigation.navigate("Perfil");
     } catch (error) {
       console.log("Erro na requisição:", error);
-      console.log({email:user.email, biografia:user.biografia, username:user.username, name:user.name});
+      console.log({
+        email: user.email,
+        biografia: user.biografia,
+        username: user.username,
+        name: user.name,
+      });
     }
   }
 
@@ -125,21 +147,21 @@ export default function PerfilEdit({ navigation }) {
     setEmail(await SecureStore.getItemAsync("email"));
   }
 
-  async function getUser(){
-    try{
+  async function getUser() {
+    try {
       const uname = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(uname);
-      console.log(response.data.profile)
+      console.log(response.data.profile);
       setUser(response.data.profile);
-    }catch(error){
+    } catch (error) {
       console.log("Erro na requisição:", error);
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getEmail();
     getUser();
-  },[])
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -176,6 +198,15 @@ export default function PerfilEdit({ navigation }) {
             atributo={"Nome"}
             variavel={"name"}
             texto={user.name}
+            obj={user}
+            setobj={setUser}
+            style={styles.input}
+          />
+
+          <InputUser
+            atributo={"Username"}
+            variavel={"username"}
+            texto={user.username}
             obj={user}
             setobj={setUser}
             style={styles.input}

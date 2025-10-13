@@ -1,8 +1,21 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
+function base64ToFile(base64, filename) {
+    if (!base64) return null;
+    const arr = base64.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  }
+
 const api = axios.create({
-  baseURL: "http://10.89.240.90:5000/api/v1/",
+  baseURL: "http://10.89.240.71:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -25,31 +38,30 @@ const sheets = {
   getUserByName: (username) => api.get(`user/${username}`),
   putUser: (
     userId, 
-    user, 
-    imageUri="http://10.89.240.75:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
+    user
   ) => {
     const data = new FormData();
 
   for (let key in user) {
     data.append(key, user[key]);
   }
-
-  if (imageUri) { 
-    const filename = imageUri.split("/").pop();
-    const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : "image";
-    data.append("imagem", {
-      uri: imageUri,
-      name: filename,
-      type: type,
-    });
+  let imageToSend = data.imagens
+  if (imageToSend && typeof imageToSend === "string") { 
+    imageToSend = base64ToFile(imageToSend, "perfil_atual.jpg");
   }
 
-  api.put(`user/${userId}`, data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  if(imageToSend) {
+    data.append("imagens", imageToSend);
+  }
+
+const isForm = typeof FormData !== "undefined" && user instanceof FormData;
+    const config = {
+      headers: {
+        ...(isForm ? { "Content-Type": "multipart/form-data" } : {}),
+        Accept: "application/json",
+      },
+    };
+    return api.put(`/user/${userId}`, user, config);
 },
   deleteUser: (id) => api.delete(`user/${id}`),
   updatePassword: (id, oldPassword, newPassword) =>
