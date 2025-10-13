@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  StatusBar
 } from "react-native";
 import { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -42,23 +43,24 @@ export default function Perfil({ navigation }) {
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
-        return <Entypo name="instagram" size={20} color="black" />;
+        return <Entypo name="instagram" size={30} color="black" />;
       case "facebook":
-        return <Entypo name="facebook" size={20} color="black" />;
+        return <Entypo name="facebook" size={30} color="black" />;
       case "twitter":
-        return <Entypo name="twitter" size={20} color="black" />;
+        return <Entypo name="twitter" size={30} color="black" />;
       case "linkedin":
-        return <Entypo name="linkedin" size={20} color="black" />;
+        return <Entypo name="linkedin" size={30} color="black" />;
     }
   };
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
 
       {/* Ícone de usuário */}
       <View style={styles.fundoUser}>
-        <IoniconsUser name="person" size={80} color="#949599" />
+        <IoniconsUser name="person" size={100} color="#949599" />
       </View>
 
       {/* Nome do usuário e ícone de lápis ao lado */}
@@ -118,60 +120,63 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 10,
     paddingBottom: 20, 
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 170,
+    height: 170,
+    borderRadius: 200,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
-    marginTop: 20,
+    marginBottom: 15,
+    marginTop: 15,
   },
   icon: {
     position: "absolute",
   },
   nomeWrapper: {
     flexDirection: "row", 
-    alignItems: "center",
     justifyContent: "center",
-    gap: 3,
+    alignItems: "center",
+    position:'relative',
+    gap: 8,
   },
   editIconWrapper: {
-    marginLeft: 5,
-    marginTop: -10,
+    position: 'absolute',
+    right: -35,
+    top: "50%",
+    transform: [{ translateY: -26 }],
   },
   editIcon: {
-    marginTop: 10,
+    marginTop: 0,
   },
   title: {
     fontSize: 30,
     textAlign: "center",
-    marginTop: 10,
-    fontWeight: 'bold',
-  },
+    marginTop: 2,
+   },
   name: {
-    fontSize: 30,
+    fontSize: 50,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 30,
   },
   subtitle: {
-    display: 'flex',
-    fontSize: 20,
-    paddingHorizontal: "5%",
-    textAlign: 'center',
+    fontSize: 22,
+    paddingHorizontal: "20",
+    textAlign: 'justify',
+    lineHeight: 26,
+    marginBottom: 20,
     justifyContent:'center',
+    flexDirection:'row',
   },
   contatoItem: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    padding: 10,
+    alignItems: "center",
+    padding: 4,
   },
   contactText: {
-    fontSize: 20,
+    fontSize: 30,
     marginLeft: 10, 
   },
   button: {
@@ -187,11 +192,11 @@ const styles = StyleSheet.create({
     elevation: 5,
     width: "80%",
     position: "absolute",
-    bottom: 70, 
+    bottom: 30, 
   },
   buttonText: {
     color: "#fff",
     fontWeight: "700",
-    fontSize: 18,
+    fontSize: 23,
   },
 });

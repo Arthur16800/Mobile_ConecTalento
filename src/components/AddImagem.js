@@ -7,7 +7,7 @@ import {
     StyleSheet,
 } from "react-native"
 
-export default function AddImagem({images, delimages, index}) {
+export default function AddImagem({image, delimages, index}) {
   return (
     <View>
       <View style={styles.topLine}>
@@ -17,8 +17,8 @@ export default function AddImagem({images, delimages, index}) {
       </View>
 
       <View style={styles.botSpace}>
-        <Text style={styles.title}> Preview da Foto {index}: </Text>
-        <Image source={{ uri: images[index] }} style={styles.photo} />
+        <Text style={styles.title}> Preview da Foto {index + 1}: </Text>
+        <Image source={{ uri: image }} style={styles.photo} />
       </View>
     </View>
   );

@@ -10,6 +10,7 @@ import {
   StatusBar,
 } from "react-native";
 import { useState } from "react";
+import backgroundImage from "../../assets/backgroundLogin.png"
 import Header from "../components/Header";
 import InputUser from "../components/InputObj";
 import InputPassword from "../components/InputPassword";
@@ -20,17 +21,32 @@ import BarraLateral from "../components/BarraLateral";
 
 export default function PerfilEdit({ navigation }) {
   const [contatos, setContatos] = useState([
-    { platform: "email", value: "emailTeste" },
+    { id: 0, type: "instagram", value: "@instagramteste" },
+    { id: 1, type: "email", value: "EmailTeste" },
+    { id: 2, type: "linkedin", value: "LinkedinTeste" },
+    { id: 3, type: "facebook", value: "FacebookTeste" },
+    { id: 4, type: "twitter", value: "TwitterTeste" },
   ]);
 
+  const [user, setUser] = useState({
+    username: "Cláudio Ramos",
+    email: "emailTeste",
+    bibliografia:
+      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
+    password: "",
+    confirmPassword: "",
+    showPassword: true,
+    showPassword2: true,
+  });
+
   // Modal BarraLateral;
-    const [isVisible, setIsVisible] = useState(false);
-    const toggleVisibleFalse = () => {
-      setIsVisible(false);
-    };
-    const toggleVisibleTrue = () => {
-      setIsVisible(true);
-    };
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibleFalse = () => {
+    setIsVisible(false);
+  };
+  const toggleVisibleTrue = () => {
+    setIsVisible(true);
+  };
   // Fim Modal
 
   // Modal AddContatos
@@ -53,36 +69,40 @@ export default function PerfilEdit({ navigation }) {
   };
   // Fim Modal
 
-  const addcont = (plataforma, valor) => {
-     setContatos((contatos) => [
+  const addcont = (id, plataforma, valor) => {
+    setContatos((contatos) => [
       ...contatos,
-      { platform: plataforma, value: valor },
+      { id: id, type: plataforma, value: valor },
     ]);
     toggleContatosModalFalse();
   };
-
-  const [user, setUser] = useState({
-    username: "Cláudio Ramos",
-    email: "emailTeste",
-    bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
-    password: "",
-    confirmPassword: "",
-    showPassword: true,
-    showPassword2: true,
-  });
+  const changecont = (id, plataforma, valor) => {
+    setContatos(
+      contatos.map(
+        (contato) =>
+          contato.id === id
+            ? { ...contato, type: plataforma, value: valor } 
+            : contato
+      )
+    );
+    toggleContatosModalFalse();
+  };
+  const deletecont = (id) => {
+    setContatos(contatos.filter((contato)=>contato.id !== id));
+    toggleContatosModalFalse();
+  };
 
   return (
     <KeyboardAvoidingView
       style={styles.wrapper}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <ScrollView contentContainerStyle={styles.container}>
         <Header toggleVisible={toggleVisibleTrue} />
 
         <View style={styles.painel}>
-          <Image style={styles.colorBar} />
+          <Image style={styles.colorBar} source={backgroundImage} />
 
           <View style={styles.lineUser}>
             <View style={styles.backIcon}>
@@ -158,7 +178,7 @@ export default function PerfilEdit({ navigation }) {
             style={styles.button}
             onPress={() => toggleContatosModalTrue()}
           >
-            <Text style={styles.buttonText}>Adicionar Contatos</Text>
+            <Text style={styles.buttonText}>Gerenciar Contatos</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -179,8 +199,10 @@ export default function PerfilEdit({ navigation }) {
       <ModalContatos
         modal={contatosVisible}
         fechamodal={toggleContatosModalFalse}
-        contatos={contatos}
+        contacts={contatos}
         addcont={addcont}
+        changecont={changecont}
+        deletecont={deletecont}
       />
     </KeyboardAvoidingView>
   );

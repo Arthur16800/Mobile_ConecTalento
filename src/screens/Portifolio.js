@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, StatusBar } from "react-native";
 import { useState } from "react";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
@@ -13,6 +13,7 @@ export default function Portifolio({navigation}) {
   };
   return (
     <View style={styles.container}>
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
       <BarraLateral
         isVisible={isVisible}
@@ -29,6 +30,5 @@ const styles = StyleSheet.create({
       backgroundColor: "#FFFFFF",
       alignItems:"center",
       justifyContent: "space-between",
-      paddingTop: 35,
     },
   });
