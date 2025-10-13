@@ -21,17 +21,20 @@ const sheets = {
   postLogin: (user) => api.post("login", user),
   postCadastro: (user) => api.post("user", user),
   getProjects: () => api.get("projects"),
-  searchProjects: (text) => api.post("ROTA AINDA NÃO DESENVOLVIDA", text),
-  filterProjects: (filter) => api.post("ROTA AINDA NÃO DESENVOLVIDA", filter),
+  searchProjects: (text) => api.post("project/search", text),
   getUserByName: (username) => api.get(`user/${username}`),
-  putUser: (userId, user, imageUri) => {
+  putUser: (
+    userId, 
+    user, 
+    imageUri="http://10.89.240.75:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
+  ) => {
     const data = new FormData();
 
   for (let key in user) {
     data.append(key, user[key]);
   }
 
-  if (imageUri) {
+  if (imageUri) { 
     const filename = imageUri.split("/").pop();
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : "image";

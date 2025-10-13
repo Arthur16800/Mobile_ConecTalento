@@ -22,10 +22,9 @@ import BarraLateral from "../components/BarraLateral";
 import ModalMudarSenha from "../components/ModalMudarSenha";
 import * as SecureStore from "expo-secure-store";
 import {Image as RNImage} from "react-native";
-import imageDefault from "../../assets/logo"
 
 export default function PerfilEdit({ navigation }) {
-  const imageDefaultUri = RNImage.resolveAssetSource(imageDefault).uri;
+  const imageDefaultUri = RNImage.resolveAssetSource(require("../../assets/logo.png")).uri;
   const [email, setEmail] = useState("");
   const [contatos, setContatos] = useState([
     { id: 0, type: "instagram", value: "@instagramteste" },
@@ -113,16 +112,12 @@ export default function PerfilEdit({ navigation }) {
   async function putUser() {
     try {
       const userId = SecureStore.getItemAsync("id");
-      console.log(1)
-      const response = await api.putUser(userId, {biografia:user.biografia, email:user.email, name:user.name, username:user.username}, imageDefaultUri);
-      console.log(2)
+      const response = await api.putUser(userId, {email:user.email, biografia:user.biografia, username:user.username, name:user.name}, imageDefaultUri);
       Alert.alert(response.data.message);
-      console.log(3)
       navigation.navigate("Perfil");
     } catch (error) {
-      console.log(4)
       console.log("Erro na requisição:", error);
-      console.log({biografia:user.biografia, email:user.email, name:user.name, username:user.username});
+      console.log({email:user.email, biografia:user.biografia, username:user.username, name:user.name});
     }
   }
 
@@ -317,7 +312,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   title: {
-    fontSize: 30,
+    fontSize: 25,
     marginBottom: 10,
   },
   nomeEdit: {
