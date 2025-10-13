@@ -4,17 +4,22 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  StatusBar
+  StatusBar,
 } from "react-native";
-import { useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import { useState, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 import { ScrollView } from "react-native-gesture-handler";
+import api from "../axios/axios";
+
 
 export default function Perfil({ navigation }) {
+  const [emailAtual, setEmail] = useState("");
+  const [user, setUser] = useState({});
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => {
@@ -25,21 +30,40 @@ export default function Perfil({ navigation }) {
     setIsVisible(true);
   };
 
-  const emailAtual = "emailTeste";
+  async function getEmail() {
+    setEmail(await SecureStore.getItemAsync("email"));
+  }
 
-  const user = {
-    username: "Cláudio Ramos",
-    email: "emailTeste",
-    bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
-  };
+  async function getUser(){
+    try{
+      const name = await SecureStore.getItemAsync("username");
+      const response = await api.getUserByName(name);
+      setUser(response.data.profile);
+    }catch(error){
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
+  async function getContatos() {
+    try {
+      const response = await api.getContacts(userStore.username);
+      setContatos(response.data.contacts);
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
 
-  const contatos = [
+  useEffect(() => {
+    getEmail();
+    getUser();
+    // getContatos();
+  }, []);
+
+  const [contatos, setContatos] = useState([
     { tipo: "instagram", valor: "@instagramteste" },
     { tipo: "linkedin", valor: "LinkedinTeste" },
     { tipo: "facebook", valor: "FacebookTeste" },
     { tipo: "twitter", valor: "TwitterTeste" },
-  ];
+  ]);
 
   const renderIcon = (tipo) => {
     switch (tipo) {
@@ -84,8 +108,8 @@ export default function Perfil({ navigation }) {
       </View>
 
       {/* Biografia */}
-      {user.bibliografia && (
-        <Text style={styles.subtitle}>{user.bibliografia}</Text>
+      {user.biografia && (
+        <Text style={styles.subtitle}>{user.biografia}</Text>
       )}
 
       {/* Contatos */}
@@ -122,7 +146,9 @@ const styles = StyleSheet.create({
   scrollContainer: {
     paddingTop: 20,
     paddingHorizontal: 20,
-    paddingBottom: 180, // espaço para o botão
+    paddingBottom: 180,
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
@@ -139,6 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+
     marginBottom: 15,
   },
   editIconWrapper: {
@@ -146,6 +173,12 @@ const styles = StyleSheet.create({
     right: 5,
     top: "50%",
     transform: [{ translateY: -13 }],
+  },
+
+  title: {
+    fontSize: 30,
+    textAlign: "center",
+    marginTop: 2,
   },
   name: {
     fontSize: 40,
@@ -158,11 +191,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
   contatosContainer: {
     marginBottom: 20,
   },
@@ -172,7 +200,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contactText: {
+
     fontSize: 18,
+
     marginLeft: 10,
   },
   button: {
@@ -186,8 +216,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
-    marginTop: 40,     // cria espaço acima do botão
-    marginBottom: 60,  // evita ficar colado no fim do scroll
+    marginTop: 40,     
+    marginBottom: 60,  
+    width: "80%",
+    position: "absolute",
+    bottom: 30,
   },
   buttonText: {
     color: "#fff",

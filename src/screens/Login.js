@@ -8,7 +8,7 @@ import {
   Image,
   ImageBackground,
   StatusBar,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 // axios
@@ -25,12 +25,14 @@ export default function Login({ navigation }) {
     email: "",
     password: "",
     showPassword: true,
-  });  
+  });
   const [controlLoad, setControlLoad] = useState(false);
 
-
-  async function saveToken(token) {
+  async function saveInfo(token, userP) {
     await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync("username", userP.username);
+    await SecureStore.setItemAsync("email", userP.email);
+    await SecureStore.setItemAsync("id", userP.ID_user.toString());
   }
 
   async function handleLogin() {
@@ -38,7 +40,8 @@ export default function Login({ navigation }) {
     await api.postLogin(user).then(
       (response) => {
         Alert.alert(response.data.message);
-        saveToken(response.data.token);
+        console.log(response.data.user);
+        saveInfo(response.data.token, response.data.user);
         setControlLoad(false);
         navigation.navigate("Home");
       },
