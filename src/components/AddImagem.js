@@ -7,11 +7,11 @@ import {
     StyleSheet,
 } from "react-native"
 
-export default function AddImagem({image, delimages, index}) {
+export default function AddImagem({image, delimage, index}) {
   return (
     <View>
       <View style={styles.topLine}>
-        <TouchableOpacity style={styles.orbClose} onPress={()=>delimages(index)}>
+        <TouchableOpacity style={styles.orbClose} onPress={()=>delimage(index)}>
           <Feather name="x" size={30} color="white" />
         </TouchableOpacity>
       </View>
