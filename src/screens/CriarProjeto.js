@@ -59,6 +59,7 @@ export default function CriarProjeto({ navigation }) {
       quality: 1,
     });
     if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
       if (images.length < 5) {
         pushImage(uri);
       } else {
@@ -80,7 +81,7 @@ export default function CriarProjeto({ navigation }) {
           key={index}
           source={{ uri: imageUri }}
           style={{
-            width: screenWidth, 
+            width: screenWidth * 0.9,
             height: screenWidth * 0.6, 
             resizeMode: "cover",
             marginBottom: 10,
@@ -111,8 +112,8 @@ export default function CriarProjeto({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
-      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{
             alignItems: "center",
@@ -163,7 +164,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginTop: 20,
   },
   nomeEdit: {
     flex: 0.3,
