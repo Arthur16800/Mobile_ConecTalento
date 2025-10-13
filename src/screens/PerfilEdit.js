@@ -8,18 +8,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  Alert,
 } from "react-native";
-import { useState } from "react";
-import backgroundImage from "../../assets/backgroundLogin.png"
+import { useEffect, useState } from "react";
+import api from "../axios/axios";
+import backgroundImage from "../../assets/backgroundLogin.png";
 import Header from "../components/Header";
 import InputUser from "../components/InputObj";
-import InputPassword from "../components/InputPassword";
 import ModalContatos from "../components/ModalContatos";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
+import ModalMudarSenha from "../components/ModalMudarSenha";
+import * as SecureStore from "expo-secure-store";
+import {Image as RNImage} from "react-native";
+import imageDefault from "../../assets/logo"
 
 export default function PerfilEdit({ navigation }) {
+  const imageDefaultUri = RNImage.resolveAssetSource(imageDefault).uri;
+  const [email, setEmail] = useState("");
   const [contatos, setContatos] = useState([
     { id: 0, type: "instagram", value: "@instagramteste" },
     { id: 1, type: "email", value: "EmailTeste" },
@@ -28,15 +35,11 @@ export default function PerfilEdit({ navigation }) {
     { id: 4, type: "twitter", value: "TwitterTeste" },
   ]);
 
-  const [user, setUser] = useState({
-    username: "Cláudio Ramos",
-    email: "emailTeste",
-    bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras  (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
-    password: "",
+  const [user, setUser] = useState({});
+  const [passwords, setPasswords] = useState({
+    passwordNow: "",
+    passwordNew: "",
     confirmPassword: "",
-    showPassword: true,
-    showPassword2: true,
   });
 
   // Modal BarraLateral;
@@ -57,6 +60,27 @@ export default function PerfilEdit({ navigation }) {
   const toggleContatosModalTrue = () => {
     setContatosVisible(true);
   };
+  const addcont = (id, plataforma, valor) => {
+    setContatos((contatos) => [
+      ...contatos,
+      { id: id, type: plataforma, value: valor },
+    ]);
+    toggleContatosModalFalse();
+  };
+  const changecont = (id, plataforma, valor) => {
+    setContatos(
+      contatos.map((contato) =>
+        contato.id === id
+          ? { ...contato, type: plataforma, value: valor }
+          : contato
+      )
+    );
+    toggleContatosModalFalse();
+  };
+  const deletecont = (id) => {
+    setContatos(contatos.filter((contato) => contato.id !== id));
+    toggleContatosModalFalse();
+  };
   // Fim Modal;
 
   // Modal MudarSenha
@@ -69,28 +93,58 @@ export default function PerfilEdit({ navigation }) {
   };
   // Fim Modal
 
-  const addcont = (id, plataforma, valor) => {
-    setContatos((contatos) => [
-      ...contatos,
-      { id: id, type: plataforma, value: valor },
-    ]);
-    toggleContatosModalFalse();
-  };
-  const changecont = (id, plataforma, valor) => {
-    setContatos(
-      contatos.map(
-        (contato) =>
-          contato.id === id
-            ? { ...contato, type: plataforma, value: valor } 
-            : contato
-      )
-    );
-    toggleContatosModalFalse();
-  };
-  const deletecont = (id) => {
-    setContatos(contatos.filter((contato)=>contato.id !== id));
-    toggleContatosModalFalse();
-  };
+  async function putSenha() {
+    if (passwords.confirmPassword !== passwords.passwordNew) {
+      Alert.alert("Digite e confirme a mesma nova senha!");
+    } else {
+      try {
+        const response = await api.updatePassword(
+          user.ID_user,
+          passwords.passwordNow,
+          passwords.passwordNew
+        );
+        Alert.alert(response.data.message);
+      } catch (error) {
+        console.log("Erro na requisição:", error.data.message.error);
+      }
+    }
+  }
+
+  async function putUser() {
+    try {
+      const userId = SecureStore.getItemAsync("id");
+      console.log(1)
+      const response = await api.putUser(userId, {biografia:user.biografia, email:user.email, name:user.name, username:user.username}, imageDefaultUri);
+      console.log(2)
+      Alert.alert(response.data.message);
+      console.log(3)
+      navigation.navigate("Perfil");
+    } catch (error) {
+      console.log(4)
+      console.log("Erro na requisição:", error);
+      console.log({biografia:user.biografia, email:user.email, name:user.name, username:user.username});
+    }
+  }
+
+  async function getEmail() {
+    setEmail(await SecureStore.getItemAsync("email"));
+  }
+
+  async function getUser(){
+    try{
+      const uname = await SecureStore.getItemAsync("username");
+      const response = await api.getUserByName(uname);
+      console.log(response.data.profile)
+      setUser(response.data.profile);
+    }catch(error){
+      console.log("Erro na requisição:", error);
+    }
+  }
+
+  useEffect(()=>{
+    getEmail();
+    getUser();
+  },[])
 
   return (
     <KeyboardAvoidingView
@@ -108,13 +162,13 @@ export default function PerfilEdit({ navigation }) {
             <View style={styles.backIcon}>
               <IoniconsUser name="person" size={45} color="#949599" />
             </View>
-            <Text style={styles.title}>{user.username} </Text>
+            <Text style={styles.title}>{user.username}</Text>
             <MaterialIcons name="do-not-disturb-on" size={35} color="red" />
           </View>
 
           <TouchableOpacity
             style={[styles.button, { marginBottom: "2%", width: "95%" }]}
-            onPress={() => navigation.navigate("Perfil")}
+            onPress={() => putUser()}
           >
             <Text style={styles.buttonText}>Salvar Perfil</Text>
           </TouchableOpacity>
@@ -125,8 +179,8 @@ export default function PerfilEdit({ navigation }) {
         <View style={styles.nomeEdit}>
           <InputUser
             atributo={"Nome"}
-            variavel={"username"}
-            texto={"Nome anterior(fazer com axios api)"}
+            variavel={"name"}
+            texto={user.name}
             obj={user}
             setobj={setUser}
             style={styles.input}
@@ -135,42 +189,22 @@ export default function PerfilEdit({ navigation }) {
           <InputUser
             atributo={"Email"}
             variavel={"email"}
-            texto={"Email anterior(fazer com axios api)"}
+            texto={user.email}
             obj={user}
             setobj={setUser}
             style={styles.input}
           />
 
-          <InputPassword
-            titulo={"Senha"}
-            texto={"********"}
-            variavel={"password"}
-            showpassword={"showPassword"}
+          <InputUser
+            atributo={"Biografia"}
+            variavel={"biografia"}
+            texto={user.biografia}
+            multiline={true}
+            rows={4}
             obj={user}
             setobj={setUser}
             style={styles.input}
           />
-
-          <InputPassword
-            titulo={"Confirme sua senha"}
-            texto={"********"}
-            variavel={"ConfirmPassword"}
-            showpassword={"showPassword2"}
-            obj={user}
-            setobj={setUser}
-            style={styles.input}
-          />
-
-          {user.bibliografia && (
-            <InputUser
-              atributo={"Bibliografia"}
-              variavel={"bibliografia"}
-              texto={"Texto anterior(fazer com axios api)"}
-              obj={user}
-              setobj={setUser}
-              style={styles.input}
-            />
-          )}
         </View>
 
         <View style={styles.botView}>
@@ -203,6 +237,14 @@ export default function PerfilEdit({ navigation }) {
         addcont={addcont}
         changecont={changecont}
         deletecont={deletecont}
+      />
+
+      <ModalMudarSenha
+        modal={senhaModal}
+        fechamodal={toggleSenhaModalFalse}
+        user={user}
+        setUser={setUser}
+        putSenha={putSenha}
       />
     </KeyboardAvoidingView>
   );

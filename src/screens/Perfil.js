@@ -4,16 +4,20 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  StatusBar
+  StatusBar,
 } from "react-native";
-import { useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import { useState, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
+import api from "../axios/axios";
 
 export default function Perfil({ navigation }) {
+  const [emailAtual, setEmail] = useState("");
+  const [user, setUser] = useState({});
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => {
@@ -24,21 +28,40 @@ export default function Perfil({ navigation }) {
     setIsVisible(true);
   };
 
-  const emailAtual = "emailTeste";
+  async function getEmail() {
+    setEmail(await SecureStore.getItemAsync("email"));
+  }
 
-  const user = {
-    username: "Cláudio Ramos",
-    email: "emailTeste",
-    bibliografia:
-      "Entendi. O que está acontecendo é que o uso de SafeAreaView (especialmente no iOS) reserva espaço automaticamente para a barra de status e outras (como a notch, ou entalhe), e dependendo do dispositivo, isso pode parecer uma “barra grande” visualmente.",
-  };
+  async function getUser(){
+    try{
+      const name = await SecureStore.getItemAsync("username");
+      const response = await api.getUserByName(name);
+      setUser(response.data.profile);
+    }catch(error){
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
+  async function getContatos() {
+    try {
+      const response = await api.getContacts(userStore.username);
+      setContatos(response.data.contacts);
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
 
-  const contatos = [
+  useEffect(() => {
+    getEmail();
+    getUser();
+    // getContatos();
+  }, []);
+
+  const [contatos, setContatos] = useState([
     { tipo: "instagram", valor: "@instagramteste" },
     { tipo: "linkedin", valor: "LinkedinTeste" },
     { tipo: "facebook", valor: "FacebookTeste" },
     { tipo: "twitter", valor: "TwitterTeste" },
-  ];
+  ]);
 
   const renderIcon = (tipo) => {
     switch (tipo) {
@@ -81,8 +104,8 @@ export default function Perfil({ navigation }) {
       </View>
 
       {/* Biografia */}
-      {user.bibliografia && (
-        <Text style={styles.subtitle}>{user.bibliografia}</Text>
+      {user.biografia && (
+        <Text style={styles.subtitle}>{user.biografia}</Text>
       )}
 
       {/* Contatos */}
@@ -120,7 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingBottom: 20, 
+    paddingBottom: 20,
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
@@ -136,14 +159,14 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   nomeWrapper: {
-    flexDirection: "row", 
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    position:'relative',
+    position: "relative",
     gap: 8,
   },
   editIconWrapper: {
-    position: 'absolute',
+    position: "absolute",
     right: -35,
     top: "50%",
     transform: [{ translateY: -26 }],
@@ -155,7 +178,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
     marginTop: 2,
-   },
+  },
   name: {
     fontSize: 50,
     textAlign: "center",
@@ -164,11 +187,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 22,
     paddingHorizontal: "20",
-    textAlign: 'justify',
+    textAlign: "justify",
     lineHeight: 26,
     marginBottom: 20,
-    justifyContent:'center',
-    flexDirection:'row',
+    justifyContent: "center",
+    flexDirection: "row",
   },
   contatoItem: {
     flexDirection: "row",
@@ -177,7 +200,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 30,
-    marginLeft: 10, 
+    marginLeft: 10,
   },
   button: {
     backgroundColor: "#803AD6",
@@ -192,7 +215,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     width: "80%",
     position: "absolute",
-    bottom: 30, 
+    bottom: 30,
   },
   buttonText: {
     color: "#fff",

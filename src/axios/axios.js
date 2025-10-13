@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://10.89.240.71:5000/api/v1/",
+  baseURL: "http://10.89.240.74:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -24,7 +24,30 @@ const sheets = {
   searchProjects: (text) => api.post("ROTA AINDA NÃO DESENVOLVIDA", text),
   filterProjects: (filter) => api.post("ROTA AINDA NÃO DESENVOLVIDA", filter),
   getUserByName: (username) => api.get(`user/${username}`),
-  putUser: (user) => api.put(`user/${user.id}`, user),
+  putUser: (userId, user, imageUri) => {
+    const data = new FormData();
+
+  for (let key in user) {
+    data.append(key, user[key]);
+  }
+
+  if (imageUri) {
+    const filename = imageUri.split("/").pop();
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : "image";
+    data.append("imagem", {
+      uri: imageUri,
+      name: filename,
+      type: type,
+    });
+  }
+
+  api.put(`user/${userId}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+},
   deleteUser: (id) => api.delete(`user/${id}`),
   updatePassword: (id, oldPassword, newPassword) =>
     api.put(`user/newpassword/${id}`, {

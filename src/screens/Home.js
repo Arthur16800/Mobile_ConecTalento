@@ -28,6 +28,10 @@ export default function Home({ navigation }) {
       console.log("Erro na requisição:", error.data.message.error);
     }
   }
+  useEffect(() => {
+    getProjects();
+  }, []);
+
   async function searchProjects(text){
     try{
       const response = await api.searchProjects(text);
@@ -36,10 +40,6 @@ export default function Home({ navigation }) {
       console.log("Erro na busca:", error.data.message.error);
     }
   }
-
-  useEffect(() => {
-    getProjects();
-  }, []);
 
   return (
     <View style={styles.container}>
