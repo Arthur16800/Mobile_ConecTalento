@@ -104,6 +104,7 @@ export default function PerfilEdit({ navigation }) {
     if (passwords.confirmPassword !== passwords.passwordNew) {
       Alert.alert("Digite e confirme a mesma nova senha!");
     } else {
+      console.log(passwords);
       try {
         const response = await api.updatePassword(
           user.ID_user,
@@ -111,6 +112,7 @@ export default function PerfilEdit({ navigation }) {
           passwords.passwordNew
         );
         Alert.alert(response.data.message);
+        toggleSenhaModalFalse();
       } catch (error) {
         console.log("Erro na requisição:", error.data.message.error);
       }
@@ -268,8 +270,8 @@ export default function PerfilEdit({ navigation }) {
       <ModalMudarSenha
         modal={senhaModal}
         fechamodal={toggleSenhaModalFalse}
-        user={user}
-        setUser={setUser}
+        user={passwords}
+        setUser={setPasswords}
         putSenha={putSenha}
       />
     </KeyboardAvoidingView>

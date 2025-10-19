@@ -5,7 +5,8 @@ import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
 
 export default function Portifolio({navigation}) { 
-  const username = "username";
+  const pegarUsername = async ()=> {const username = SecureStore.getItemAsync("username");}
+  
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
@@ -33,6 +34,7 @@ export default function Portifolio({navigation}) {
     }
   }
   useEffect(() => {
+    pegarUsername();
     getProjects();
   }, []);
   

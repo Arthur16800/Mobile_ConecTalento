@@ -7,15 +7,15 @@ import {
   Image,
   StatusBar,
   Dimensions,
+  Alert
 } from "react-native";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Header from "../components/Header";
 import InputObj from "../components/InputObj";
 import BarraLateral from "../components/BarraLateral";
-import AddImagem from "../components/AddImagem";
 
 export default function CriarProjeto({ navigation }) {
   const [project, setProject] = useState({
@@ -30,11 +30,6 @@ export default function CriarProjeto({ navigation }) {
   }, []);
 
   const screenWidth = Dimensions.get("window").width;
-  {
-    /* Lógica imagem */
-  }
-
-  let images = project.imgs;
 
   const pushImage = (imagem) => {
     setProject((prevProject) => ({
@@ -44,40 +39,50 @@ export default function CriarProjeto({ navigation }) {
   };
 
   const deleteImage = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setProject((prevProject) => ({
-      ...prevProject,
-      imgs: newImages,
-    }));
+    setProject((prevProject) => {
+      const newImages = [...prevProject.imgs];
+      newImages.splice(index, 1);
+      return {
+        ...prevProject,
+        imgs: newImages,
+      };
+    });
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      if (images.length < 5) {
-        pushImage(uri);
-      } else {
-        Alert.alert(
-          "Imagens Demais",
-          "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas."
-        );
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        allowsEditing: true,
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const { uri } = result.assets[0];
+        setProject((prevProject) => {
+          if (prevProject.imgs.length < 5) {
+            return {
+              ...prevProject,
+              imgs: [...prevProject.imgs, uri],
+            };
+          } else {
+            Alert.alert(
+              "Imagens Demais",
+              "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas."
+            );
+            return prevProject;
+          }
+        });
       }
-      console.log(project.imgs);
+    } catch (error) {
+      console.error("Erro ao selecionar imagem:", error);
     }
   };
 
   function renderImages() {
-    if (images.length === 0) {
-      return <Text>Nenhuma imagem anexada.</Text>;
-    } else {
-      return images.map((imageUri, index) => (
+    return project.imgs.map((imageUri, index) => (
+      <TouchableOpacity key={index} onPress={() => deleteImage(index)}>
         <Image
-          key={index}
           source={{ uri: imageUri }}
           style={{
             width: screenWidth, 
@@ -87,17 +92,14 @@ export default function CriarProjeto({ navigation }) {
             borderRadius: 12,
           }}
         />
-      ));
-    }
+      </TouchableOpacity>
+    ));
   }
 
-  {
-    /* Fim lógica imagem */
-  }
+  useEffect(() => {
+    console.log("Atualizado: project.imgs", project.imgs);
+  }, [project.imgs]);
 
-  {
-    /* Lógica visible */
-  }
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibleFalse = () => {
     setIsVisible(false);
@@ -105,9 +107,6 @@ export default function CriarProjeto({ navigation }) {
   const toggleVisibleTrue = () => {
     setIsVisible(true);
   };
-  {
-    /* Fim lógica visible */
-  }
 
   return (
     <View style={styles.container}>
@@ -143,11 +142,16 @@ export default function CriarProjeto({ navigation }) {
             <TouchableOpacity style={styles.button} onPress={pickImage}>
               <Text style={styles.buttonText}>Inserir Imagem</Text>
             </TouchableOpacity>
+                      <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Criar Projeto</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.imagesContainer}>
-            {images.length > 0 ? renderImages() : <Text> Sem imagem anexada. </Text>}
+            {project.imgs.length > 0 ? renderImages() : <Text>Sem imagem anexada.</Text>}
           </View>
+
+
         </ScrollView>
       </SafeAreaView>
 
@@ -159,6 +163,7 @@ export default function CriarProjeto({ navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
