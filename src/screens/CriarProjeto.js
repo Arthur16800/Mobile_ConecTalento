@@ -7,17 +7,20 @@ import {
   Image,
   StatusBar,
   Dimensions,
-  Alert
+  Alert,
 } from "react-native";
 import { useLayoutEffect, useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
+import * as SecureStore from "expo-secure-store"
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Header from "../components/Header";
 import InputObj from "../components/InputObj";
 import BarraLateral from "../components/BarraLateral";
+import api from "../axios/axios"
 
 export default function CriarProjeto({ navigation }) {
+  const [userId, setId] = useState("");
   const [project, setProject] = useState({
     name: "",
     desc: "",
@@ -25,8 +28,8 @@ export default function CriarProjeto({ navigation }) {
   });
 
   useLayoutEffect(() => {
-    StatusBar.setBarStyle("dark-content"); 
-    StatusBar.setBackgroundColor("transparent"); 
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
   }, []);
 
   const screenWidth = Dimensions.get("window").width;
@@ -37,6 +40,18 @@ export default function CriarProjeto({ navigation }) {
       imgs: [...prevProject.imgs, imagem],
     }));
   };
+
+  const createProject = async (projeto, imagens, id)=>{
+    try{
+      const result = await api.postProject(projeto, imagens, id);
+      if(result){
+      Alert.alert("Projeto Criado com Sucesso!");
+      }
+    }
+    catch(error){
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
 
   const deleteImage = (index) => {
     setProject((prevProject) => {
@@ -52,7 +67,7 @@ export default function CriarProjeto({ navigation }) {
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'images',
+        mediaTypes: "images",
         allowsEditing: true,
         quality: 1,
       });
@@ -85,16 +100,20 @@ export default function CriarProjeto({ navigation }) {
         <Image
           source={{ uri: imageUri }}
           style={{
-            width: screenWidth, 
-            height: screenWidth * 0.6, 
+            width: screenWidth,
+            height: screenWidth * 0.6,
             resizeMode: "cover",
             marginBottom: 10,
-            borderRadius: 12,
+            borderRadius: 50,
           }}
         />
       </TouchableOpacity>
     ));
   }
+
+  // useEffect(()=>{
+  //   setId(SecureStore.getItemAsync("id"));
+  // }, []);
 
   useEffect(() => {
     console.log("Atualizado: project.imgs", project.imgs);
@@ -111,7 +130,7 @@ export default function CriarProjeto({ navigation }) {
   return (
     <View style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
         <ScrollView
           contentContainerStyle={{
             alignItems: "center",
@@ -142,16 +161,20 @@ export default function CriarProjeto({ navigation }) {
             <TouchableOpacity style={styles.button} onPress={pickImage}>
               <Text style={styles.buttonText}>Inserir Imagem</Text>
             </TouchableOpacity>
-                      <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} 
+            // onPress={()=>createProject({titulo:project.name, descricao:project.desc}, project.imgs, userId)}
+            >
               <Text style={styles.buttonText}>Criar Projeto</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.imagesContainer}>
-            {project.imgs.length > 0 ? renderImages() : <Text>Sem imagem anexada.</Text>}
+            {project.imgs.length > 0 ? (
+              renderImages()
+            ) : (
+              <Text>Sem imagem anexada.</Text>
+            )}
           </View>
-
-
         </ScrollView>
       </SafeAreaView>
 

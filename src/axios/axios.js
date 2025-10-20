@@ -15,7 +15,7 @@ function base64ToFile(base64, filename) {
   }
 
 const api = axios.create({
-  baseURL: "http://10.89.240.71:5000/api/v1/",
+  baseURL: "http://10.89.240.87:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -78,14 +78,17 @@ const isForm = typeof FormData !== "undefined" && user instanceof FormData;
     }
 
     if (imageUri) {
-      const filename = imageUri.split("/").pop();
+      imageUri.map((image)=>{
+        const filename = image.split("/").pop();
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : "image";
       data.append("imagem", {
-        uri: imageUri,
+        uri: image,
         name: filename,
         type: type,
       });
+      })
+      
     }
 
     return api.post(`projects/${idUser}`, projeto, {
