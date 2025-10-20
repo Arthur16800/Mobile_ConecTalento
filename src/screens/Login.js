@@ -101,12 +101,6 @@ export default function Login({ navigation }) {
                 <Text style={styles.footerLink}>Cadastre-se</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Home</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-                <Text style={styles.footerLink}>Home</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </ImageBackground>
