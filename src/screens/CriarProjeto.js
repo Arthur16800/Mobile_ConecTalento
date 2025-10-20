@@ -100,6 +100,7 @@ export default function CriarProjeto({ navigation }) {
         <Image
           source={{ uri: imageUri }}
           style={{
+
             width: screenWidth,
             height: screenWidth * 0.6,
             resizeMode: "cover",
@@ -129,6 +130,7 @@ export default function CriarProjeto({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
       <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
         <ScrollView
@@ -191,7 +193,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginTop: 20,
   },
   nomeEdit: {
     flex: 0.3,
