@@ -2,14 +2,14 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://10.89.240.90:5000/api/v1/",
+  baseURL: "http://192.168.100.10:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync("token");
-    if (token) {
+    if (token) {  
       config.headers.Authorization = `${token}`;
     }
     return config;
@@ -26,7 +26,7 @@ const sheets = {
   putUser: (
     userId, 
     user, 
-    imageUri="http://10.89.240.75:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
+    imageUri="http://192.168.100.10:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
   ) => {
     const data = new FormData();
 
@@ -45,7 +45,7 @@ const sheets = {
     });
   }
 
-  api.put(`user/${userId}`, data, {
+  return api.put(`user/${userId}`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

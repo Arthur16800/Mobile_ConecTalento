@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Image,
   StatusBar,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
@@ -15,11 +16,21 @@ import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 import { ScrollView } from "react-native-gesture-handler";
 import api from "../axios/axios";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 
 export default function Perfil({ navigation }) {
   const [emailAtual, setEmail] = useState("");
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    extrainfo: {
+      link_insta: null,
+      link_facebook: null,
+      link_github: null,
+      link_pinterest: null,
+      numero_telefone: null,
+    },
+  });
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => {
@@ -34,36 +45,46 @@ export default function Perfil({ navigation }) {
     setEmail(await SecureStore.getItemAsync("email"));
   }
 
-  async function getUser(){
-    try{
+  async function getUser() {
+    try {
       const name = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(name);
       setUser(response.data.profile);
-    }catch(error){
-      console.log("Erro na requisição:", error.data.message.error);
-    }
-  }
-  async function getContatos() {
-    try {
-      const response = await api.getContacts(userStore.username);
-      setContatos(response.data.contacts);
     } catch (error) {
       console.log("Erro na requisição:", error.data.message.error);
     }
   }
 
+  function contatos_filter(contatos) {
+    return contatos.filter(item => item.valor);
+  }
+
+
+
+  const [contatos, setContatos] = useState([]);
+
   useEffect(() => {
     getEmail();
     getUser();
-    // getContatos();
+
+    contatos_filter(contatos)
+
   }, []);
 
-  const [contatos, setContatos] = useState([
-    { tipo: "instagram", valor: "@instagramteste" },
-    { tipo: "linkedin", valor: "LinkedinTeste" },
-    { tipo: "facebook", valor: "FacebookTeste" },
-    { tipo: "twitter", valor: "TwitterTeste" },
-  ]);
+  useEffect(() => {
+    if (user.extrainfo) {
+      const contatosIniciais = [
+        { tipo: "instagram", valor: user.extrainfo.link_insta },
+        { tipo: "facebook", valor: user.extrainfo.link_facebook },
+        { tipo: "pinterest", valor: user.extrainfo.link_pinterest },
+        { tipo: "github", valor: user.extrainfo.link_github },
+      ];
+
+      setContatos(contatos_filter(contatosIniciais));
+    }
+  }, [user]);
+
+
 
   const renderIcon = (tipo) => {
     switch (tipo) {
@@ -71,56 +92,75 @@ export default function Perfil({ navigation }) {
         return <Entypo name="instagram" size={30} color="black" />;
       case "facebook":
         return <Entypo name="facebook" size={30} color="black" />;
-      case "twitter":
-        return <Entypo name="twitter" size={30} color="black" />;
-      case "linkedin":
-        return <Entypo name="linkedin" size={30} color="black" />;
+      case "pinterest":
+        return <FontAwesome name="pinterest" size={30} color="black" />
+      case "github":
+        return <AntDesign name="github" size={30} color="black" />
+      case null:
+        return
     }
   };
 
   return (
     <View style={styles.container}>
-      
+
       <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
-      <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={{
+        paddingBottom: 80, alignItems: "center",
+        justifyContent: "flex-start",
+      }}>
 
-      {/* Ícone de usuário */}
-      <View style={styles.fundoUser}>
-        <IoniconsUser name="person" size={100} color="#949599" />
-      </View>
+        {/* Ícone de usuário */}
+        <View style={styles.fundoUser}>
 
-      {/* Nome do usuário e ícone de lápis ao lado */}
-      <View style={styles.nomeWrapper}>
-        <Text style={styles.name}>{user.username}</Text>
-        {emailAtual === user.email && (
-          <TouchableOpacity
-            onPress={() => navigation.navigate("PerfilEdit")}
-            style={styles.editIconWrapper}
-          >
-            <MaterialCommunityIcons
-              name="pencil-outline"
-              size={30}
-              color="black"
+          {user.imagem ? (
+            <Image
+              source={{ uri: `data:${user.tipo_imagem};base64,${user.imagem}` }}
+              style={styles.profileImage}
             />
-          </TouchableOpacity>
+          ) : (
+            <IoniconsUser name="person" size={100} color="#949599" />
+          )}
+
+
+
+        </View>
+
+        {/* Nome do usuário e ícone de lápis ao lado */}
+        <View style={styles.nomeWrapper}>
+          <Text style={styles.name} numberOfLines={0}>{user.username}</Text>
+          {emailAtual === user.email && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PerfilEdit")}
+              style={styles.editIconWrapper}
+            >
+              <MaterialCommunityIcons
+                name="pencil-outline"
+                size={30}
+                color="black"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Biografia */}
+        {user.biografia && (
+          <Text style={styles.subtitle}>{user.biografia}</Text>
         )}
-      </View>
 
-      {/* Biografia */}
-      {user.biografia && (
-        <Text style={styles.subtitle}>{user.biografia}</Text>
-      )}
-
-      {/* Contatos */}
-      <Text style={styles.title}>Contatos</Text>
+        {/* Contatos */}
+        <Text style={styles.title}>Contatos</Text>
         {contatos.map((item) => (
+
           <View key={item.tipo} style={styles.contatoItem}>
             {renderIcon(item.tipo)}
-          <Text style={styles.contactText}>{item.valor}</Text>
+            <Text style={styles.contactText}>{item.valor}</Text>
           </View>
         ))}
 
+
+      </ScrollView>
       {/* Botão para ver projetos */}
       <TouchableOpacity
         style={styles.button}
@@ -128,7 +168,6 @@ export default function Perfil({ navigation }) {
       >
         <Text style={styles.buttonText}>Ver meus projetos</Text>
       </TouchableOpacity>
-      </ScrollView>
       <BarraLateral
         isVisible={isVisible}
         onClose={toggleVisibleFalse}
@@ -147,8 +186,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 180,
-    alignItems: "center",
-    justifyContent: "flex-start",
   },
   fundoUser: {
     backgroundColor: "#d2d3d5",
@@ -216,11 +253,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
-    marginTop: 40,     
-    marginBottom: 60,  
     width: "80%",
     position: "absolute",
-    bottom: 30,
+    bottom: 80,
+    alignSelf: "center", // 👈 centraliza horizontalmente
   },
   buttonText: {
     color: "#fff",

@@ -111,7 +111,7 @@ export default function PerfilEdit({ navigation }) {
 
   async function putUser() {
     try {
-      const userId = SecureStore.getItemAsync("id");
+      const userId = await SecureStore.getItemAsync("id");
       const response = await api.putUser(userId, {email:user.email, biografia:user.biografia, username:user.username, name:user.name}, imageDefaultUri);
       Alert.alert(response.data.message);
       navigation.navigate("Perfil");

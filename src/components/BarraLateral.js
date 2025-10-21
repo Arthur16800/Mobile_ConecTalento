@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Animated,
   FlatList,
@@ -18,6 +18,7 @@ const { width } = Dimensions.get("window");
 const BarraLateral = ({ navigation, isVisible, onClose }) => {
   const translateX = useRef(new Animated.Value(width)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     Animated.parallel([
@@ -33,6 +34,14 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
       }),
     ]).start();
   }, [isVisible]);
+
+  useEffect(() => {
+    async function getuserName() {
+      const name = await SecureStore.getItemAsync("username");
+      setUserName(name);
+    }
+    getuserName()
+  }, []);
 
   const logOut = () => {
     SecureStore.deleteItemAsync("token");
@@ -60,8 +69,8 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
       <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
         <FlatList
           data={[
-            { key: ""},
-            { key: "Cláudio Ramos" },
+            { key: "" },
+            { key: userName },
             { key: "Página Inicial", page: "Home" },
             { key: "Meu perfil", page: "Perfil" },
             { key: "Portifólio", page: "Portifolio" },
@@ -69,9 +78,9 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
             { key: "Desconectar (Log-out)" },
           ]}
           renderItem={({ item }) => {
-            if (item.key === "Cláudio Ramos") {
+            if (item.key === userName) {
               return (
-                <TouchableOpacity style={[styles.styleRender, {justifyContent:"space-between"}]} onPress={onClose}>
+                <TouchableOpacity style={[styles.styleRender, { justifyContent: "space-between" }]} onPress={onClose}>
                   <Text style={[styles.item, styles.nomeUsuario]}>
                     {item.key}
                   </Text>
@@ -81,7 +90,7 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
 
             if (item.key === "") {
               return (
-                <TouchableOpacity style={[styles.styleRender, {justifyContent:"flex-end", padding:"10"}]} onPress={onClose}>
+                <TouchableOpacity style={[styles.styleRender, { justifyContent: "flex-end", padding: "10" }]} onPress={onClose}>
                   <Feather name="x" size={32} color="white" />
                 </TouchableOpacity>
               );
