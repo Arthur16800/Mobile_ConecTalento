@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   FlatList,
@@ -18,8 +18,18 @@ const { width } = Dimensions.get("window");
 const BarraLateral = ({ navigation, isVisible, onClose }) => {
   const translateX = useRef(new Animated.Value(width)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const [username, setUsername] = useState("Usuário");
 
   useEffect(() => {
+    const fetchUsername = async () => {
+      const storedName = await SecureStore.getItemAsync("username");
+      if (storedName) {
+        setUsername(storedName);
+      }
+    };
+
+    fetchUsername();
+
     Animated.parallel([
       Animated.timing(translateX, {
         toValue: isVisible ? 0 : width,
@@ -61,7 +71,7 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
         <FlatList
           data={[
             { key: ""},
-            { key: "Cláudio Ramos" },
+            { key: username },
             { key: "Página Inicial", page: "Home" },
             { key: "Meu perfil", page: "Perfil" },
             { key: "Portifólio", page: "Portifolio" },
@@ -69,7 +79,7 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
             { key: "Desconectar (Log-out)" },
           ]}
           renderItem={({ item }) => {
-            if (item.key === "Cláudio Ramos") {
+            if (item.key === username) {
               return (
                 <TouchableOpacity style={[styles.styleRender, {justifyContent:"space-between"}]} onPress={onClose}>
                   <Text style={[styles.item, styles.nomeUsuario]}>

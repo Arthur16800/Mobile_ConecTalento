@@ -112,10 +112,6 @@ export default function CriarProjeto({ navigation }) {
     ));
   }
 
-  // useEffect(()=>{
-  //   setId(SecureStore.getItemAsync("id"));
-  // }, []);
-
   useEffect(() => {
     console.log("Atualizado: project.imgs", project.imgs);
   }, [project.imgs]);
@@ -132,7 +128,6 @@ export default function CriarProjeto({ navigation }) {
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} />
-      <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
         <ScrollView
           contentContainerStyle={{
             alignItems: "center",
@@ -185,6 +180,7 @@ export default function CriarProjeto({ navigation }) {
         onClose={toggleVisibleFalse}
         navigation={navigation}
       />
+      
     </View>
   );
 }
