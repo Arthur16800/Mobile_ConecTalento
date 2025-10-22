@@ -112,6 +112,10 @@ export default function CriarProjeto({ navigation }) {
     ));
   }
 
+  // useEffect(()=>{
+  //   setId(SecureStore.getItemAsync("id"));
+  // }, []);
+
   useEffect(() => {
     console.log("Atualizado: project.imgs", project.imgs);
   }, [project.imgs]);
@@ -180,7 +184,6 @@ export default function CriarProjeto({ navigation }) {
         onClose={toggleVisibleFalse}
         navigation={navigation}
       />
-      
     </View>
   );
 }

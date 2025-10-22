@@ -3,15 +3,13 @@ import { useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
-import api from "../axios/axios";
-import Card from "../components/Card";
 
 export default function Portifolio({navigation}) { 
-  const pegarUsername = async () => {setUsername(SecureStore.getItemAsync("username"))}
+  const pegarUsername = async ()=> {const username = SecureStore.getItemAsync("username");}
+  
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
-  const [username, setUsername] = useState("");
   const toggleVisibleFalse = () => {
     setIsVisible(false);
   };
@@ -19,45 +17,27 @@ export default function Portifolio({navigation}) {
     setIsVisible(true);
   };
 
-  async function searchProjects(text) {
-    try {
+  async function searchProjects(text){
+    try{
       const response = await api.searchProjects(text);
       setProjects(response.data.profile_projeto);
-    } catch (error) {
-      console.log("Erro completo:", error);
-      const errorMessage =
-        error?.response?.data?.message?.error || error?.message || "Erro desconhecido";
-      console.log("Erro na busca:", errorMessage);
+    }catch(error){
+      console.log("Erro na busca:", error.data.message.error);
     }
   }
-  
-  async function getProjects(username) {
+  async function getProjects() {
     try {
       const response = await api.getProjectsByUser(username);
       setProjects(response.data.profile_projeto);
     } catch (error) {
-      console.log("Erro completo:", error);
-      const errorMessage =
-        error?.response?.data?.message?.error || error?.message || "Erro desconhecido";
-      console.log("Erro na requisição:", errorMessage);
+      console.log("Erro na requisição:", error.data.message.error);
     }
   }
   useEffect(() => {
-      async function fetchData() {
-        try {
-          const storedUsername = await SecureStore.getItemAsync("username");
-          setUsername(storedUsername);
-    
-          if (storedUsername) {
-            await getProjects(storedUsername); // passa o username corretamente
-          }
-        } catch (error) {
-          console.log("Erro ao pegar username ou projetos:", error);
-        }
-      }
-      fetchData();
-    }, []);
-
+    pegarUsername();
+    getProjects();
+  }, []);
+  
   return (
     <View style={styles.container}>
     <StatusBar hidden={false} backgroundColor="#fff" />
@@ -79,6 +59,7 @@ export default function Portifolio({navigation}) {
           <Card
             imageSource={uriImage}
             title={item.titulo}
+            onLike={handleLike}
             styleCard={styles.card}
           />
         );

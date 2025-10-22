@@ -8,15 +8,11 @@ import {
   Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Dimensions } from "react-native";
-
-const screenWidth = Dimensions.get("window").width;
 
 const Card = ({ imageSource, title, onLike, styleCard }) => {
   const [liked, setLiked] = useState(false);
   const [scale] = useState(new Animated.Value(1));
   const [count, setCount] = useState(0); // Para contar as curtidas
-
 
   const handleLike = () => {
     const newLikedState = !liked;
@@ -69,8 +65,8 @@ const Card = ({ imageSource, title, onLike, styleCard }) => {
 
 const styles = StyleSheet.create({
   imageContainer: {
-    width: screenWidth * 0.9,
-    height: screenWidth * 0.6,
+    width: "80%",
+    height: "75%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#DADADA",
@@ -78,13 +74,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 5,
     marginTop:15
   },
   imagem: {
     width: "100%",
     height: "100%",
-    borderRadius: 12,
+    borderRadius: 8,
   },
   heartButton: {
     position: "absolute",
