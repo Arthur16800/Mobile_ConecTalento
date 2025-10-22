@@ -21,10 +21,10 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
 import ModalMudarSenha from "../components/ModalMudarSenha";
 import * as SecureStore from "expo-secure-store";
-import {Image as RNImage} from "react-native";
+import { Image as RNImage } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function PerfilEdit({ navigation }) {
-  const imageDefaultUri = RNImage.resolveAssetSource(require("../../assets/logo.png")).uri;
   const [email, setEmail] = useState("");
   const [contatos, setContatos] = useState([
     { id: 0, type: "instagram", value: "@instagramteste" },
@@ -92,6 +92,30 @@ export default function PerfilEdit({ navigation }) {
   };
   // Fim Modal
 
+  async function pickImage() {
+    // Pedir permissão para acessar galeria
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permission.status !== "granted") {
+      Alert.alert(
+        "Permissão negada",
+        "Permita o acesso à galeria para escolher uma imagem."
+      );
+      return;
+    }
+    // Abrir galeria
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri; // caminho local da imagem
+      console.log("Imagem selecionada:", imageUri);
+      return imageUri;
+    }
+  }
+
   async function putSenha() {
     if (passwords.confirmPassword !== passwords.passwordNew) {
       Alert.alert("Digite e confirme a mesma nova senha!");
@@ -112,12 +136,27 @@ export default function PerfilEdit({ navigation }) {
   async function putUser() {
     try {
       const userId = await SecureStore.getItemAsync("id");
-      const response = await api.putUser(userId, {email:user.email, biografia:user.biografia, username:user.username, name:user.name}, imageDefaultUri);
+      const response = await api.putUser(
+        userId,
+        {
+          email: user.email,
+          biografia: user.biografia,
+          username: user.username,
+          name: user.name,
+        },
+        user.imagem
+      );
       Alert.alert(response.data.message);
       navigation.navigate("Perfil");
     } catch (error) {
       console.log("Erro na requisição:", error);
-      console.log({email:user.email, biografia:user.biografia, username:user.username, name:user.name});
+      console.log({
+        email: user.email,
+        biografia: user.biografia,
+        username: user.username,
+        name: user.name,
+        imagem: imageDefaultUri,
+      });
     }
   }
 
@@ -125,21 +164,21 @@ export default function PerfilEdit({ navigation }) {
     setEmail(await SecureStore.getItemAsync("email"));
   }
 
-  async function getUser(){
-    try{
+  async function getUser() {
+    try {
       const uname = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(uname);
-      console.log(response.data.profile)
+      console.log(response.data.profile);
       setUser(response.data.profile);
-    }catch(error){
+    } catch (error) {
       console.log("Erro na requisição:", error);
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getEmail();
     getUser();
-  },[])
+  }, []);
 
   return (
     <KeyboardAvoidingView
