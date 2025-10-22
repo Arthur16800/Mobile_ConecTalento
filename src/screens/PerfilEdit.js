@@ -112,7 +112,35 @@ export default function PerfilEdit({ navigation }) {
     if (!result.canceled) {
       const imageUri = result.assets[0].uri; // caminho local da imagem
       console.log("Imagem selecionada:", imageUri);
-      return imageUri;
+      setUser({...user, image: imageUri});
+    }
+  }
+
+  async function uploadUserImage(userId, imageUri) {
+    const formData = new FormData();
+
+    // Extrai nome e tipo do arquivo
+    const filename = imageUri.split("/").pop();
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : "image";
+
+    formData.append("imagem", {
+      uri: imageUri,
+      name: filename,
+      type,
+    });
+
+    try {
+      const response = await axios.put(
+        `http://192.168.x.x:5000/api/v1/user/${userId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      console.log("Upload concluído:", response.data);
+    } catch (error) {
+      console.log("Erro no upload:", error.message);
     }
   }
 
@@ -194,7 +222,18 @@ export default function PerfilEdit({ navigation }) {
 
           <View style={styles.lineUser}>
             <View style={styles.backIcon}>
-              <IoniconsUser name="person" size={45} color="#949599" />
+              <TouchableOpacity onPress={uploadUserImage}>
+                {user.imagem ? (
+                  <Image
+                    source={{
+                      uri: `data:${user.tipo_imagem};base64,${user.imagem}`,
+                    }}
+                    style={styles.profileImage}
+                  />
+                ) : (
+                  <IoniconsUser name="person" size={100} color="#949599" />
+                )}
+              </TouchableOpacity>
             </View>
             <Text style={styles.title}>{user.username}</Text>
             <MaterialIcons name="do-not-disturb-on" size={35} color="red" />
