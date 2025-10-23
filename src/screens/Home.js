@@ -37,13 +37,18 @@ export default function Home({ navigation }) {
   }, []);
 
   async function searchProjects() {
-    try {
-      setLoading(true);
-      const response = await api.searchProjects(String(search));
-      setProjects(response.data);
-    } catch (error) {
-    } finally {
-      setLoading(false);
+    if (search === "") {
+      getProjects();
+    } else {
+      try {
+        setLoading(true);
+        const response = await api.searchProjects(String(search));
+        setProjects(response.data);
+        console.log(response.data || "empty");
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
     }
   }
 
@@ -56,7 +61,7 @@ export default function Home({ navigation }) {
         setText={setSearch}
         getFunction={searchProjects}
       />
-      {loading ? <ActivityIndicator style={{flexGrow:1}} size={70} color="black" /> :
+      {loading ? <ActivityIndicator style={{ flexGrow: 1 }} size={70} color="black" /> :
         <FlatList
           data={projects}
           keyExtractor={(item) => item.ID_projeto}
