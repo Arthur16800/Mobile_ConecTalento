@@ -1,7 +1,7 @@
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, FlatList, StatusBar } from "react-native";
+import { View, StyleSheet, Dimensions, FlatList, StatusBar, ActivityIndicator, } from "react-native";
 import Card from "../components/Card";
 import api from "../axios/axios";
 
@@ -11,6 +11,7 @@ const screenWidth = Dimensions.get("window").width;
 export default function Home({ navigation }) {
   const [projects, setProjects] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   const toggleVisibleFalse = () => setIsVisible(false);
@@ -22,22 +23,27 @@ export default function Home({ navigation }) {
 
   async function getProjects() {
     try {
+      setLoading(true);
       const response = await api.getProjects();
       setProjects(response.data.profile_projeto);
     } catch (error) {
       console.log("Erro na requisição:", error.data.message.error);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
     getProjects();
   }, []);
 
-  async function searchProjects(text){
-    try{
-      const response = await api.searchProjects(text);
-      setProjects(response.data.profile_projeto);
-    }catch(error){
-      console.log("Erro na busca:", error.data.message.error);
+  async function searchProjects() {
+    try {
+      setLoading(true);
+      const response = await api.searchProjects(String(search));
+      setProjects(response.data);
+    } catch (error) {
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -50,29 +56,29 @@ export default function Home({ navigation }) {
         setText={setSearch}
         getFunction={searchProjects}
       />
+      {loading ? <ActivityIndicator style={{flexGrow:1}} size={70} color="black" /> :
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item.ID_projeto}
+          renderItem={({ item }) => {
+            const uriImage =
+              "data:" + item.tipo_imagem + ";base64," + item.imagem;
 
-      <FlatList
-        data={projects}
-        keyExtractor={(item) => item.ID_projeto}
-        renderItem={({ item }) => {
-          const uriImage =
-            "data:" + item.tipo_imagem + ";base64," + item.imagem;
-
-          return (
-            <Card
-              imageSource={uriImage}
-              title={item.titulo}
-              onLike={handleLike}
-              styleCard={styles.card}
-            />
-          );
-        }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          alignItems: "center",
-          paddingHorizontal: 10,
-        }}
-      />
+            return (
+              <Card
+                imageSource={uriImage}
+                title={item.titulo}
+                onLike={handleLike}
+                styleCard={styles.card}
+              />
+            );
+          }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            alignItems: "center",
+            paddingHorizontal: 10,
+          }}
+        />}
 
       <BarraLateral
         isVisible={isVisible}

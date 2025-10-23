@@ -8,6 +8,7 @@ import {
   StatusBar,
   Dimensions,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useLayoutEffect, useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -26,6 +27,7 @@ export default function CriarProjeto({ navigation }) {
     descricao: "",
   });
   const [imagens, setImagens] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useLayoutEffect(() => {
     StatusBar.setBarStyle("dark-content");
@@ -39,18 +41,17 @@ export default function CriarProjeto({ navigation }) {
   };
 
   const createProject = async (projeto, imagens, userId) => {
-    console.log(1);
-    console.log(project);
     try {
+      setLoading(true);
       const result = await api.createProjeto(projeto, imagens, userId);
-      console.log(2);
       if (result) {
         Alert.alert("Projeto Criado com Sucesso!");
+        navigation.navigate("Home");
       }
-      console.log(3);
     } catch (error) {
-      console.log(4);
-      console.log("Erro na requisição:", error.response?.data?.error);
+      console.log("Erro na requisição:", error.response.data.error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,6 +76,7 @@ export default function CriarProjeto({ navigation }) {
             "Imagens Demais",
             "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas."
           );
+
         }
       }
     } catch (error) {
@@ -153,11 +155,13 @@ export default function CriarProjeto({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
+              disabled={loading}
               onPress={() => {
                 createProject(project, imagens, userId);
               }}
             >
-              <Text style={styles.buttonText}>Criar Projeto</Text>
+              {loading ? <ActivityIndicator color="white" /> :
+                <Text style={styles.buttonText}>Criar Projeto</Text>}
             </TouchableOpacity>
           </View>
 

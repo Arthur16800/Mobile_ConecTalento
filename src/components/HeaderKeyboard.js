@@ -36,8 +36,8 @@ export default function Header({
             onChangeText={(newText) => setText(newText)}
             value={text}
             enterKeyHint={"search"}
-            onSubmitEditing={(text) => {
-              getFunction(text);
+            onSubmitEditing={() => {
+              getFunction();
             }}
           />
 
@@ -49,8 +49,8 @@ export default function Header({
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={(text) => {
-                getFunction(text);
+              onPress={() => {
+                getFunction();
               }}
             >
               <Entypo name="magnifying-glass" size={30} color="black" />
