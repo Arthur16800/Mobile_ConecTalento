@@ -82,6 +82,7 @@ export default function Home({ navigation }) {
             flexGrow: 1,
             alignItems: "center",
             paddingHorizontal: 10,
+            paddingBottom:25
           }}
         />}
 
@@ -102,8 +103,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card: {
-    width: screenWidth * 0.8,
-    height: screenHeight * 0.3,
+    width: screenWidth * 0.85,
+    height: screenHeight * 0.32,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#DADADA",

@@ -1,4 +1,4 @@
-import { View, StyleSheet, StatusBar, FlatList } from "react-native";
+import { View, StyleSheet, StatusBar, FlatList, Dimensions, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import HeaderK from "../components/HeaderKeyboard";
@@ -6,12 +6,16 @@ import BarraLateral from "../components/BarraLateral";
 import api from "../axios/axios";
 import Card from "../components/Card";
 
-export default function Portifolio({navigation}) { 
-  const pegarUsername = async () => {setUsername(SecureStore.getItemAsync("username"))}
+const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
+
+export default function Portifolio({ navigation }) {
+  const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [username, setUsername] = useState("");
+
   const toggleVisibleFalse = () => {
     setIsVisible(false);
   };
@@ -26,11 +30,34 @@ export default function Portifolio({navigation}) {
     } catch (error) {
       console.log("Erro completo:", error);
       const errorMessage =
-        error?.response?.data?.message?.error || error?.message || "Erro desconhecido";
+        error?.response?.data?.message?.error ||
+        error?.message ||
+        "Erro desconhecido";
       console.log("Erro na busca:", errorMessage);
     }
   }
-  
+  async function searchProjects() {
+    setLoading(true);
+    if (search === "") {
+      getProjects(username);
+      setLoading(false);
+    } else {
+      try {
+        const response = await api.searchProjects(String(search));
+        setProjects(response.data);
+        console.log(response.data || "empty");
+      } catch (error) {
+        console.log("Erro completo:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
+  const handleLike = (newLikedState) => {
+    console.log("Curtido:", newLikedState);
+  };
+
   async function getProjects(username) {
     try {
       const response = await api.getProjectsByUser(username);
@@ -38,72 +65,100 @@ export default function Portifolio({navigation}) {
     } catch (error) {
       console.log("Erro completo:", error);
       const errorMessage =
-        error?.response?.data?.message?.error || error?.message || "Erro desconhecido";
+        error?.response?.data?.message?.error ||
+        error?.message ||
+        "Erro desconhecido";
       console.log("Erro na requisição:", errorMessage);
     }
   }
   useEffect(() => {
-      async function fetchData() {
-        try {
-          const storedUsername = await SecureStore.getItemAsync("username");
-          setUsername(storedUsername);
-    
-          if (storedUsername) {
-            await getProjects(storedUsername); // passa o username corretamente
-          }
-        } catch (error) {
-          console.log("Erro ao pegar username ou projetos:", error);
+    async function fetchData() {
+      try {
+        const storedUsername = await SecureStore.getItemAsync("username");
+        setUsername(storedUsername);
+
+        if (storedUsername) {
+          await getProjects(storedUsername); 
         }
+      } catch (error) {
+        console.log("Erro ao pegar username ou projetos:", error);
       }
-      fetchData();
-    }, []);
+    }
+    fetchData();
+  }, []);
 
   return (
     <View style={styles.container}>
-    <StatusBar hidden={false} backgroundColor="#fff" />
-    <HeaderK
-      toggleVisible={toggleVisibleTrue}
-      text={search}
-      setText={setSearch}
-      getFunction={searchProjects}
-    />
+      <StatusBar hidden={false} backgroundColor="#fff" />
+      <HeaderK
+        toggleVisible={toggleVisibleTrue}
+        text={search}
+        setText={setSearch}
+        getFunction={searchProjects}
+      />
 
-    <FlatList
-      data={projects}
-      keyExtractor={(item) => item.ID_projeto}
-      renderItem={({ item }) => {
-        const uriImage =
-          "data:" + item.tipo_imagem + ";base64," + item.imagem;
+      {loading ? (
+        <ActivityIndicator style={{ flexGrow: 1 }} size={70} color="black" />
+      ) : (
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item.ID_projeto}
+          renderItem={({ item }) => {
+            const uriImage =
+              "data:" + item.tipo_imagem + ";base64," + item.imagem;
 
-        return (
-          <Card
-            imageSource={uriImage}
-            title={item.titulo}
-            styleCard={styles.card}
-          />
-        );
-      }}
-      contentContainerStyle={{
-        flexGrow: 1,
-        alignItems: "center",
-        paddingHorizontal: 10,
-      }}
-    />
+            return (
+              <Card
+                imageSource={uriImage}
+                title={item.titulo}
+                onLike={handleLike}
+                styleCard={styles.card}
+              />
+            );
+          }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            alignItems: "center",
+            paddingHorizontal: 10,
+            paddingBottom: 25,
+          }}
+        />
+      )}
 
-    <BarraLateral
-      isVisible={isVisible}
-      onClose={toggleVisibleFalse}
-      navigation={navigation}
-    />
-  </View>
+      <BarraLateral
+        isVisible={isVisible}
+        onClose={toggleVisibleFalse}
+        navigation={navigation}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#FFFFFF",
-      alignItems:"center",
-      justifyContent: "space-between",
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    width: "100%",
+  },
+  card: {
+    width: screenWidth * 0.85,
+    height: screenHeight * 0.32,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#DADADA",
+    marginBottom: 10,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+    marginTop: 75,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});

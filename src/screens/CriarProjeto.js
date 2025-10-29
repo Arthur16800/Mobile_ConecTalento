@@ -86,7 +86,7 @@ export default function CriarProjeto({ navigation }) {
 
   function renderImages() {
     return imagens.map((imageUri, index) => (
-      <TouchableOpacity key={index} onPress={() => deleteImage(index)}>
+      <TouchableOpacity key={index} onPress={() => deleteImage(index)} >
         <Image
           source={{ uri: imageUri }}
           style={{
@@ -127,6 +127,7 @@ export default function CriarProjeto({ navigation }) {
           contentContainerStyle={{
             alignItems: "center",
             flexGrow: 1,
+            marginHorizontal:"5%"
           }}
         >
           <View style={styles.nomeEdit}>
@@ -187,7 +188,7 @@ export default function CriarProjeto({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
+    alignItems: "",
   },
   nomeEdit: {
     flex: 0.3,

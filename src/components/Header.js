@@ -2,7 +2,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import { mvs } from "react-native-size-matters"; // A função mvs é útil para escalar tamanhos de fonte.
 
-export default function Header({ toggleVisible, navigation }) {
+export default function Header({ toggleVisible}) {
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>

@@ -69,8 +69,8 @@ const Card = ({ imageSource, title, onLike, styleCard }) => {
 
 const styles = StyleSheet.create({
   imageContainer: {
-    width: screenWidth * 0.9,
-    height: screenWidth * 0.6,
+    width: screenWidth * 0.8,
+    height: screenWidth * 0.5,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#DADADA",
@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   title: {
-    marginTop: 10,
+    marginVertical: 5,
+    marginBottom:12.5,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
