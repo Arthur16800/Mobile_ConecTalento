@@ -1,5 +1,12 @@
-import { View, StyleSheet, StatusBar, FlatList, Dimensions, ActivityIndicator } from "react-native";
-import { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  FlatList,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
+import { useLayoutEffect, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
@@ -15,6 +22,11 @@ export default function Portifolio({ navigation }) {
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [username, setUsername] = useState("");
+
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
 
   const toggleVisibleFalse = () => {
     setIsVisible(false);
@@ -74,7 +86,7 @@ export default function Portifolio({ navigation }) {
         setUsername(storedUsername);
 
         if (storedUsername) {
-          await getProjects(storedUsername); 
+          await getProjects(storedUsername);
         }
       } catch (error) {
         console.log("Erro ao pegar username ou projetos:", error);

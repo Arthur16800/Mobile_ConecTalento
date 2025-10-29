@@ -15,6 +15,7 @@ export default function Header({
   text,
   setText,
   getFunction,
+  filterFunction,
 }) {
   return (
     <View style={styles.header}>
@@ -42,17 +43,13 @@ export default function Header({
           />
 
           <View style={styles.icons}>
-            <TouchableOpacity
-
-            >
-              <Feather name="filter" size={30} color="black" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                getFunction();
-              }}
-            >
+            {filterFunction &&
+            <TouchableOpacity onPress={() => filterFunction()}>
+            <Feather name="filter" size={30} color="black" />
+          </TouchableOpacity>
+          }
+          
+            <TouchableOpacity onPress={() => getFunction()}>
               <Entypo name="magnifying-glass" size={30} color="black" />
             </TouchableOpacity>
           </View>

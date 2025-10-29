@@ -10,7 +10,7 @@ import {
   StatusBar,
   Alert,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import api from "../axios/axios";
 import backgroundImage from "../../assets/backgroundLogin.png";
 import Header from "../components/Header";
@@ -36,12 +36,17 @@ export default function PerfilEdit({ navigation }) {
     { id: 4, type: "twitter", value: "TwitterTeste" },
   ]);
 
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
+
   const [user, setUser] = useState({
     email: "",
     biografia: "",
     username: "",
     name: "",
-    imagem: null
+    imagem: null,
   });
   const [passwords, setPasswords] = useState({
     passwordNow: "",
@@ -122,16 +127,13 @@ export default function PerfilEdit({ navigation }) {
   async function putUser() {
     try {
       const userId = SecureStore.getItemAsync("id");
-      const response = await api.putUser(
-        userId,
-        {
-          email: user.email,
-          biografia: user.biografia,
-          username: user.username,
-          name: user.name,
-          imagens:user.imagem
-        },
-      );
+      const response = await api.putUser(userId, {
+        email: user.email,
+        biografia: user.biografia,
+        username: user.username,
+        name: user.name,
+        imagens: user.imagem,
+      });
       Alert.alert(response.data.message);
       navigation.navigate("Perfil");
     } catch (error) {
@@ -170,8 +172,8 @@ export default function PerfilEdit({ navigation }) {
       style={styles.wrapper}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <StatusBar hidden={false} backgroundColor="#fff" />
       <ScrollView contentContainerStyle={styles.container}>
+        <StatusBar hidden={false} backgroundColor="#fff" />
         <Header toggleVisible={toggleVisibleTrue} />
 
         <View style={styles.painel}>

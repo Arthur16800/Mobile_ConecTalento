@@ -8,7 +8,7 @@ import {
   StatusBar,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { useState, useEffect } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -16,9 +16,8 @@ import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
 import { ScrollView } from "react-native-gesture-handler";
 import api from "../axios/axios";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function Perfil({ navigation }) {
   const [emailAtual, setEmail] = useState("");
@@ -31,6 +30,12 @@ export default function Perfil({ navigation }) {
       numero_telefone: null,
     },
   });
+
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
+
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibleFalse = () => {
@@ -56,19 +61,15 @@ export default function Perfil({ navigation }) {
   }
 
   function contatos_filter(contatos) {
-    return contatos.filter(item => item.valor);
+    return contatos.filter((item) => item.valor);
   }
-
-
 
   const [contatos, setContatos] = useState([]);
 
   useEffect(() => {
     getEmail();
     getUser();
-
-    contatos_filter(contatos)
-
+    contatos_filter(contatos);
   }, []);
 
   useEffect(() => {
@@ -84,8 +85,6 @@ export default function Perfil({ navigation }) {
     }
   }, [user]);
 
-
-
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
@@ -93,27 +92,28 @@ export default function Perfil({ navigation }) {
       case "facebook":
         return <Entypo name="facebook" size={30} color="black" />;
       case "pinterest":
-        return <FontAwesome name="pinterest" size={30} color="black" />
+        return <FontAwesome name="pinterest" size={30} color="black" />;
       case "github":
-        return <AntDesign name="github" size={30} color="black" />
+        return <AntDesign name="github" size={30} color="black" />;
       case null:
-        return
+        return;
     }
   };
 
   return (
     <View style={styles.container}>
-
       <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} />
-      <ScrollView style={styles.scrollContainer} contentContainerStyle={{
-        paddingBottom: 80, alignItems: "center",
-        justifyContent: "flex-start",
-      }}>
-
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{
+          paddingBottom: 80,
+          alignItems: "center",
+          justifyContent: "flex-start",
+        }}
+      >
         {/* Ícone de usuário */}
         <View style={styles.fundoUser}>
-
           {user.imagem ? (
             <Image
               source={{ uri: `data:${user.tipo_imagem};base64,${user.imagem}` }}
@@ -122,14 +122,13 @@ export default function Perfil({ navigation }) {
           ) : (
             <IoniconsUser name="person" size={100} color="#949599" />
           )}
-
-
-
         </View>
 
         {/* Nome do usuário e ícone de lápis ao lado */}
         <View style={styles.nomeWrapper}>
-          <Text style={styles.name} numberOfLines={0}>{user.username}</Text>
+          <Text style={styles.name} numberOfLines={0}>
+            {user.username}
+          </Text>
           {emailAtual === user.email && (
             <TouchableOpacity
               onPress={() => navigation.navigate("PerfilEdit")}
@@ -152,14 +151,11 @@ export default function Perfil({ navigation }) {
         {/* Contatos */}
         <Text style={styles.title}>Contatos</Text>
         {contatos.map((item) => (
-
           <View key={item.tipo} style={styles.contatoItem}>
             {renderIcon(item.tipo)}
             <Text style={styles.contactText}>{item.valor}</Text>
           </View>
         ))}
-
-
       </ScrollView>
       {/* Botão para ver projetos */}
       <TouchableOpacity
@@ -237,7 +233,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contactText: {
-
     fontSize: 18,
 
     marginLeft: 10,

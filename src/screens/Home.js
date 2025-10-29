@@ -1,7 +1,16 @@
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, FlatList, StatusBar, ActivityIndicator, } from "react-native";
+import { useLayoutEffect, useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  FlatList,
+  StatusBar,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import Card from "../components/Card";
 import api from "../axios/axios";
 
@@ -11,13 +20,18 @@ const screenWidth = Dimensions.get("window").width;
 export default function Home({ navigation }) {
   const [projects, setProjects] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [filter, setFilter] = useState(false);
+  const [whichFilter, setWhichFilter] = useState("recentes");
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
 
-
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
 
   async function getProjects() {
     try {
@@ -28,11 +42,53 @@ export default function Home({ navigation }) {
       console.log("Erro na requisição:", error.data.message.error);
     } finally {
       setLoading(false);
+      setFilter(false);
+      setWhichFilter("recentes");
     }
   }
   useEffect(() => {
     getProjects();
   }, []);
+  const decideStyle = (value, value2 = null) =>{
+    if (value === whichFilter || value2 === whichFilter){
+      return styles.circleChosen;
+    }else{
+      return styles.circle;
+    }
+  }
+  const decideColor = (value, value2 = null) =>{
+    if (value === whichFilter || value2 === whichFilter){
+      return "white";
+    }else{
+      return "black";
+    }
+  }
+
+  useEffect(()=>{
+    const ordenados = [...projects];
+
+    switch (whichFilter) {
+      case "maisLike":
+        ordenados.sort((a, b) => b.total_curtidas - a.total_curtidas);
+        break;
+      case "menosLike":
+        ordenados.sort((a, b) => a.total_curtidas - b.total_curtidas);
+        break;
+      case "A-Z":
+        ordenados.sort((a, b) => a.titulo.localeCompare(b.titulo));
+        break;
+      case "Z-A":
+        ordenados.sort((a, b) => b.titulo.localeCompare(a.titulo));
+        break;
+      case "recentes":
+      default:
+        ordenados.sort((a, b) => b.ID_projeto - a.ID_projeto);
+        break;
+    }
+
+    setProjects(ordenados);
+
+  }, [whichFilter])
 
   async function searchProjects() {
     if (search === "") {
@@ -46,20 +102,44 @@ export default function Home({ navigation }) {
       } catch (error) {
       } finally {
         setLoading(false);
+        setFilter(false);
+        setWhichFilter("recentes");
       }
     }
   }
 
+  const toggleFilter = () => {
+    setFilter(!filter);
+  };
+
   return (
     <View style={styles.container}>
-      <StatusBar hidden={false} backgroundColor="#fff" />
+      <StatusBar hidden={true} backgroundColor="#fff" />
       <HeaderK
         toggleVisible={toggleVisibleTrue}
         text={search}
         setText={setSearch}
         getFunction={searchProjects}
+        filterFunction={toggleFilter}
       />
-      {loading ? <ActivityIndicator style={{ flexGrow: 1 }} size={70} color="black" /> :
+      {filter && (
+        <View style={styles.filters}>
+          <TouchableOpacity style={decideStyle("recentes")} onPress={()=>setWhichFilter("recentes")}>
+            <Text style={{color:decideColor("recentes")}}>Mais Recentes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={decideStyle("maisLike", "menosLike")} onPress={()=>{ if (whichFilter !== "maisLike") {setWhichFilter("maisLike")}else{setWhichFilter("menosLike")}}}>
+            {whichFilter === "maisLike" ? <Text style={{color:decideColor("maisLike")}}>Menos Curtidos</Text>: <Text style={{color:decideColor("menosLike")}}>Mais Curtidos</Text>}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={decideStyle("A-Z", "Z-A")} onPress={()=>{ if (whichFilter !== "A-Z") {setWhichFilter("A-Z")}else{setWhichFilter("Z-A")}}}>
+          {whichFilter === "A-Z" ? <Text style={{color:decideColor("A-Z")}}>Título Z-A</Text>: <Text style={{color:decideColor("Z-A")}}>Título A-Z</Text>}
+          </TouchableOpacity>
+        </View>
+      )}
+      {loading ? (
+        <ActivityIndicator style={{ flexGrow: 1 }} size={70} color="black" />
+      ) : (
         <FlatList
           data={projects}
           keyExtractor={(item) => item.ID_projeto}
@@ -79,9 +159,10 @@ export default function Home({ navigation }) {
             flexGrow: 1,
             alignItems: "center",
             paddingHorizontal: 10,
-            paddingBottom:25
+            paddingBottom: 25,
           }}
-        />}
+        />
+      )}
 
       <BarraLateral
         isVisible={isVisible}
@@ -99,6 +180,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
   },
+  filters: {
+    display: "flex",
+    flexDirection: "row",
+    marginVertical: screenHeight * 0.01,
+    marginHorizontal: screenWidth * 0.05,
+    gap:screenWidth * 0.1,
+    width: screenWidth * 0.9,
+    height: screenHeight * 0.05
+  },
   card: {
     width: screenWidth * 0.85,
     height: screenHeight * 0.32,
@@ -113,6 +203,27 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 5,
     marginTop: 75,
+  },
+  circle: {
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: "black",
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    backgroundColor:"white"
+  },
+  circleChosen: {
+    borderRadius: 30,
+    borderWidth: 0,
+    borderColor: "#803AD6",
+    padding: 13,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    backgroundColor:"#803AD6",
+    color:"#ffffff",
   },
   title: {
     fontSize: 18,

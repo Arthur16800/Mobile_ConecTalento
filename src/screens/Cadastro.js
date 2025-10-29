@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Image,
   ImageBackground,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import api from "../axios/axios";
 import * as SecureStore from "expo-secure-store";
@@ -20,7 +20,7 @@ import ModalConfirmEmail from "../components/ModalConfirmEmail";
 
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
-    name:"",
+    name: "",
     username: "",
     email: "",
     password: "",
@@ -37,6 +37,12 @@ export default function Cadastro({ navigation }) {
   const fecharModal = () => {
     setModalConf(false);
   };
+
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
+
   async function saveInfo(token, userP) {
     await SecureStore.setItemAsync("token", token);
     await SecureStore.setItemAsync("username", userP.username);
@@ -44,26 +50,29 @@ export default function Cadastro({ navigation }) {
     await SecureStore.setItemAsync("id", userP.ID_user.toString());
   }
   async function handleCadastro() {
-    try{
+    try {
       setControlLoad(true);
       const response = await api.postCadastro(user);
       console.log(response.data.message);
-      if(response.data.message === "Código válido. Usuário autenticado."){
+      if (response.data.message === "Código válido. Usuário autenticado.") {
         saveInfo(response.data.token, response.data.user);
         setControlLoad(false);
         Alert.alert("Usuário criado com sucesso!");
         navigation.navigate("Home");
-      }else if(response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail."){
+      } else if (
+        response.data.message === "Código reenviado ao e-mail." ||
+        "Código enviado ao e-mail."
+      ) {
         visibModal();
-        setControlLoad(false);        
+        setControlLoad(false);
       }
-    }catch(error){
-      Alert.alert("Erro no cadastro", error.data.message.error)
+    } catch (error) {
+      Alert.alert("Erro no cadastro", error.data.message.error);
     }
   }
   return (
     <View style={styles.container}>
-      <StatusBar hidden={false} backgroundColor="#fff" />
+      <StatusBar hidden={true} backgroundColor="#fff" />
       <ImageBackground source={backgroundLogin} style={styles.background}>
         <View style={styles.whiteboard}>
           <Text style={styles.title}>Cadastro</Text>
@@ -106,8 +115,16 @@ export default function Cadastro({ navigation }) {
             showpassword={"showPassword2"}
           />
           <View>
-            <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()} disabled={controlLoad}>
-            {controlLoad?<ActivityIndicator color="white" />:<Text style={styles.buttonText}>Criar Conta</Text>}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleCadastro()}
+              disabled={controlLoad}
+            >
+              {controlLoad ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.buttonText}>Criar Conta</Text>
+              )}
             </TouchableOpacity>
             <View style={styles.footer}>
               <Text style={styles.footerText}>Já possui conta?</Text>

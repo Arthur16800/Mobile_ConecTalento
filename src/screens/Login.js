@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import {
   View,
   Text,
@@ -35,6 +35,11 @@ export default function Login({ navigation }) {
     await SecureStore.setItemAsync("id", userP.ID_user.toString());
   }
 
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
+
   async function handleLogin() {
     setControlLoad(true);
     await api.postLogin(user).then(
@@ -54,7 +59,7 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden={false} backgroundColor="#fff" />
+      <StatusBar hidden={true} backgroundColor="#fff" />
       <ImageBackground source={backgroundLogin} style={styles.background}>
         <View style={styles.whiteboard}>
           <Text style={styles.title}>Login</Text>

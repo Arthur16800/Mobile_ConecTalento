@@ -29,11 +29,6 @@ export default function CriarProjeto({ navigation }) {
   const [imagens, setImagens] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useLayoutEffect(() => {
-    StatusBar.setBarStyle("dark-content");
-    StatusBar.setBackgroundColor("transparent");
-  }, []);
-
   const screenWidth = Dimensions.get("window").width;
 
   const pushImage = (imagem) => {
@@ -76,17 +71,16 @@ export default function CriarProjeto({ navigation }) {
             "Imagens Demais",
             "Limite de 5 imagens atingido, exclua alguma imagem para adicionar novas."
           );
-
         }
       }
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error.response?.data?.error);
     }
-  }
+  };
 
   function renderImages() {
     return imagens.map((imageUri, index) => (
-      <TouchableOpacity key={index} onPress={() => deleteImage(index)} >
+      <TouchableOpacity key={index} onPress={() => deleteImage(index)}>
         <Image
           source={{ uri: imageUri }}
           style={{
@@ -121,13 +115,14 @@ export default function CriarProjeto({ navigation }) {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
+        <StatusBar hidden={false} backgroundColor="#fff" />
         <Header toggleVisible={toggleVisibleTrue} />
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             alignItems: "center",
             flexGrow: 1,
-            marginHorizontal:"5%"
+            marginHorizontal: "5%",
           }}
         >
           <View style={styles.nomeEdit}>
@@ -161,8 +156,11 @@ export default function CriarProjeto({ navigation }) {
                 createProject(project, imagens, userId);
               }}
             >
-              {loading ? <ActivityIndicator color="white" /> :
-                <Text style={styles.buttonText}>Criar Projeto</Text>}
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.buttonText}>Criar Projeto</Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -188,7 +186,6 @@ export default function CriarProjeto({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "",
   },
   nomeEdit: {
     flex: 0.3,
