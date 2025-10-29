@@ -1,5 +1,6 @@
 import {
   View,
+  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
@@ -16,18 +17,30 @@ export default function Header({
   setText,
   getFunction,
   filterFunction,
+  user,
 }) {
+  const uriImage = "data:" + user.tipo_imagem + ";base64," + user.imagem;
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>
         <Text style={styles.title}>ConecTalento</Text>
 
-        <TouchableOpacity
-          onPress={() => toggleVisible()}
-          style={styles.fundoUser}
-        >
-          <IoniconsUser name="person" size={40} color="#949599" />
-        </TouchableOpacity>
+        {!uriImage ? (
+          <TouchableOpacity
+            onPress={() => toggleVisible()}
+            style={styles.fundoUser}
+          >
+            <IoniconsUser name="person" size={40} color="#949599" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {console.log(user) 
+              toggleVisible()}}
+            style={styles.fundoUser}
+          >
+            <Image source={{uri:uriImage}} style={{width:"100%", height:"100%", borderRadius:9999}}/>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.barraBot}>
         <View style={styles.barraPesquisa}>
@@ -43,12 +56,12 @@ export default function Header({
           />
 
           <View style={styles.icons}>
-            {filterFunction &&
-            <TouchableOpacity onPress={() => filterFunction()}>
-            <Feather name="filter" size={30} color="black" />
-          </TouchableOpacity>
-          }
-          
+            {filterFunction && (
+              <TouchableOpacity onPress={() => filterFunction()}>
+                <Feather name="filter" size={30} color="black" />
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity onPress={() => getFunction()}>
               <Entypo name="magnifying-glass" size={30} color="black" />
             </TouchableOpacity>
@@ -66,13 +79,13 @@ const styles = StyleSheet.create({
     paddingTop: mvs(10),
     paddingBottom: mvs(10),
     paddingHorizontal: 20,
-    alignItems: "center",
+    alignusers: "center",
     justifyContent: "space-evenly",
   },
   barraTopo: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignusers: "center",
     width: "100%",
     paddingBottom: mvs(10),
   },
@@ -86,14 +99,14 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    alignItems: "center",
+    alignusers: "center",
     justifyContent: "center",
   },
   barraBot: {
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignusers: "center",
   },
   barraPesquisa: {
     height: 60,
@@ -108,7 +121,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignusers: "center",
     flexDirection: "row",
   },
   icons: {

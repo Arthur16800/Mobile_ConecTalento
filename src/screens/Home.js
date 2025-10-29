@@ -19,6 +19,11 @@ const screenWidth = Dimensions.get("window").width;
 
 export default function Home({ navigation }) {
   const [projects, setProjects] = useState([]);
+  const [user, setUser] = useState({
+    username:"",
+    tipo_imagem:"",
+    imagem:""
+  });
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState(false);
   const [whichFilter, setWhichFilter] = useState("recentes");
@@ -46,9 +51,36 @@ export default function Home({ navigation }) {
       setWhichFilter("recentes");
     }
   }
+  async function getUser() {
+    try {
+      const response = await api.getUserByName(username)
+      setUser((prev) => ({
+        ...prev,
+        tipo_imagem: response.data.profile.tipo_imagem,
+        imagem: response.data.profile.imagem
+      }))
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
   useEffect(() => {
     getProjects();
+    const fetchUsername = async () => {
+      const storedName = await SecureStore.getItemAsync("username");
+      if (storedName) {
+        setUser((prev) => ({
+          ...prev,
+          username: storedName,
+        }))
+      }
+    };
+    fetchUsername();
   }, []);
+  useEffect(()=>{
+    getUser();
+    console.log(user)
+  }, [user.username])
+
   const decideStyle = (value, value2 = null) =>{
     if (value === whichFilter || value2 === whichFilter){
       return styles.circleChosen;
@@ -121,6 +153,7 @@ export default function Home({ navigation }) {
         setText={setSearch}
         getFunction={searchProjects}
         filterFunction={toggleFilter}
+        user={user}
       />
       {filter && (
         <View style={styles.filters}>
