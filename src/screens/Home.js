@@ -17,9 +17,7 @@ export default function Home({ navigation }) {
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
 
-  const handleLike = (newLikedState) => {
-    console.log("Curtido:", newLikedState);
-  };
+
 
   async function getProjects() {
     try {
@@ -72,8 +70,7 @@ export default function Home({ navigation }) {
             return (
               <Card
                 imageSource={uriImage}
-                title={item.titulo}
-                onLike={handleLike}
+                item={item}
                 styleCard={styles.card}
               />
             );

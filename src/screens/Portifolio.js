@@ -54,10 +54,6 @@ export default function Portifolio({ navigation }) {
     }
   }
 
-  const handleLike = (newLikedState) => {
-    console.log("Curtido:", newLikedState);
-  };
-
   async function getProjects(username) {
     try {
       const response = await api.getProjectsByUser(username);
@@ -110,8 +106,7 @@ export default function Portifolio({ navigation }) {
             return (
               <Card
                 imageSource={uriImage}
-                title={item.titulo}
-                onLike={handleLike}
+                item={item}
                 styleCard={styles.card}
               />
             );

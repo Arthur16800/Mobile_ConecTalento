@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -6,30 +6,65 @@ import {
   Text,
   TouchableOpacity,
   Animated,
+  Dimensions,
 } from "react-native";
+import { Badge } from 'react-native-paper';
 import { Ionicons } from "@expo/vector-icons";
-import { Dimensions } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import api from "../axios/axios"
 
 const screenWidth = Dimensions.get("window").width;
 
-const Card = ({ imageSource, title, onLike, styleCard }) => {
+const Card = ({ imageSource, item, styleCard }) => {
+  const [userId, setUserId] = useState("");
   const [liked, setLiked] = useState(false);
   const [scale] = useState(new Animated.Value(1));
-  const [count, setCount] = useState(0); // Para contar as curtidas
+  const [likesCount, setLikesCount] = useState(item.total_curtidas);
 
-
-  const handleLike = () => {
-    const newLikedState = !liked;
-    setLiked(newLikedState);
-    if (newLikedState) {
-      setCount(count + 1); // Incrementa o contador quando curtir
-    } else {
-      setCount(count - 1); // Decrementa o contador se desfizer o like
+  useEffect(() => {
+    if (userId) {
+      api
+        .getProjectsLikedUser(userId)
+        .then((res) => {
+          const likedProjects = res.data.profile_projeto.map(
+            (p) => p.ID_projeto
+          );
+          if (likedProjects.includes(item.ID_projeto)) setLiked(true);
+        })
+        .catch((err) => console.log("Erro ao verificar curtidas:", err));
     }
+  }, [item.ID_projeto, userId]);
 
-    // Chama a função onLike se fornecida
-    if (onLike) {
-      onLike(newLikedState);
+  useEffect(()=>{
+    async function getIdUser(){
+      setUserId(await SecureStore.getItemAsync("id"));
+    }
+    getIdUser();
+  },[])
+
+  const handleLikeAPI = async () => {
+    try {
+      const res = await api.likeProject(item.ID_projeto, userId);
+
+      if (res.data.curtido) {
+        setLiked(true);
+        setLikesCount((prev) => prev + 1);
+      } else {
+        setLiked(false);
+        setLikesCount((prev) => Math.max(prev - 1, 0));
+      }
+    } catch (err) {
+      console.error("Erro ao curtir:", err);
+      if (err.response) {
+        console.log("Status:", err.response.status);
+        console.log("Dados do erro:", err.response.data);
+      }
+  }
+}
+
+  const handleLike = () => {    
+    if (handleLikeAPI) {
+      handleLikeAPI();
     }
 
     // Animação do coração
@@ -59,10 +94,11 @@ const Card = ({ imageSource, title, onLike, styleCard }) => {
               color={liked ? "red" : "black"}
             />
           </Animated.View>
+          <Badge>{likesCount}</Badge>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.item}>{item.titulo}</Text>
     </View>
   );
 };
@@ -79,7 +115,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     elevation: 5,
-    marginTop:15
+    marginTop: 15,
   },
   imagem: {
     width: "100%",
@@ -102,15 +138,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "relative",
   },
-  countText: {
+  likesCountText: {
     position: "absolute",
     bottom: -1,
     fontSize: 12,
     color: "#000",
   },
-  title: {
+  item: {
     marginVertical: 5,
-    marginBottom:12.5,
+    marginBottom: 12.5,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",

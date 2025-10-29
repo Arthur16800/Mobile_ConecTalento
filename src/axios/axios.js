@@ -15,7 +15,7 @@ function base64ToFile(base64, filename) {
 }
 
 const api = axios.create({
-  baseURL: "http://10.89.240.90:5000/api/v1/",
+  baseURL: "http://10.89.240.88:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -34,7 +34,7 @@ const sheets = {
   postLogin: (user) => api.post("login", user),
   postCadastro: (user) => api.post("user", user),
   getProjects: () => api.get("projects"),
-  searchProjects: (text) => api.get(`project/search`, {params:{q:text}}),
+  searchProjects: (text) => api.get(`project/search`, { params: { q: text } }),
   getUserByName: (username) => api.get(`user/${username}`),
   putUser: (
     userId,
@@ -88,11 +88,11 @@ const sheets = {
           data.append("imagens", {
             uri: imagem,
             name: filename,
-            type: type
+            type: type,
           });
         });
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     }
     return api.post(`/project/${userId}`, data, {
@@ -127,6 +127,20 @@ const sheets = {
       },
     });
   }, // TENHO QUE ESTUDAR COMO FUNCIONA O "ENVIAR MULTIPLAS IMAGENS PARA O SERVIDOR"
+  getProjectsLikedUser: (userId) => {
+    if (!userId) return Promise.reject(new Error("User ID ausente"));
+    return api.get(`/projectsliked/${userId}`);
+  },
+
+  likeProject: (projectId, userId) => {
+    if (!projectId || !userId) {
+      return Promise.reject(new Error("Project ID ou User ID ausente"));
+    }
+    return api.post("/like_dislike_projects", {
+      ID_projeto: Number(projectId),
+      ID_user: Number(userId),
+    });
+  },
 };
 
 export default sheets;
