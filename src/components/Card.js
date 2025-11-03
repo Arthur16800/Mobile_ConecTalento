@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     elevation: 5,
-    marginTop: 15,
+    marginTop: 20,
   },
   imagem: {
     width: "100%",
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     position: "absolute",
-    top: -15,
+    top: -20,
     right: -20,
     zIndex: 2,
   },
@@ -133,10 +133,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 1,
     borderColor: "black",
-    padding: 12,
+    padding: 14,
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
+    top: 10,
   },
   likesCountText: {
     position: "absolute",
