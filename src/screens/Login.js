@@ -45,7 +45,7 @@ export default function Login({ navigation }) {
     await api.postLogin(user).then(
       (response) => {
         Alert.alert(response.data.message);
-        console.log(response.data.user);
+        // console.log(response.data.user);
         saveInfo(response.data.token, response.data.user);
         setControlLoad(false);
         navigation.navigate("Home");

@@ -52,14 +52,18 @@ export default function Portifolio({ navigation }) {
       console.log("Erro na busca:", errorMessage);
     }
   }
-  async function getUser() {
+  async function getUser(username) {
     try {
-      const response = await api.getUserByName(username)
+      const response = await api.getUserByName(username);
+      const tipoImagemBuffer = response.data.profile.tipo_imagem;
+      const imagemBuffer = response.data.profile.imagem;
       setUser({
-        tipo_imagem: response.data.profile.tipo_imagem || null,
-        imagem: response.data.profile.imagem || null
+        tipo_imagem: tipoImagemBuffer,
+        imagem: imagemBuffer
       })
-    } catch (error) {}
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
   }
   async function searchProjects() {
     setLoading(true);
@@ -99,7 +103,7 @@ export default function Portifolio({ navigation }) {
 
         if (storedUsername) {
           await getProjects(storedUsername);
-          await getUser();
+          await getUser(storedUsername);
         }
       } catch (error) {
         console.log("Erro ao buscar username ou projetos:", error);

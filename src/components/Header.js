@@ -1,11 +1,10 @@
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Image } from "react-native";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import { mvs } from "react-native-size-matters"; // A função mvs é útil para escalar tamanhos de fonte.
 
 export default function Header({ toggleVisible, user }) {
+  const { tipo_imagem, imagem } = user;
 
-  const {tipo_imagem, imagem} = user;
-  
   const uriImage = "data:" + tipo_imagem + ";base64," + imagem;
 
   return (
@@ -22,11 +21,15 @@ export default function Header({ toggleVisible, user }) {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            onPress={() => {console.log(user) 
-              toggleVisible()}}
+            onPress={() => {
+              toggleVisible();
+            }}
             style={styles.fundoUser}
           >
-            <Image source={{uri:uriImage}} style={{width:"100%", height:"100%", borderRadius:9999}}/>
+            <Image
+              source={{ uri: uriImage }}
+              style={{ width: "100%", height: "100%", borderRadius: 9999 }}
+            />
           </TouchableOpacity>
         )}
       </View>

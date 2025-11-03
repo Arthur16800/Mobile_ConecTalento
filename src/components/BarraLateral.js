@@ -76,6 +76,7 @@ const BarraLateral = ({ navigation, isVisible, onClose }) => {
             { key: "Meu perfil", page: "Perfil" },
             { key: "Portifólio", page: "Portifolio" },
             { key: "Criar um novo Projeto", page: "CriarProjeto" },
+            { key: "Adquira uma conta Premium", page: "Premium" },
             { key: "Desconectar (Log-out)" },
           ]}
           renderItem={({ item }) => {

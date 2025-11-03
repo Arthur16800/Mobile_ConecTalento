@@ -19,7 +19,7 @@ export default function Header({
   filterFunction,
   user,
 }) {
-  const {tipo_imagem, imagem} = user
+  const { tipo_imagem, imagem } = user;
   const uriImage = "data:" + tipo_imagem + ";base64," + imagem;
   return (
     <View style={styles.header}>
@@ -35,11 +35,15 @@ export default function Header({
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            onPress={() => {console.log(user) 
-              toggleVisible()}}
+            onPress={() => {
+              toggleVisible();
+            }}
             style={styles.fundoUser}
           >
-            <Image source={{uri:uriImage}} style={{width:"100%", height:"100%", borderRadius:9999}}/>
+            <Image
+              source={{ uri: uriImage }}
+              style={{ width: "100%", height: "100%", borderRadius: 9999 }}
+            />
           </TouchableOpacity>
         )}
       </View>

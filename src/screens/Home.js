@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import Card from "../components/Card";
 import api from "../axios/axios";
 
@@ -20,9 +21,9 @@ const screenWidth = Dimensions.get("window").width;
 export default function Home({ navigation }) {
   const [projects, setProjects] = useState([]);
   const [user, setUser] = useState({
-    username: "",
-    tipo_imagem: "",
-    imagem: "",
+    username:"",
+    tipo_imagem:"",
+    imagem:""
   });
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState(false);
@@ -51,18 +52,7 @@ export default function Home({ navigation }) {
       setWhichFilter("recentes");
     }
   }
-  async function getUser() {
-    try {
-      const response = await api.getUserByName(username);
-      setUser((prev) => ({
-        ...prev,
-        tipo_imagem: response.data.profile.tipo_imagem,
-        imagem: response.data.profile.imagem,
-      }));
-    } catch (error) {
-      console.log("Erro na requisição:", error.data.message.error);
-    }
-  }
+
   useEffect(() => {
     getProjects();
     const fetchUsername = async () => {
@@ -71,31 +61,47 @@ export default function Home({ navigation }) {
         setUser((prev) => ({
           ...prev,
           username: storedName,
-        }));
+        }))
       }
     };
     fetchUsername();
   }, []);
-  useEffect(() => {
-    getUser();
-  }, [user.username]);
 
-  const decideStyle = (value, value2 = null) => {
-    if (value === whichFilter || value2 === whichFilter) {
+  async function getUser() {
+    try {
+      const response = await api.getUserByName(user.username)
+      const tipoImagemBuffer = response.data.profile.tipo_imagem;
+      const imagemBuffer = response.data.profile.imagem;
+      setUser((prev) => ({
+        ...prev,
+        tipo_imagem: tipoImagemBuffer,
+        imagem: imagemBuffer
+      }))
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
+  
+  useEffect(()=>{
+    getUser();
+  }, [user.username])
+
+  const decideStyle = (value, value2 = null) =>{
+    if (value === whichFilter || value2 === whichFilter){
       return styles.circleChosen;
-    } else {
+    }else{
       return styles.circle;
     }
-  };
-  const decideColor = (value, value2 = null) => {
-    if (value === whichFilter || value2 === whichFilter) {
+  }
+  const decideColor = (value, value2 = null) =>{
+    if (value === whichFilter || value2 === whichFilter){
       return "white";
-    } else {
+    }else{
       return "black";
     }
-  };
+  }
 
-  useEffect(() => {
+  useEffect(()=>{
     const ordenados = [...projects];
 
     switch (whichFilter) {
@@ -118,7 +124,8 @@ export default function Home({ navigation }) {
     }
 
     setProjects(ordenados);
-  }, [whichFilter]);
+
+  }, [whichFilter])
 
   async function searchProjects() {
     if (search === "") {
@@ -154,51 +161,16 @@ export default function Home({ navigation }) {
       />
       {filter && (
         <View style={styles.filters}>
-          <TouchableOpacity
-            style={decideStyle("recentes")}
-            onPress={() => setWhichFilter("recentes")}
-          >
-            <Text style={{ color: decideColor("recentes") }}>
-              Mais Recentes
-            </Text>
+          <TouchableOpacity style={decideStyle("recentes")} onPress={()=>setWhichFilter("recentes")}>
+            <Text style={{color:decideColor("recentes")}}>Mais Recentes</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={decideStyle("maisLike", "menosLike")}
-            onPress={() => {
-              if (whichFilter !== "maisLike") {
-                setWhichFilter("maisLike");
-              } else {
-                setWhichFilter("menosLike");
-              }
-            }}
-          >
-            {whichFilter === "maisLike" ? (
-              <Text style={{ color: decideColor("maisLike") }}>
-                Menos Curtidos
-              </Text>
-            ) : (
-              <Text style={{ color: decideColor("menosLike") }}>
-                Mais Curtidos
-              </Text>
-            )}
+          <TouchableOpacity style={decideStyle("maisLike", "menosLike")} onPress={()=>{ if (whichFilter !== "maisLike") {setWhichFilter("maisLike")}else{setWhichFilter("menosLike")}}}>
+            {whichFilter === "maisLike" ? <Text style={{color:decideColor("maisLike")}}>Menos Curtidos</Text>: <Text style={{color:decideColor("menosLike")}}>Mais Curtidos</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={decideStyle("A-Z", "Z-A")}
-            onPress={() => {
-              if (whichFilter !== "A-Z") {
-                setWhichFilter("A-Z");
-              } else {
-                setWhichFilter("Z-A");
-              }
-            }}
-          >
-            {whichFilter === "A-Z" ? (
-              <Text style={{ color: decideColor("A-Z") }}>Título Z-A</Text>
-            ) : (
-              <Text style={{ color: decideColor("Z-A") }}>Título A-Z</Text>
-            )}
+          <TouchableOpacity style={decideStyle("A-Z", "Z-A")} onPress={()=>{ if (whichFilter !== "A-Z") {setWhichFilter("A-Z")}else{setWhichFilter("Z-A")}}}>
+          {whichFilter === "A-Z" ? <Text style={{color:decideColor("A-Z")}}>Título Z-A</Text>: <Text style={{color:decideColor("Z-A")}}>Título A-Z</Text>}
           </TouchableOpacity>
         </View>
       )}
@@ -250,9 +222,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: screenHeight * 0.01,
     marginHorizontal: screenWidth * 0.05,
-    gap: screenWidth * 0.1,
+    gap:screenWidth * 0.1,
     width: screenWidth * 0.9,
-    height: screenHeight * 0.05,
+    height: screenHeight * 0.05
   },
   card: {
     width: screenWidth * 0.85,
@@ -277,7 +249,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    backgroundColor: "white",
+    backgroundColor:"white"
   },
   circleChosen: {
     borderRadius: 30,
@@ -287,8 +259,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    backgroundColor: "#803AD6",
-    color: "#ffffff",
+    backgroundColor:"#803AD6",
+    color:"#ffffff",
   },
   title: {
     fontSize: 18,
