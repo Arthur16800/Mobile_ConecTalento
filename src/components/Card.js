@@ -8,10 +8,11 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import { Badge } from 'react-native-paper';
+// local badge (avoid additional dependency)
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import api from "../axios/axios"
+import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -20,6 +21,7 @@ const Card = ({ imageSource, item, styleCard }) => {
   const [liked, setLiked] = useState(false);
   const [scale] = useState(new Animated.Value(1));
   const [likesCount, setLikesCount] = useState(item.total_curtidas);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (userId) {
@@ -81,7 +83,11 @@ const Card = ({ imageSource, item, styleCard }) => {
   };
 
   return (
-    <View style={styleCard}>
+    <TouchableOpacity
+      style={styleCard}
+      activeOpacity={0.9}
+      onPress={() => navigation.navigate('ProjetoInfo', { item })}
+    >
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageSource }} style={styles.imagem} />
 
@@ -93,12 +99,14 @@ const Card = ({ imageSource, item, styleCard }) => {
               color={liked ? "red" : "black"}
             />
           </Animated.View>
-          <Badge>{likesCount}</Badge>
+          <View style={styles.localBadge}>
+            <Text style={styles.localBadgeText}>{likesCount}</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
       <Text style={styles.item}>{item.titulo}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -142,6 +150,21 @@ const styles = StyleSheet.create({
     bottom: -1,
     fontSize: 12,
     color: "#000",
+  },
+  localBadge: {
+    marginLeft: 6,
+    backgroundColor: 'white',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  localBadgeText: {
+    fontSize: 12,
+    fontWeight: '700'
   },
   item: {
     marginVertical: 5,

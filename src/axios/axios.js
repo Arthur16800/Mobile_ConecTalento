@@ -58,6 +58,25 @@ const sheets = {
       nova_senha: newPassword,
     }),
   getProjectsByUser: (username) => api.get(`projects/${username}`),
+  getProjectById: async (id) => {
+    // Try a few possible endpoints because backend routes may vary between 'project', 'projects' or 'projectdetail'
+    const candidates = [`project/${id}`, `projects/${id}`, `projectdetail/${id}`, `project/${id}/details`];
+    for (const path of candidates) {
+      try {
+        const res = await api.get(path);
+        return res;
+      } catch (err) {
+        // continue to next candidate on 404 or other errors
+        // if it's a network/auth error, rethrow
+        if (err.response && err.response.status === 404) continue;
+        throw err;
+      }
+    }
+    // If none matched, throw a not found like axios would
+    const e = new Error('Not Found');
+    e.response = { status: 404 };
+    throw e;
+  },
 
   createProjeto: (form, imagens, userId) => {
     const data = new FormData();
