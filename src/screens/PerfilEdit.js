@@ -174,7 +174,7 @@ export default function PerfilEdit({ navigation }) {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <StatusBar hidden={false} backgroundColor="#fff" />
-        <Header toggleVisible={toggleVisibleTrue} />
+        <Header toggleVisible={toggleVisibleTrue} user={user} />
 
         <View style={styles.painel}>
           <Image style={styles.colorBar} source={backgroundImage} />

@@ -22,6 +22,10 @@ export default function Portifolio({ navigation }) {
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [username, setUsername] = useState("");
+  const [user, setUser] = useState({
+    imagem: "",
+    tipo_imagem: "",
+  })
 
   useLayoutEffect(() => {
     StatusBar.setBarStyle("dark-content");
@@ -46,6 +50,17 @@ export default function Portifolio({ navigation }) {
         error?.message ||
         "Erro desconhecido";
       console.log("Erro na busca:", errorMessage);
+    }
+  }
+  async function getUser() {
+    try {
+      const response = await api.getUserByName(username)
+      setUser({
+        tipo_imagem: response.data.profile.tipo_imagem,
+        imagem: response.data.profile.imagem
+      })
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
     }
   }
   async function searchProjects() {
@@ -87,6 +102,7 @@ export default function Portifolio({ navigation }) {
 
         if (storedUsername) {
           await getProjects(storedUsername);
+          await getUser();
         }
       } catch (error) {
         console.log("Erro ao pegar username ou projetos:", error);
@@ -103,6 +119,7 @@ export default function Portifolio({ navigation }) {
         text={search}
         setText={setSearch}
         getFunction={searchProjects}
+        user={user}
       />
 
       {loading ? (

@@ -26,6 +26,11 @@ export default function CriarProjeto({ navigation }) {
     titulo: "",
     descricao: "",
   });
+  const [user, setUser] = useState({
+    imagem:"",
+    tipo_imagem:"",
+    username:"",
+  })
   const [imagens, setImagens] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -49,6 +54,18 @@ export default function CriarProjeto({ navigation }) {
       setLoading(false);
     }
   };
+  async function getUser() {
+    try {
+      const response = await api.getUserByName(user.username)
+      setUser({
+        username:user.username,
+        tipo_imagem: response.data.profile.tipo_imagem,
+        imagem: response.data.profile.imagem
+      })
+    } catch (error) {
+      console.log("Erro na requisição:", error.data.message.error);
+    }
+  }
 
   const deleteImage = (indexDelete) => {
     setImagens((prevImages) =>
@@ -97,12 +114,21 @@ export default function CriarProjeto({ navigation }) {
 
   async function getIds() {
     const idbuffer = await SecureStore.getItemAsync("id");
+    const usernameBuffer = await SecureStore.getItemAsync("username");
     setId(idbuffer);
+    setUser((prev)=>({
+      ...prev,
+      username:usernameBuffer
+    }))
   }
 
   useEffect(() => {
     getIds();
   }, []);
+
+  useEffect(() => {
+    getUser();
+  }, [user.username]);
 
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibleFalse = () => {
@@ -116,7 +142,7 @@ export default function CriarProjeto({ navigation }) {
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
         <StatusBar hidden={false} backgroundColor="#fff" />
-        <Header toggleVisible={toggleVisibleTrue} />
+        <Header toggleVisible={toggleVisibleTrue} user={user} />
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{

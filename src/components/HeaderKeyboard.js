@@ -19,13 +19,14 @@ export default function Header({
   filterFunction,
   user,
 }) {
-  const uriImage = "data:" + user.tipo_imagem + ";base64," + user.imagem;
+  const {tipo_imagem, imagem} = user
+  const uriImage = "data:" + tipo_imagem + ";base64," + imagem;
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>
         <Text style={styles.title}>ConecTalento</Text>
 
-        {!uriImage ? (
+        {!imagem || !tipo_imagem ? (
           <TouchableOpacity
             onPress={() => toggleVisible()}
             style={styles.fundoUser}
@@ -79,13 +80,13 @@ const styles = StyleSheet.create({
     paddingTop: mvs(10),
     paddingBottom: mvs(10),
     paddingHorizontal: 20,
-    alignusers: "center",
+    alignItems: "center",
     justifyContent: "space-evenly",
   },
   barraTopo: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignusers: "center",
+    alignItems: "center",
     width: "100%",
     paddingBottom: mvs(10),
   },
@@ -99,14 +100,14 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    alignusers: "center",
+    alignItems: "center",
     justifyContent: "center",
   },
   barraBot: {
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    alignusers: "center",
+    alignItems: "center",
   },
   barraPesquisa: {
     height: 60,
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     display: "flex",
     justifyContent: "space-between",
-    alignusers: "center",
+    alignItems: "center",
     flexDirection: "row",
   },
   icons: {
