@@ -30,8 +30,7 @@ const Card = ({ imageSource, item, styleCard }) => {
             (p) => p.ID_projeto
           );
           if (likedProjects.includes(item.ID_projeto)) setLiked(true);
-        })
-        .catch((err) => console.log("Erro ao verificar curtidas:", err));
+        });
     }
   }, [item.ID_projeto, userId]);
 
