@@ -127,6 +127,8 @@ const styles = StyleSheet.create({
   icons: {
     display: "flex",
     flexDirection: "row",
-    gap: 10,
+    gap: 5,
+    padding: 15,
+    left: 10,
   },
 });
