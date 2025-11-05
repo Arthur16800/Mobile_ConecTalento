@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   Image,
   StatusBar,
@@ -19,7 +18,11 @@ import api from "../axios/axios";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-export default function Perfil({ navigation }) {
+export default function Perfil({ route, navigation }) {
+  // --- parâmetros recebidos (caso venha de ProjetoInfo)
+  const params = route.params || {};
+  const usernameParam = params.username || null;
+
   const [emailAtual, setEmail] = useState("");
   const [user, setUser] = useState({
     extrainfo: {
@@ -30,48 +33,53 @@ export default function Perfil({ navigation }) {
       numero_telefone: null,
     },
   });
+  const [contatos, setContatos] = useState([]);
+  const [isVisible, setIsVisible] = useState(false);
 
+  const toggleVisibleFalse = () => setIsVisible(false);
+  const toggleVisibleTrue = () => setIsVisible(true);
+
+  // --- barra de status
   useLayoutEffect(() => {
     StatusBar.setBarStyle("dark-content");
     StatusBar.setBackgroundColor("transparent");
   }, []);
 
-  const [isVisible, setIsVisible] = useState(false);
-
-  const toggleVisibleFalse = () => {
-    setIsVisible(false);
-  };
-
-  const toggleVisibleTrue = () => {
-    setIsVisible(true);
-  };
-
+  // --- busca email do logado
   async function getEmail() {
     setEmail(await SecureStore.getItemAsync("email"));
   }
 
+  // --- busca usuário: logado ou de outro perfil
   async function getUser() {
     try {
-      const name = await SecureStore.getItemAsync("username");
-      const response = await api.getUserByName(name);
-      setUser(response.data.profile);
+      if (usernameParam) {
+        // 👇 perfil de outro usuário
+        const response = await api.getUserByName(usernameParam);
+        setUser(response.data.profile || response.data);
+      } else {
+        // 👇 perfil do usuário logado
+        const name = await SecureStore.getItemAsync("username");
+        const response = await api.getUserByName(name);
+        setUser(response.data.profile || response.data);
+      }
     } catch (error) {
-      console.log("Erro na requisição:", error.data.message.error);
+      console.log("Erro na requisição:", error);
     }
   }
 
+  // --- filtra contatos não vazios
   function contatos_filter(contatos) {
     return contatos.filter((item) => item.valor);
   }
 
-  const [contatos, setContatos] = useState([]);
-
+  // --- carregamento inicial
   useEffect(() => {
     getEmail();
     getUser();
-    contatos_filter(contatos);
-  }, []);
+  }, [usernameParam]);
 
+  // --- atualiza lista de contatos quando user muda
   useEffect(() => {
     if (user.extrainfo) {
       const contatosIniciais = [
@@ -80,11 +88,11 @@ export default function Perfil({ navigation }) {
         { tipo: "pinterest", valor: user.extrainfo.link_pinterest },
         { tipo: "github", valor: user.extrainfo.link_github },
       ];
-
       setContatos(contatos_filter(contatosIniciais));
     }
   }, [user]);
 
+  // --- renderiza ícones
   const renderIcon = (tipo) => {
     switch (tipo) {
       case "instagram":
@@ -95,8 +103,8 @@ export default function Perfil({ navigation }) {
         return <FontAwesome name="pinterest" size={30} color="black" />;
       case "github":
         return <AntDesign name="github" size={30} color="black" />;
-      case null:
-        return;
+      default:
+        return null;
     }
   };
 
@@ -104,6 +112,7 @@ export default function Perfil({ navigation }) {
     <View style={styles.container}>
       <StatusBar hidden={false} backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} user={user} />
+
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={{
@@ -112,7 +121,7 @@ export default function Perfil({ navigation }) {
           justifyContent: "flex-start",
         }}
       >
-        {/* Ícone de usuário */}
+        {/* Imagem do usuário */}
         <View style={styles.fundoUser}>
           {user.imagem ? (
             <Image
@@ -124,10 +133,10 @@ export default function Perfil({ navigation }) {
           )}
         </View>
 
-        {/* Nome do usuário e ícone de lápis ao lado */}
+        {/* Nome e botão de editar */}
         <View style={styles.nomeWrapper}>
           <Text style={styles.name} numberOfLines={0}>
-            {user.username}
+            {user.username || "Usuário"}
           </Text>
           {emailAtual === user.email && (
             <TouchableOpacity
@@ -148,8 +157,12 @@ export default function Perfil({ navigation }) {
           <Text style={styles.subtitle}>{user.biografia}</Text>
         )}
 
+        {/* Título */}
+        <Text style={styles.title}>
+          {usernameParam ? "Contatos do usuário" : "Meus contatos"}
+        </Text>
+
         {/* Contatos */}
-        <Text style={styles.title}>Contatos</Text>
         {contatos.map((item) => (
           <View key={item.tipo} style={styles.contatoItem}>
             {renderIcon(item.tipo)}
@@ -157,13 +170,17 @@ export default function Perfil({ navigation }) {
           </View>
         ))}
       </ScrollView>
-      {/* Botão para ver projetos */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Portifolio")}
-      >
-        <Text style={styles.buttonText}>Ver meus projetos</Text>
-      </TouchableOpacity>
+
+      {/* Botão de projetos (só para o próprio perfil) */}
+      {!usernameParam && (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Portifolio")}
+        >
+          <Text style={styles.buttonText}>Ver meus projetos</Text>
+        </TouchableOpacity>
+      )}
+
       <BarraLateral
         isVisible={isVisible}
         onClose={toggleVisibleFalse}
@@ -198,7 +215,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
-
     marginBottom: 15,
   },
   editIconWrapper: {
@@ -207,7 +223,6 @@ const styles = StyleSheet.create({
     top: "50%",
     transform: [{ translateY: -13 }],
   },
-
   title: {
     fontSize: 30,
     textAlign: "center",
@@ -224,9 +239,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 20,
   },
-  contatosContainer: {
-    marginBottom: 20,
-  },
   contatoItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -234,7 +246,6 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 18,
-
     marginLeft: 10,
   },
   button: {
@@ -251,7 +262,7 @@ const styles = StyleSheet.create({
     width: "80%",
     position: "absolute",
     bottom: 80,
-    alignSelf: "center", // 👈 centraliza horizontalmente
+    alignSelf: "center",
   },
   buttonText: {
     color: "#fff",

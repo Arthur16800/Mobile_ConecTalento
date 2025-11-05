@@ -22,7 +22,7 @@ export default function ProjetoInfo({ route, navigation }) {
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
   const [user, setUser] = useState({
-    username:"",
+    username: "",
     imagem: "",
     tipo_imagem: "",
   });
@@ -161,44 +161,24 @@ export default function ProjetoInfo({ route, navigation }) {
 
   async function getUser() {
     try {
-      const response = await api.getUserByName(username)
+      const response = await api.getUserByName(username);
       setUser({
         tipo_imagem: response.data.profile.tipo_imagem || null,
-        imagem: response.data.profile.imagem || null
-      })
+        imagem: response.data.profile.imagem || null,
+      });
     } catch (error) {}
   }
 
   useEffect(() => {
     async function fetchData() {
       try {
-          await getUser(itemState.username);
-        
+        await getUser(itemState.username);
       } catch (error) {
         console.log("Erro ao buscar username ou projetos:", error);
       }
     }
     fetchData();
   }, [itemState.username]);
-
-  const handleLike = async () => {
-    if (!userId) return;
-    if (!itemState || !itemState.ID_projeto) return;
-    try {
-      const res = await api.likeProject(itemState.ID_projeto, userId);
-      if (res.data && typeof res.data.curtido !== "undefined") {
-        if (res.data.curtido) {
-          setLiked(true);
-          setLikesCount((prev) => prev + 1);
-        } else {
-          setLiked(false);
-          setLikesCount((prev) => Math.max(prev - 1, 0));
-        }
-      }
-    } catch (err) {
-      console.error("Erro ao curtir o projeto:", err);
-    }
-  };
 
   const creatorName =
     (creator && (creator.name || creator.username)) ||
@@ -207,7 +187,6 @@ export default function ProjetoInfo({ route, navigation }) {
     itemState?.username ||
     "Usuário";
 
-
   const creatorImageUri =
     creator && creator.imagem && creator.tipo_imagem
       ? `data:${creator.tipo_imagem};base64,${creator.imagem}`
@@ -215,7 +194,6 @@ export default function ProjetoInfo({ route, navigation }) {
       ? `data:${itemState.tipo_imagem_usuario};base64,${itemState.imagem_usuario}`
       : null;
 
-      
   const creatorBio =
     (creator && (creator.biografia || creator.bio)) ||
     itemState?.biografia ||
@@ -293,25 +271,6 @@ export default function ProjetoInfo({ route, navigation }) {
               <Text style={{ color: "#666" }}>Sem imagem</Text>
             </View>
           )}
-
-          <TouchableOpacity
-            style={styles.likeButton}
-            onPress={handleLike}
-            activeOpacity={0.8}
-          >
-            <View
-              style={[styles.heartCircle, liked ? styles.heartActive : null]}
-            >
-              <Ionicons
-                name={liked ? "heart" : "heart-outline"}
-                size={20}
-                color={liked ? "#fff" : "#000"}
-              />
-            </View>
-            <View style={styles.likeCountContainer}>
-              <Text style={styles.likeCountText}>{likesCount}</Text>
-            </View>
-          </TouchableOpacity>
 
           <View style={styles.titleRow}>
             <Text style={styles.title}>
@@ -417,46 +376,6 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "800", marginBottom: 8 },
   description: { fontSize: 15, color: "#333", lineHeight: 20 },
   centered: { flex: 1, alignItems: "center", justifyContent: "center" },
-  likeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  heartCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    elevation: 3,
-  },
-  heartActive: { backgroundColor: "#ff4d4d" },
-  likeCountContainer: {
-    marginLeft: 8,
-    backgroundColor: "rgba(255,255,255,0.9)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  likeCountText: { fontWeight: "700" },
-  headerBack: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    elevation: 2,
-  },
   cardMain: {
     width: screenWidth * 0.95,
     backgroundColor: "#fff",
