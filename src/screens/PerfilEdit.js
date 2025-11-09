@@ -27,7 +27,6 @@ import * as ImagePicker from "expo-image-picker";
 
 
 export default function PerfilEdit({ navigation }) {
-  const imageDefaultUri = RNImage.resolveAssetSource(require("../../assets/logo.png")).uri;
   const [email, setEmail] = useState("");
   const [contatos, setContatos] = useState([
     { id: 0, type: "instagram", value: "@instagramteste" },
@@ -106,6 +105,57 @@ export default function PerfilEdit({ navigation }) {
   };
 
   //fim modal validar email
+  async function pickImage() {
+    // Pedir permissão para acessar galeria
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permission.status !== "granted") {
+      Alert.alert(
+        "Permissão negada",
+        "Permita o acesso à galeria para escolher uma imagem."
+      );
+      return;
+    }
+    // Abrir galeria
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri; // caminho local da imagem
+      console.log("Imagem selecionada:", imageUri);
+      setUser({...user, image: imageUri});
+    }
+  }
+
+  async function uploadUserImage(userId, imageUri) {
+    const formData = new FormData();
+
+    // Extrai nome e tipo do arquivo
+    const filename = imageUri.split("/").pop();
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : "image";
+
+    formData.append("imagem", {
+      uri: imageUri,
+      name: filename,
+      type,
+    });
+
+    try {
+      const response = await axios.put(
+        `http://192.168.x.x:5000/api/v1/user/${userId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      console.log("Upload concluído:", response.data);
+    } catch (error) {
+      console.log("Erro no upload:", error.message);
+    }
+  }
 
   async function putSenha() {
     if (passwords.confirmPassword !== passwords.passwordNew) {
@@ -128,7 +178,16 @@ export default function PerfilEdit({ navigation }) {
     try {
       setControlLoad(true)
       const userId = await SecureStore.getItemAsync("id");
-      const response = await api.putUser(userId, { email: user.email, biografia: user.biografia, username: user.username, name: user.name }, imageDefaultUri);
+      const response = await api.putUser(
+        userId,
+        {
+          email: user.email,
+          biografia: user.biografia,
+          username: user.username,
+          name: user.name,
+        },
+        user.imagem
+      );
 
       if (response.data.message === "Código válido. Usuário autenticado.") {
         saveInfo(response.data.token, response.data.user);
@@ -144,7 +203,13 @@ export default function PerfilEdit({ navigation }) {
       navigation.navigate("Perfil");
     } catch (error) {
       console.log("Erro na requisição:", error);
-      console.log({ email: user.email, biografia: user.biografia, username: user.username, name: user.name });
+      console.log({
+        email: user.email,
+        biografia: user.biografia,
+        username: user.username,
+        name: user.name,
+        imagem: imageDefaultUri,
+      });
     }
   }
 
@@ -156,41 +221,18 @@ export default function PerfilEdit({ navigation }) {
     try {
       const uname = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(uname);
-      console.log(response.data.profile)
+      console.log(response.data.profile);
       setUser(response.data.profile);
     } catch (error) {
       console.log("Erro na requisição:", error);
     }
   }
 
-  async function pickImage() {
-  // Pede permissão para acessar a galeria
-  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (status !== "granted") {
-    Alert.alert("Permissão necessária", "Precisamos de acesso à sua galeria para escolher uma imagem.");
-    return;
-  }
-
-  // Abre a galeria
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [1, 1], // deixa a imagem quadrada (ideal para perfil)
-    quality: 1,
-  });
-
-  // Se o usuário escolheu uma imagem
-  if (!result.canceled) {
-    const uri = result.assets[0].uri;
-    setUser((prev) => ({ ...prev, imagem: uri, tipo_imagem: result.assets[0].type})); // salva a URI da imagem no estado
-  }
-}
-
 
   useEffect(() => {
     getEmail();
     getUser();
-  }, [])
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -206,7 +248,18 @@ export default function PerfilEdit({ navigation }) {
 
           <View style={styles.lineUser}>
             <View style={styles.backIcon}>
-              <IoniconsUser name="person" size={45} color="#949599" />
+              <TouchableOpacity onPress={uploadUserImage}>
+                {user.imagem ? (
+                  <Image
+                    source={{
+                      uri: `data:${user.tipo_imagem};base64,${user.imagem}`,
+                    }}
+                    style={styles.profileImage}
+                  />
+                ) : (
+                  <IoniconsUser name="person" size={100} color="#949599" />
+                )}
+              </TouchableOpacity>
             </View>
             <Text style={styles.title}>{user.username}</Text>
             <MaterialIcons name="do-not-disturb-on" size={35} color="red" />
