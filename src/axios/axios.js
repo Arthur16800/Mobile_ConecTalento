@@ -1,8 +1,10 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
+const ip = "192.168.100.10"
+
 const api = axios.create({
-  baseURL: "http://192.168.100.10:5000/api/v1/",
+  baseURL: `http://${ip}:5000/api/v1/`,
   headers: { accept: "application/json" },
 });
 
@@ -26,7 +28,7 @@ const sheets = {
   putUser: (
     userId, 
     user, 
-    imageUri="http://192.168.100.10:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
+    imageUri=`http://${ip}:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be`
   ) => {
     const data = new FormData();
 

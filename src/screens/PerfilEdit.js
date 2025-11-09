@@ -21,7 +21,10 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
 import ModalMudarSenha from "../components/ModalMudarSenha";
 import * as SecureStore from "expo-secure-store";
-import {Image as RNImage} from "react-native";
+import { Image as RNImage } from "react-native";
+import ModalConfirmEmail from "../components/ModalConfirmEmail";
+import * as ImagePicker from "expo-image-picker";
+
 
 export default function PerfilEdit({ navigation }) {
   const imageDefaultUri = RNImage.resolveAssetSource(require("../../assets/logo.png")).uri;
@@ -92,6 +95,18 @@ export default function PerfilEdit({ navigation }) {
   };
   // Fim Modal
 
+  //início modal validar email
+  const [controlLoad, setControlLoad] = useState(false);
+  const [modalConf, setModalConf] = useState(false);
+  const visibModal = () => {
+    setModalConf(true);
+  };
+  const fecharModal = () => {
+    setModalConf(false);
+  };
+
+  //fim modal validar email
+
   async function putSenha() {
     if (passwords.confirmPassword !== passwords.passwordNew) {
       Alert.alert("Digite e confirme a mesma nova senha!");
@@ -111,13 +126,25 @@ export default function PerfilEdit({ navigation }) {
 
   async function putUser() {
     try {
+      setControlLoad(true)
       const userId = await SecureStore.getItemAsync("id");
-      const response = await api.putUser(userId, {email:user.email, biografia:user.biografia, username:user.username, name:user.name}, imageDefaultUri);
+      const response = await api.putUser(userId, { email: user.email, biografia: user.biografia, username: user.username, name: user.name }, imageDefaultUri);
+
+      if (response.data.message === "Código válido. Usuário autenticado.") {
+        saveInfo(response.data.token, response.data.user);
+        setControlLoad(false);
+        Alert.alert("Usuário atualizado com sucesso!");
+        fecharModal();
+      } else if (response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail.") {
+        visibModal();
+        setControlLoad(false);
+      }
+
       Alert.alert(response.data.message);
       navigation.navigate("Perfil");
     } catch (error) {
       console.log("Erro na requisição:", error);
-      console.log({email:user.email, biografia:user.biografia, username:user.username, name:user.name});
+      console.log({ email: user.email, biografia: user.biografia, username: user.username, name: user.name });
     }
   }
 
@@ -125,21 +152,45 @@ export default function PerfilEdit({ navigation }) {
     setEmail(await SecureStore.getItemAsync("email"));
   }
 
-  async function getUser(){
-    try{
+  async function getUser() {
+    try {
       const uname = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(uname);
       console.log(response.data.profile)
       setUser(response.data.profile);
-    }catch(error){
+    } catch (error) {
       console.log("Erro na requisição:", error);
     }
   }
 
-  useEffect(()=>{
+  async function pickImage() {
+  // Pede permissão para acessar a galeria
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== "granted") {
+    Alert.alert("Permissão necessária", "Precisamos de acesso à sua galeria para escolher uma imagem.");
+    return;
+  }
+
+  // Abre a galeria
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [1, 1], // deixa a imagem quadrada (ideal para perfil)
+    quality: 1,
+  });
+
+  // Se o usuário escolheu uma imagem
+  if (!result.canceled) {
+    const uri = result.assets[0].uri;
+    setUser((prev) => ({ ...prev, imagem: uri, tipo_imagem: result.assets[0].type})); // salva a URI da imagem no estado
+  }
+}
+
+
+  useEffect(() => {
     getEmail();
     getUser();
-  },[])
+  }, [])
 
   return (
     <KeyboardAvoidingView
@@ -240,6 +291,16 @@ export default function PerfilEdit({ navigation }) {
         user={user}
         setUser={setUser}
         putSenha={putSenha}
+      />
+
+      <ModalConfirmEmail
+        fechamodal={fecharModal}
+        code={"code"}
+        user={user}
+        setuser={setUser}
+        handle={putUser}
+        modal={modalConf}
+        clickable={controlLoad}
       />
     </KeyboardAvoidingView>
   );
