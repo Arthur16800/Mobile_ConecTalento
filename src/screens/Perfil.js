@@ -102,7 +102,7 @@ export default function Perfil({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden={false} backgroundColor="#fff" />
+      <StatusBar hidden backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} user={user} />
       <ScrollView
         style={styles.scrollContainer}

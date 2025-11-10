@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  StatusBar
 } from "react-native";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
@@ -209,6 +210,7 @@ export default function Premium({ navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar hidden backgroundColor="#fff" />
       <Header toggleVisible={toggleVisibleTrue} user={user} />
 
       <View

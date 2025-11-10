@@ -114,7 +114,7 @@ export default function Portifolio({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden={false} backgroundColor="#fff" />
+      <StatusBar hidden backgroundColor="#fff" />
       <HeaderK
         toggleVisible={toggleVisibleTrue}
         text={search}
