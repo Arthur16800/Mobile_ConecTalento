@@ -373,6 +373,15 @@ export default function ProjetoInfo({ route, navigation }) {
         onClose={toggleVisibleFalse}
         navigation={navigation}
       />
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("AtualizarProjeto", {
+            ID_projeto: itemState?.ID_projeto ?? routeId,
+          })
+        }
+      >
+        <Text style={styles.buttonText}>Editar projeto</Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -10,6 +10,8 @@ import PerfilEdit from "./screens/PerfilEdit";
 import Portifolio from "./screens/Portifolio";
 import CriarProjeto from "./screens/CriarProjeto";
 import Premium from "./screens/Premium";
+import AtualizarProjeto from "./screens/AtualizarProjeto";
+
 
 const Stack = createStackNavigator();
 
@@ -30,7 +32,9 @@ export default function App() {
 
         <Stack.Screen name="CriarProjeto" component={CriarProjeto} />
 
-        <Stack.Screen name="Premium" component={Premium} />      
+        <Stack.Screen name="Premium" component={Premium} /> 
+             
+        <Stack.Screen name="AtualizarProjeto" component={AtualizarProjeto} />      
       </Stack.Navigator>
     </NavigationContainer>
   );

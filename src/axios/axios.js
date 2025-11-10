@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://10.89.240.75:5000/api/v1/",
+  baseURL: "http://10.89.240.71:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -10,7 +10,7 @@ api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync("token");
     if (token) {
-      config.headers.Authorization = `${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -149,6 +149,16 @@ const sheets = {
       ID_user: Number(userId),
     });
   },
+
+  updateProjeto: (ID_projeto, formData) => {
+  return api.put(`/project/${ID_projeto}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Accept: "application/json",
+    },
+  });
+},
+
 };
 
 export default sheets;
