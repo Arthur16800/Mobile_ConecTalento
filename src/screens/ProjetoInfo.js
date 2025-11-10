@@ -21,25 +21,19 @@ export default function ProjetoInfo({ route, navigation }) {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
-  const [user, setUser] = useState({
-    username: "",
-    imagem: "",
-    tipo_imagem: "",
-  });
-
+  const [user, setUser] = useState({ username: "", imagem: "", tipo_imagem: "" });
   const params = route.params || {};
   const routeItem = params.item || null;
   const routeId = params.id || params.ID_projeto || params.projectId || null;
-
   const [itemState, setItemState] = useState(routeItem);
   const [creator, setCreator] = useState(null);
   const [loadingCreator, setLoadingCreator] = useState(false);
   const [userId, setUserId] = useState(null);
   const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(
-    routeItem?.total_curtidas ?? routeItem?.likes ?? 0
-  );
+  const [likesCount, setLikesCount] = useState(routeItem?.total_curtidas ?? routeItem?.likes ?? 0);
   const [notFound, setNotFound] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  let scrollRef = null;
 
   const buildProjectImageUri = (it) => {
     if (!it) return null;
@@ -48,8 +42,7 @@ export default function ProjetoInfo({ route, navigation }) {
       if (first && first.imagem && first.tipo_imagem)
         return `data:${first.tipo_imagem};base64,${first.imagem}`;
     }
-    if (it.imagem && it.tipo_imagem)
-      return `data:${it.tipo_imagem};base64,${it.imagem}`;
+    if (it.imagem && it.tipo_imagem) return `data:${it.tipo_imagem};base64,${it.imagem}`;
     return it.image || it.image_url || null;
   };
 
@@ -58,27 +51,22 @@ export default function ProjetoInfo({ route, navigation }) {
   useEffect(() => {
     async function fetchCreator() {
       if (!itemState) return;
-
       if (itemState.autor) {
         setCreator(itemState.autor);
         return;
       }
-
       const username =
         itemState.username ||
         itemState.user_name ||
         itemState.usuario ||
         itemState.autor?.username;
       if (!username) return;
-
       try {
         setLoadingCreator(true);
         const res = await api.getUserByName(String(username));
         const profile = res.data?.profile || res.data || null;
         if (profile) setCreator(profile);
-      } catch (err) {
-        // ignore
-      } finally {
+      } catch (err) {} finally {
         setLoadingCreator(false);
       }
     }
@@ -97,15 +85,10 @@ export default function ProjetoInfo({ route, navigation }) {
               res.data && res.data.profile_projeto
                 ? res.data.profile_projeto.map((p) => p.ID_projeto)
                 : [];
-            if (itemState && likedProjects.includes(itemState.ID_projeto))
-              setLiked(true);
-          } catch (err) {
-            // ignore
-          }
+            if (itemState && likedProjects.includes(itemState.ID_projeto)) setLiked(true);
+          } catch (err) {}
         }
-      } catch (err) {
-        // silent
-      }
+      } catch (err) {}
     }
     getUser();
   }, [itemState]);
@@ -118,39 +101,27 @@ export default function ProjetoInfo({ route, navigation }) {
   useEffect(() => {
     let active = true;
     async function fetchProjectById() {
-      // If we already have a full item with descricao or imagens, no need to fetch
       const hasDescricao =
         itemState &&
         typeof itemState.descricao !== "undefined" &&
         itemState.descricao !== null &&
         String(itemState.descricao).trim().length > 0;
       const hasImagens =
-        itemState &&
-        Array.isArray(itemState.imagens) &&
-        itemState.imagens.length > 0;
-
+        itemState && Array.isArray(itemState.imagens) && itemState.imagens.length > 0;
       if (!routeId && itemState && (hasDescricao || hasImagens)) return;
-
       const idToFetch =
-        routeId ||
-        (itemState && itemState.ID_projeto ? itemState.ID_projeto : null);
+        routeId || (itemState && itemState.ID_projeto ? itemState.ID_projeto : null);
       if (!idToFetch) return;
-
       try {
         const res = await api.getProjectById(idToFetch);
         if (!active) return;
-        const proj =
-          res.data?.projeto || res.data?.profile_projeto || res.data || null;
+        const proj = res.data?.projeto || res.data?.profile_projeto || res.data || null;
         if (proj) {
           setItemState(proj);
           setLikesCount(proj.total_curtidas ?? proj.likes ?? likesCount);
         }
       } catch (err) {
-        // silent
-        // If needed, developer can inspect err in debugger
-        if (err?.response?.status === 404) {
-          setNotFound(true);
-        }
+        if (err?.response?.status === 404) setNotFound(true);
       }
     }
     fetchProjectById();
@@ -159,7 +130,7 @@ export default function ProjetoInfo({ route, navigation }) {
     };
   }, [routeId, itemState]);
 
-  async function getUser() {
+  async function getUserData(username) {
     try {
       const response = await api.getUserByName(username);
       setUser({
@@ -172,7 +143,7 @@ export default function ProjetoInfo({ route, navigation }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        await getUser(itemState.username);
+        await getUserData(itemState.username);
       } catch (error) {
         console.log("Erro ao buscar username ou projetos:", error);
       }
@@ -250,47 +221,89 @@ export default function ProjetoInfo({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} user={user} />
-
       <ScrollView contentContainerStyle={styles.content}>
         <View style={{ width: "100%", paddingHorizontal: 16, marginTop: 8 }}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.headerBack}
-          >
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBack}>
             <Ionicons name="arrow-back" size={22} color="#7A2CF6" />
           </TouchableOpacity>
         </View>
         <View style={styles.cardMain}>
-          {projectImageUri ? (
-            <Image
-              source={{ uri: projectImageUri }}
-              style={styles.projectImage}
-            />
+          {Array.isArray(itemState.imagens) && itemState.imagens.length > 0 ? (
+            <View style={{ position: "relative", width: "100%", alignItems: "center" }}>
+              <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                style={{ width: "100%" }}
+                onScroll={(e) => {
+                  const index = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+                  setCurrentIndex(index);
+                }}
+                scrollEventThrottle={16}
+                ref={(ref) => (scrollRef = ref)}
+              >
+                {itemState.imagens.map((img, index) => (
+                  <Image
+                    key={index}
+                    source={{
+                      uri: `data:${img.tipo_imagem};base64,${img.imagem}`,
+                    }}
+                    style={styles.projectImage}
+                  />
+                ))}
+              </ScrollView>
+              {itemState.imagens.length > 1 && (
+                <>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const prev = Math.max(currentIndex - 1, 0);
+                      setCurrentIndex(prev);
+                      scrollRef?.scrollTo({ x: prev * screenWidth, animated: true });
+                    }}
+                    style={[styles.navButton, { left: 10 }]}
+                  >
+                    <Ionicons name="chevron-back" size={28} color="#fff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const next = Math.min(currentIndex + 1, itemState.imagens.length - 1);
+                      setCurrentIndex(next);
+                      scrollRef?.scrollTo({ x: next * screenWidth, animated: true });
+                    }}
+                    style={[styles.navButton, { right: 10 }]}
+                  >
+                    <Ionicons name="chevron-forward" size={28} color="#fff" />
+                  </TouchableOpacity>
+                </>
+              )}
+              <View style={styles.dotsContainer}>
+                {itemState.imagens.map((_, i) => (
+                  <View
+                    key={i}
+                    style={[styles.dot, i === currentIndex ? styles.activeDot : null]}
+                  />
+                ))}
+              </View>
+            </View>
+          ) : projectImageUri ? (
+            <Image source={{ uri: projectImageUri }} style={styles.projectImage} />
           ) : (
             <View style={[styles.projectImage, styles.imagePlaceholder]}>
               <Text style={{ color: "#666" }}>Sem imagem</Text>
             </View>
           )}
-
           <View style={styles.titleRow}>
-            <Text style={styles.title}>
-              {itemState.titulo || itemState.title}
-            </Text>
+            <Text style={styles.title}>{itemState.titulo || itemState.title}</Text>
           </View>
-
           <View style={styles.creatorCard}>
             <View style={styles.creatorLeft}>
               {creatorImageUri ? (
-                <Image
-                  source={{ uri: creatorImageUri }}
-                  style={styles.avatar}
-                />
+                <Image source={{ uri: creatorImageUri }} style={styles.avatar} />
               ) : (
                 <View style={[styles.avatar, styles.avatarPlaceholder]}>
                   <Ionicons name="person" size={24} color="#fff" />
                 </View>
               )}
-
               <View style={{ marginLeft: 12, flex: 1 }}>
                 <Text style={styles.creatorName}>{creatorName}</Text>
                 {itemState.username || (creator && creator.username) ? (
@@ -305,33 +318,24 @@ export default function ProjetoInfo({ route, navigation }) {
                 ) : null}
               </View>
             </View>
-
             <TouchableOpacity
               style={styles.viewProfileButton}
               onPress={() => {
-                // navigate to profile screen if username available
                 const username =
-                  itemState?.username ||
-                  creator?.username ||
-                  itemState?.autor?.username;
+                  itemState?.username || creator?.username || itemState?.autor?.username;
                 if (username) navigation.navigate("Perfil", { username });
               }}
             >
               <Text style={styles.viewProfileText}>Ver perfil</Text>
             </TouchableOpacity>
           </View>
-
           <View style={styles.descriptionCard}>
             <Text style={styles.sectionTitle}>Descrição</Text>
             <Text style={styles.description}>{projectDescription}</Text>
           </View>
         </View>
       </ScrollView>
-      <BarraLateral
-        isVisible={isVisible}
-        onClose={toggleVisibleFalse}
-        navigation={navigation}
-      />
+      <BarraLateral isVisible={isVisible} onClose={toggleVisibleFalse} navigation={navigation} />
     </View>
   );
 }
@@ -364,11 +368,7 @@ const styles = StyleSheet.create({
   creatorRow: { width: "100%", marginTop: 14, alignItems: "flex-start" },
   creatorInner: { flexDirection: "row", alignItems: "center" },
   avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: "#bbb" },
-  avatarPlaceholder: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#999",
-  },
+  avatarPlaceholder: { alignItems: "center", justifyContent: "center", backgroundColor: "#999" },
   creatorName: { fontSize: 16, fontWeight: "700" },
   creatorUsername: { color: "#666", marginTop: 2 },
   creatorBio: { color: "#444", marginTop: 6 },
@@ -390,12 +390,7 @@ const styles = StyleSheet.create({
     elevation: 6,
     alignSelf: "center",
   },
-  titleRow: {
-    width: "100%",
-    paddingHorizontal: 16,
-    marginTop: 8,
-    alignItems: "flex-start",
-  },
+  titleRow: { width: "100%", paddingHorizontal: 16, marginTop: 8, alignItems: "flex-start" },
   creatorCard: {
     width: "100%",
     flexDirection: "row",
@@ -422,4 +417,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionTitle: { fontWeight: "800", marginBottom: 8 },
+  navButton: {
+    position: "absolute",
+    top: "45%",
+    backgroundColor: "rgba(0,0,0,0.4)",
+    padding: 8,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  dotsContainer: { flexDirection: "row", justifyContent: "center", marginTop: 8 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#ccc", marginHorizontal: 4 },
+  activeDot: { backgroundColor: "#7A2CF6" },
 });
