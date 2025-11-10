@@ -15,6 +15,7 @@ export default function InputPassword({
   obj,
   setobj,
   showpassword,
+  submitFunc = () => {},
 }) {
   const [focusedInput, setFocusedInput] = useState(null);
 
@@ -43,6 +44,7 @@ export default function InputPassword({
           secureTextEntry={!obj[showpassword]}
           value={obj[variavel]}
           onChangeText={(value) => setobj({ ...obj, [variavel]: value })}
+          onSubmitEditing={submitFunc}
           style={styles.input}
           onFocus={() => setFocusedInput(variavel)}
           onBlur={() => setFocusedInput(null)}

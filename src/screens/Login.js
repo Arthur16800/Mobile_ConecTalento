@@ -9,6 +9,8 @@ import {
   ImageBackground,
   StatusBar,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 // axios
@@ -61,53 +63,63 @@ export default function Login({ navigation }) {
     <View style={styles.container}>
       <StatusBar hidden={true} backgroundColor="#fff" />
       <ImageBackground source={backgroundLogin} style={styles.background}>
-        <View style={styles.whiteboard}>
-          <Text style={styles.title}>Login</Text>
-          <Image source={logo} style={styles.logo} />
+        <KeyboardAvoidingView behavior={"padding"} style={styles.whiteboard}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled" // permite tocar fora para fechar teclado
+          >
+            <View style={styles.whiteboard}>
+              <Text style={styles.title}>Login</Text>
+              <Image source={logo} style={styles.logo} />
 
-          <Text style={styles.subtitle}>
-            Seja bem-vindo(a)! Faça seu Login na ConecTalento
-          </Text>
+              <Text style={styles.subtitle}>
+                Seja bem-vindo(a)! Faça seu Login na ConecTalento
+              </Text>
 
-          <View>
-            <InputUser
-              atributo={"Usuário"}
-              variavel={"email"}
-              texto={"Digite seu E-mail:"}
-              obj={user}
-              setobj={setUser}
-            />
+              <View>
+                <InputUser
+                  atributo={"Usuário"}
+                  variavel={"email"}
+                  texto={"Digite seu E-mail:"}
+                  obj={user}
+                  setobj={setUser}
+                />
 
-            <InputPassword
-              titulo={"Senha"}
-              texto={"Digite sua senha"}
-              variavel={"password"}
-              showpassword={"showPassword"}
-              obj={user}
-              setobj={setUser}
-            />
-          </View>
-          <View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleLogin}
-              disabled={controlLoad}
-            >
-              {controlLoad ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text style={styles.buttonText}>Entrar</Text>
-              )}
-            </TouchableOpacity>
+                <InputPassword
+                  titulo={"Senha"}
+                  texto={"Digite sua senha"}
+                  variavel={"password"}
+                  showpassword={"showPassword"}
+                  obj={user}
+                  setobj={setUser}
+                  submitFunc={() => handleLogin()}
+                />
+              </View>
+              <View>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleLogin}
+                  disabled={controlLoad}
+                >
+                  {controlLoad ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text style={styles.buttonText}>Entrar</Text>
+                  )}
+                </TouchableOpacity>
 
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Não possui conta?</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
-                <Text style={styles.footerLink}>Cadastre-se</Text>
-              </TouchableOpacity>
+                <View style={styles.footer}>
+                  <Text style={styles.footerText}>Não possui conta?</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("Cadastro")}
+                  >
+                    <Text style={styles.footerLink}>Cadastre-se</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </View>
   );
@@ -118,6 +130,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     width: "100%",
+  },
+  scrollContent: { 
+    flexGrow: 1, 
+    justifyContent: "center" 
   },
   background: {
     flex: 1,
@@ -134,7 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     rowGap: "3%",
-    borderRadius: "8px",
+    borderRadius: 12,
   },
   logo: {
     position: "absolute",
