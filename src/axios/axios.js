@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://10.89.240.71:5000/api/v1/",
+  baseURL: "http://10.89.240.75:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -108,6 +108,8 @@ const sheets = {
       },
     });
   },
+  paymentUserPix: (id_user, email) => api.post(`/pagamento-pix/${id_user}`, { email }),
+  getPaymentPixStatus: (id_user, paymentId) => api.get(`/pagamento/pix/status/${id_user}/${paymentId}`),
 
   putProject: async (projeto, imageUri, id) => {
     const data = new FormData();
