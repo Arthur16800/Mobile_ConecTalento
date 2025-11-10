@@ -25,7 +25,6 @@ import { Image as RNImage } from "react-native";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
 import * as ImagePicker from "expo-image-picker";
 
-
 export default function PerfilEdit({ navigation }) {
   const [email, setEmail] = useState("");
   const [contatos, setContatos] = useState([
@@ -106,7 +105,7 @@ export default function PerfilEdit({ navigation }) {
 
   //fim modal validar email
   async function pickImage() {
-    // Pedir permissão para acessar galeria
+    // Pedir permissão
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permission.status !== "granted") {
       Alert.alert(
@@ -115,17 +114,27 @@ export default function PerfilEdit({ navigation }) {
       );
       return;
     }
-    // Abrir galeria
+
+    // Abrir a galeria
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      aspect: [1, 1], // recorte quadrado (perfil)
       quality: 1,
     });
 
+    // Se o usuário não cancelou
     if (!result.canceled) {
-      const imageUri = result.assets[0].uri; // caminho local da imagem
-      console.log("Imagem selecionada:", imageUri);
-      setUser({...user, image: imageUri});
+      const imageUri = result.assets[0].uri;
+      const type = result.assets[0].mimeType || "image/jpeg"; // tipo da imagem
+      console.log("Imagem selecionada:", imageUri, type);
+
+      // Atualiza o estado do usuário com a nova imagem
+      setUser((prevUser) => ({
+        ...prevUser,
+        imagem: imageUri,
+        tipo_imagem: type,
+      }));
     }
   }
 
@@ -144,8 +153,8 @@ export default function PerfilEdit({ navigation }) {
     });
 
     try {
-      const response = await axios.put(
-        `http://192.168.x.x:5000/api/v1/user/${userId}`,
+      const response = await api.put(
+        `http://10.89.240.90:5000/api/v1/user/${userId}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -176,31 +185,40 @@ export default function PerfilEdit({ navigation }) {
 
   async function putUser() {
     try {
-      setControlLoad(true)
+      setControlLoad(true);
       const userId = await SecureStore.getItemAsync("id");
+      console.log("teste1")
+      console.log(user);
       const response = await api.putUser(
         userId,
         {
           email: user.email,
           biografia: user.biografia,
-          username: user.username,
+          username_: user.username,
           name: user.name,
         },
         user.imagem
       );
-
+      console.log("teste2")
       if (response.data.message === "Código válido. Usuário autenticado.") {
         saveInfo(response.data.token, response.data.user);
         setControlLoad(false);
         Alert.alert("Usuário atualizado com sucesso!");
+        navigation.navigate("Perfil");
+        console.log("passou aqui")
         fecharModal();
-      } else if (response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail.") {
+        
+      } else if (
+        response.data.message === "Código reenviado ao e-mail." ||
+        response.data.message === "Código enviado ao e-mail." 
+      ) {
+        console.log(response.data.message);
         visibModal();
         setControlLoad(false);
       }
 
       Alert.alert(response.data.message);
-      navigation.navigate("Perfil");
+      
     } catch (error) {
       console.log("Erro na requisição:", error);
       console.log({
@@ -228,7 +246,6 @@ export default function PerfilEdit({ navigation }) {
     }
   }
 
-
   useEffect(() => {
     getEmail();
     getUser();
@@ -248,12 +265,10 @@ export default function PerfilEdit({ navigation }) {
 
           <View style={styles.lineUser}>
             <View style={styles.backIcon}>
-              <TouchableOpacity onPress={uploadUserImage}>
+              <TouchableOpacity onPress={pickImage}>
                 {user.imagem ? (
                   <Image
-                    source={{
-                      uri: `data:${user.tipo_imagem};base64,${user.imagem}`,
-                    }}
+                    source={{ uri: user.imagem }}
                     style={styles.profileImage}
                   />
                 ) : (
@@ -441,4 +456,10 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
   },
+  profileImage: {
+    width: 65,
+    height: 65,
+    borderRadius: 9999,
+    resizeMode: "cover",
+  },  
 });

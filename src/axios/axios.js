@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-const ip = "192.168.100.10"
+const ip = "10.89.240.90"
 
 const api = axios.create({
   baseURL: `http://${ip}:5000/api/v1/`,
@@ -40,7 +40,7 @@ const sheets = {
     const filename = imageUri.split("/").pop();
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : "image";
-    data.append("imagem", {
+    data.append("arquivo", {
       uri: imageUri,
       name: filename,
       type: type,
