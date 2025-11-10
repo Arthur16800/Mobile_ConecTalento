@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import sheets from "../axios/axios"; // Importação renomeada de 'api' para 'sheets'
+import sheets from "../axios/axios"; // Importação usando 'sheets'
 import * as SecureStore from "expo-secure-store";
 import Header from "../components/Header";
 import BarraLateral from "../components/BarraLateral";
@@ -55,7 +55,8 @@ export default function ProjetoInfo({ route, navigation }) {
   };
   const projectImageUri = getSingleProjectImageUri(itemState);
 
-  // 1. Fetch Creator
+  // --- EFEITOS DE CARREGAMENTO ---
+
   useEffect(() => {
     async function fetchCreator() {
       if (!itemState) return;
@@ -71,7 +72,7 @@ export default function ProjetoInfo({ route, navigation }) {
       if (!username) return;
       try {
         setLoadingCreator(true);
-        const res = await sheets.getUserByName(String(username)); // sheets.getUserByName
+        const res = await sheets.getUserByName(String(username));
         const profile = res.data?.profile || res.data || null;
         if (profile) setCreator(profile);
       } catch (err) {
@@ -82,7 +83,6 @@ export default function ProjetoInfo({ route, navigation }) {
     fetchCreator();
   }, [itemState]);
 
-  // 2. Get User ID, Username e Like Status
   useEffect(() => {
     async function getUserAndLikeStatus() {
       try {
@@ -96,7 +96,7 @@ export default function ProjetoInfo({ route, navigation }) {
         if (id) {
           setUserId(id);
           try {
-            const res = await sheets.getProjectsLikedUser(id); // sheets.getProjectsLikedUser
+            const res = await sheets.getProjectsLikedUser(id);
             const likedProjects =
               res.data && res.data.profile_projeto
                 ? res.data.profile_projeto.map((p) => p.ID_projeto)
@@ -111,13 +111,11 @@ export default function ProjetoInfo({ route, navigation }) {
     getUserAndLikeStatus();
   }, [itemState, routeId]);
 
-  // 3. Update Likes Count (Mantido, não usa API)
   useEffect(() => {
     if (!itemState) return;
     setLikesCount(itemState.total_curtidas ?? itemState.likes ?? likesCount);
   }, [itemState]);
 
-  // 4. Fetch Project by ID (if needed)
   useEffect(() => {
     let active = true;
     async function fetchProjectById() {
@@ -139,7 +137,7 @@ export default function ProjetoInfo({ route, navigation }) {
       if (!idToFetch) return;
 
       try {
-        const res = await sheets.getProjectById(idToFetch); // sheets.getProjectById
+        const res = await sheets.getProjectById(idToFetch);
         if (!active) return;
         const proj =
           res.data?.projeto || res.data?.profile_projeto || res.data || null;
@@ -155,7 +153,6 @@ export default function ProjetoInfo({ route, navigation }) {
     };
   }, [routeId, itemState]);
 
-  // 5. Check if the logged user is the project creator (Mantido, não usa API)
   useEffect(() => {
     if (!itemState || !user?.username) return;
 
@@ -174,13 +171,12 @@ export default function ProjetoInfo({ route, navigation }) {
     }
   }, [creator, user, itemState]);
 
-  // 6. Fetch User for Header (Mantido)
   useEffect(() => {
     async function fetchData() {
       if (!itemState?.username) return;
       try {
         const username = itemState.username;
-        const response = await sheets.getUserByName(username); // sheets.getUserByName
+        const response = await sheets.getUserByName(username);
         setUser({
           ...user,
           tipo_imagem: response.data.profile.tipo_imagem || null,
@@ -206,15 +202,17 @@ export default function ProjetoInfo({ route, navigation }) {
     if (!projectId) return;
 
     try {
-      if (liked) {
-        await sheets.unlikeProject(userId, projectId); // sheets.unlikeProject
-        setLiked(false);
-        setLikesCount((prev) => Math.max(prev - 1, 0));
-      } else {
-        await sheets.likeProject(userId, projectId); // sheets.likeProject
-        setLiked(true);
-        setLikesCount((prev) => prev + 1);
-      }
+      // Usa a rota unificada do backend para curtir/descurtir
+      const res = await sheets.likeProject(projectId, userId);
+
+      const newLikedStatus = res.data.curtido;
+
+      setLiked(newLikedStatus);
+
+      // Atualiza a contagem local
+      setLikesCount((prev) =>
+        newLikedStatus ? prev + 1 : Math.max(prev - 1, 0)
+      );
     } catch (err) {
       console.error("Erro ao curtir/descurtir:", err);
       Alert.alert(
@@ -245,7 +243,7 @@ export default function ProjetoInfo({ route, navigation }) {
                 return;
               }
 
-              await sheets.deleteProject(projectId, userId); // sheets.deleteProject
+              await sheets.deleteProject(projectId, userId);
 
               Alert.alert("Sucesso", "Projeto excluído com sucesso.");
               navigation.goBack();
@@ -298,6 +296,8 @@ export default function ProjetoInfo({ route, navigation }) {
     );
   }
 
+  // --- RENDERIZAÇÃO PRINCIPAL ---
+
   return (
     <View style={styles.container}>
       <Header toggleVisible={toggleVisibleTrue} user={user} />
@@ -313,6 +313,7 @@ export default function ProjetoInfo({ route, navigation }) {
         </View>
 
         <View style={styles.cardMain}>
+          {/* Carrossel de Imagens */}
           <View style={styles.carouselContainer}>
             {Array.isArray(itemState?.imagens) &&
             itemState.imagens.length > 0 ? (
@@ -387,6 +388,7 @@ export default function ProjetoInfo({ route, navigation }) {
               <Text style={styles.title}>
                 {itemState.titulo || itemState.title}
               </Text>
+              {/* Botão Curtir */}
               <TouchableOpacity
                 onPress={handleLikeToggle}
                 style={styles.likeButton}
@@ -429,6 +431,7 @@ export default function ProjetoInfo({ route, navigation }) {
               </View>
             </View>
 
+            {/* BOTÕES DE AÇÃO DO AUTOR */}
             <View style={styles.creatorActions}>
               {isMe && (
                 <>
