@@ -149,6 +149,17 @@ const sheets = {
       ID_user: Number(userId),
     });
   },
+  
+  // >>> ROTA DE EXCLUSÃO ADICIONADA <<<
+  deleteProject: (projectId, userId) => {
+    if (!projectId || !userId) {
+      return Promise.reject(new Error("Project ID ou User ID ausente"));
+    }
+    // Rota: router.delete("/project/:ID_projeto") e espera ID_user no body
+    return api.delete(`project/${projectId}`, {
+      data: { ID_user: Number(userId) },
+    });
+  },
 };
 
 export default sheets;
