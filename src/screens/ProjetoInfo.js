@@ -270,7 +270,7 @@ export default function ProjetoInfo({ route, navigation }) {
     itemState?.nome_criador ||
     itemState?.nome ||
     itemState?.username ||
-    "Usuário";
+    "Loading";
 
   const creatorImageUri =
     creator && creator.imagem && creator.tipo_imagem

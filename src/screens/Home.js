@@ -164,7 +164,7 @@ export default function Home({ navigation }) {
       try {
         setLoading(true);
         const response = await sheets.searchProjects(String(search));
-        setProjects(response.data);
+        setProjects(response.data.profile_projeto);
       } catch (error) {
           console.log("Erro na busca:", error);
       } finally {

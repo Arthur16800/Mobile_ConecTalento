@@ -82,6 +82,7 @@ export default function CriarProjeto({ navigation }) {
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const { uri } = result.assets[0];
         pushImage(uri);
+        console.log(uri);
         if (imagens.length > 4) {
           deleteImage(5);
           Alert.alert(

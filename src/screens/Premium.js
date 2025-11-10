@@ -18,7 +18,7 @@ export default function Premium({ navigation }) {
   const [idPix, setIdPix] = useState();
   const [state, setState] = useState();
   const [loading, setLoading] = useState(true);
-  const [cache, setCache] = useState("");
+  const [pixCreated, setPixCreated] = useState(false);
   const [formData, setFormData] = useState();
   const [tick, setTick] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -51,24 +51,27 @@ export default function Premium({ navigation }) {
   async function getUser() {
     try {
       const response = await api.getUserByName(user.username);
-      const tipoImagemBuffer = response.data.profile.tipo_imagem;
-      const imagemBuffer = response.data.profile.imagem;
-
-      setUser((prev) => ({
-        ...prev,
-        tipo_imagem: tipoImagemBuffer,
-        imagem: imagemBuffer,
-      }));
+      const { tipo_imagem, imagem } = response.data.profile;
+  
+      setUser((prev) => {
+        if (prev.tipo_imagem === tipo_imagem && prev.imagem === imagem) return prev;
+        return { ...prev, tipo_imagem, imagem };
+      });
     } catch (error) {
-      console.log("Erro na requisição:", error.data.message.error);
+      console.log("Erro na requisição:", error.response?.data?.error);
     }
   }
+  
 
   useEffect(() => {
-    getUser();
+    if (user.username) {
+      getUser();
+    }
   }, [user.username]);
 
   async function CreatePix() {
+    if (pixCreated) return;
+    setPixCreated(true);
     try {
       const response = await api.paymentUserPix(user.id, user.email);
       const nextData = {
@@ -91,7 +94,6 @@ export default function Premium({ navigation }) {
       setLoading(false);
     } catch (error) {
       console.log("Erro ao criar pix:", error);
-      console.log("error", error.response.data.error);
     }
   }
 
@@ -145,9 +147,10 @@ export default function Premium({ navigation }) {
   useEffect(() => {
     if (!formData || String(formData.payment_id) !== String(idPix)) return;
     if (formData.status === "approved") return;
-
+  
     let isPollingCancelled = false;
-
+    let pollingTimerId;
+  
     async function fetchPaymentStatus() {
       if (!formData?.payment_id) return;
       try {
@@ -162,15 +165,21 @@ export default function Premium({ navigation }) {
       } catch (error) {
         console.log("Erro ao consultar status do pagamento:", error);
         console.log(error?.response?.data?.error);
+  
+        if (error?.response?.status === 401) {
+          isPollingCancelled = true;
+          clearInterval(pollingTimerId);
+        }
       }
     }
-
+  
     fetchPaymentStatus();
-    const pollingTimerId = setInterval(() => {
-      setTick((t) => t + 1);
-      fetchPaymentStatus();
+    pollingTimerId = setInterval(() => {
+      if (!isPollingCancelled) {
+        fetchPaymentStatus();
+      }
     }, 3000);
-
+  
     return () => {
       isPollingCancelled = true;
       clearInterval(pollingTimerId);

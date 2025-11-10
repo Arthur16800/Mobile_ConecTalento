@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ export default function Login({ navigation }) {
   const [user, setUser] = useState({
     email: "",
     password: "",
-    showPassword: true,
+    showPassword: false,
   });
   const [controlLoad, setControlLoad] = useState(false);
 
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: { 
     flexGrow: 1, 
-    justifyContent: "center" 
+    justifyContent: "center",
   },
   background: {
     flex: 1,
