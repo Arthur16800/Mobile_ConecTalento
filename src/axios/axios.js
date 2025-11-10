@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://10.89.240.71:5000/api/v1/",
+  baseURL: "https://api-conectalento.eastus2.cloudapp.azure.com:5000/api/v1",
   headers: { accept: "application/json" },
 });
 
@@ -111,30 +111,17 @@ const sheets = {
   paymentUserPix: (id_user, email) => api.post(`/pagamento-pix/${id_user}`, { email }),
   getPaymentPixStatus: (id_user, paymentId) => api.get(`/pagamento/pix/status/${id_user}/${paymentId}`),
 
-  putProject: async (projeto, imageUri, id) => {
-    const data = new FormData();
-
-    for (let key in projeto) {
-      data.append(key, projeto[key]);
-    }
-
-    if (imageUri) {
-      const filename = imageUri.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image";
-      data.append("imagem", {
-        uri: imageUri,
-        name: filename,
-        type: type,
-      });
-    }
-
-    return api.put(`projects/${id}`, projeto, {
+  putProject: (projetoId, formData) => {
+    return api.put(`project/${projetoId}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Accept: "application/json",
       },
     });
-  }, // TENHO QUE ESTUDAR COMO FUNCIONA O "ENVIAR MULTIPLAS IMAGENS PARA O SERVIDOR"
+  },
+  
+
+ // TENHO QUE ESTUDAR COMO FUNCIONA O "ENVIAR MULTIPLAS IMAGENS PARA O SERVIDOR"
   getProjectsLikedUser: (userId) => {
     if (!userId) return Promise.reject(new Error("User ID ausente"));
     return api.get(`/projectsliked/${userId}`);
@@ -150,14 +137,6 @@ const sheets = {
     });
   },
 
-  updateProjeto: (ID_projeto, formData) => {
-  return api.put(`/project/${ID_projeto}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Accept: "application/json",
-    },
-  });
-},
 
 };
 

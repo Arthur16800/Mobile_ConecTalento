@@ -13,7 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
-import api from "../axios/axios";
+import sheets from "../axios/axios"; // ✅ IMPORTAÇÃO CORRETA
 
 export default function AtualizarProjeto({ route, navigation }) {
   const { ID_projeto } = route.params || {};
@@ -30,7 +30,7 @@ export default function AtualizarProjeto({ route, navigation }) {
   useEffect(() => {
     async function fetchProject() {
       try {
-        const res = await api.getProjectById(ID_projeto);
+        const res = await sheets.getProjectById(ID_projeto);
         const data =
           res.data?.projeto || res.data?.profile_projeto || res.data || null;
 
@@ -78,51 +78,60 @@ export default function AtualizarProjeto({ route, navigation }) {
       Alert.alert("Erro", "O título não pode estar vazio.");
       return;
     }
-
+  
     try {
       setUpdating(true);
-
-      // Recupera o ID_user salvo no SecureStore
+  
+      // pega ID do usuário salvo (string)
       const ID_user = await SecureStore.getItemAsync("id");
-
-      // Monta o FormData
-      const formData = new FormData();
-      formData.append("titulo", project.titulo);
-      formData.append("descricao", project.descricao);
-      formData.append("ID_user", ID_user); // 👈 agora o back sabe quem atualizou
-
-      if (project.imagem && project.imagem.startsWith("file")) {
-        formData.append("imagem", {
-          uri: project.imagem,
-          type: project.tipo_imagem || "image/jpeg",
-          name: "projeto.jpg",
-        });
+  
+      if (!ID_user) {
+        Alert.alert("Erro", "Usuário não autenticado. Faça login novamente.");
+        return;
       }
-
-      // Faz o PUT com multipart/form-data
-      const res = await api.updateProjeto(ID_projeto, formData);
-
+  
+      // DEBUG: mostra token e ID_user no console (remova depois)
+      const token = await SecureStore.getItemAsync("token");
+      console.log("DEBUG - token (início update):", token ? token.slice(0, 20) + "..." : null);
+      console.log("DEBUG - ID_user (início update):", ID_user);
+  
+      // ▶️ Aqui passamos um objeto simples (não FormData)
+      const form = {
+        titulo: project.titulo,
+        descricao: project.descricao,
+        ID_user, // importante: backend espera esse campo no body
+      };
+  
+      // ▶️ Array de URIs (o putProject cuidará de transformar em FormData)
+      const imagens = project.imagem && project.imagem.startsWith("file")
+        ? [project.imagem]
+        : [];
+  
+      // chama a função do axios que monta o FormData e envia o token via interceptor
+      const res = await sheets.putProject(ID_projeto, form, imagens);
+  
       if (res.status === 200) {
         Alert.alert("Sucesso", "Projeto atualizado com sucesso!");
         navigation.goBack();
       } else {
+        console.log("Resposta inesperada:", res.status, res.data);
         Alert.alert("Erro", "Não foi possível atualizar o projeto.");
       }
     } catch (error) {
-      console.log("Erro ao atualizar projeto:", error);
-      Alert.alert("Erro", "Falha ao atualizar o projeto.");
+      // mostra erro detalhado
+      console.log("Erro ao atualizar projeto:", error.response?.data || error.message || error);
+      Alert.alert(
+        "Erro",
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Falha ao atualizar o projeto. Verifique os campos."
+      );
     } finally {
       setUpdating(false);
     }
   };
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size={48} color="#7A2CF6" />
-      </View>
-    );
-  }
+  
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
