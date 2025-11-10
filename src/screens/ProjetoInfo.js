@@ -512,4 +512,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionTitle: { fontWeight: "800", marginBottom: 8 },
+
+  buttonText : {
+    padding: 10,
+    marginBottom: 30,
+  }
+  
 });

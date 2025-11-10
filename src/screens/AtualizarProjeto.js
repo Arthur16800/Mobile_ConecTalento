@@ -1,3 +1,4 @@
+// AtualizarProjeto.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -13,7 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
-import sheets from "../axios/axios"; // ✅ IMPORTAÇÃO CORRETA
+import sheets from "../axios/axios";
 
 export default function AtualizarProjeto({ route, navigation }) {
   const { ID_projeto } = route.params || {};
@@ -22,25 +23,22 @@ export default function AtualizarProjeto({ route, navigation }) {
   const [project, setProject] = useState({
     titulo: "",
     descricao: "",
+    // imagem pode ser URI (file://) ou base64 (string)
     imagem: null,
     tipo_imagem: null,
   });
 
-  // 🔹 Buscar projeto existente
   useEffect(() => {
     async function fetchProject() {
       try {
         const res = await sheets.getProjectById(ID_projeto);
-        const data =
-          res.data?.projeto || res.data?.profile_projeto || res.data || null;
-
+        const data = res.data?.projeto || res.data?.profile_projeto || res.data || null;
         if (data) {
           setProject({
             titulo: data.titulo || data.title || "",
             descricao: data.descricao || data.description || "",
             imagem: data.imagem || (data.imagens?.[0]?.imagem ?? null),
-            tipo_imagem:
-              data.tipo_imagem || (data.imagens?.[0]?.tipo_imagem ?? null),
+            tipo_imagem: data.tipo_imagem || (data.imagens?.[0]?.tipo_imagem ?? null),
           });
         }
       } catch (error) {
@@ -50,11 +48,9 @@ export default function AtualizarProjeto({ route, navigation }) {
         setLoading(false);
       }
     }
-
     if (ID_projeto) fetchProject();
   }, [ID_projeto]);
 
-  // 🔹 Selecionar imagem da galeria
   const handleImagePick = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -64,81 +60,74 @@ export default function AtualizarProjeto({ route, navigation }) {
 
     if (!result.canceled) {
       const img = result.assets[0];
-      setProject({
-        ...project,
+      setProject((p) => ({
+        ...p,
         imagem: img.uri,
-        tipo_imagem: img.mimeType || "image/jpeg",
-      });
+        tipo_imagem: img.type || img.mimeType || "image/jpeg",
+      }));
     }
   };
 
-  // 🔹 Atualizar projeto
-  const handleUpdate = async () => {
-    if (!project.titulo.trim()) {
-      Alert.alert("Erro", "O título não pode estar vazio.");
+  // dentro de AtualizarProjeto.js -> handleUpdate
+const handleUpdate = async () => {
+  if (!project.titulo.trim()) {
+    Alert.alert("Erro", "O título não pode estar vazio.");
+    return;
+  }
+  try {
+    setUpdating(true);
+    const ID_user = await SecureStore.getItemAsync("id");
+    if (!ID_user) {
+      Alert.alert("Erro", "Usuário não autenticado. Faça login novamente.");
+      setUpdating(false);
       return;
     }
-  
-    try {
-      setUpdating(true);
-  
-      // pega ID do usuário salvo (string)
-      const ID_user = await SecureStore.getItemAsync("id");
-  
-      if (!ID_user) {
-        Alert.alert("Erro", "Usuário não autenticado. Faça login novamente.");
-        return;
-      }
-  
-      // DEBUG: mostra token e ID_user no console (remova depois)
-      const token = await SecureStore.getItemAsync("token");
-      console.log("DEBUG - token (início update):", token ? token.slice(0, 20) + "..." : null);
-      console.log("DEBUG - ID_user (início update):", ID_user);
-  
-      // ▶️ Aqui passamos um objeto simples (não FormData)
-      const form = {
-        titulo: project.titulo,
-        descricao: project.descricao,
-        ID_user, // importante: backend espera esse campo no body
-      };
-  
-      // ▶️ Array de URIs (o putProject cuidará de transformar em FormData)
-      const imagens = project.imagem && project.imagem.startsWith("file")
-        ? [project.imagem]
-        : [];
-  
-      // chama a função do axios que monta o FormData e envia o token via interceptor
-      const res = await sheets.putProject(ID_projeto, form, imagens);
-  
-      if (res.status === 200) {
-        Alert.alert("Sucesso", "Projeto atualizado com sucesso!");
-        navigation.goBack();
-      } else {
-        console.log("Resposta inesperada:", res.status, res.data);
-        Alert.alert("Erro", "Não foi possível atualizar o projeto.");
-      }
-    } catch (error) {
-      // mostra erro detalhado
-      console.log("Erro ao atualizar projeto:", error.response?.data || error.message || error);
-      Alert.alert(
-        "Erro",
-        error.response?.data?.error ||
-          error.response?.data?.message ||
-          "Falha ao atualizar o projeto. Verifique os campos."
-      );
-    } finally {
-      setUpdating(false);
+
+    const formData = new FormData();
+    formData.append("titulo", project.titulo);
+    formData.append("descricao", project.descricao);
+    formData.append("ID_user", ID_user);
+
+    // se tiver UMA imagem local (ajuste se for múltiplas)
+    if (project.imagem && typeof project.imagem === "string" && project.imagem.startsWith("file")) {
+      formData.append("imagens", {
+        uri: project.imagem,
+        name: `photo.jpg`,
+        type: project.tipo_imagem || "image/jpeg",
+      });
     }
-  };
-  
-  
+
+    const res = await sheets.putProject(ID_projeto, formData);
+    if (res.status === 200) {
+      Alert.alert("Sucesso", "Projeto atualizado com sucesso!");
+      navigation.goBack();
+    } else {
+      console.log("Resposta inesperada:", res.status, res.data);
+      Alert.alert("Erro", "Não foi possível atualizar o projeto.");
+    }
+  } catch (err) {
+    console.log("Erro ao atualizar projeto:", err.response?.data || err.message || err);
+    Alert.alert(
+      "Erro",
+      err.response?.data?.error || err.response?.data?.message || "Falha ao atualizar o projeto."
+    );
+  } finally {
+    setUpdating(false);
+  }
+};
+
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#7A2CF6" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#7A2CF6" />
       </TouchableOpacity>
 
@@ -181,13 +170,12 @@ export default function AtualizarProjeto({ route, navigation }) {
         onPress={handleUpdate}
         disabled={updating}
       >
-        <Text style={styles.buttonText}>
-          {updating ? "Atualizando..." : "Salvar Alterações"}
-        </Text>
+        <Text style={styles.buttonText}>{updating ? "Atualizando..." : "Salvar Alterações"}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

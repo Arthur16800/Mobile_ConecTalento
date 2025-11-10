@@ -1,16 +1,19 @@
+// axios.js
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "https://api-conectalento.eastus2.cloudapp.azure.com:5000/api/v1",
-  headers: { accept: "application/json" },
+  baseURL: "http://192.168.100.28:5000/api/v1",
+  headers: { Accept: "application/json" },
 });
 
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync("token");
     if (token) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("DEBUG interceptor token:", config.headers.Authorization?.slice(0,30) + "...");
     }
     return config;
   },
@@ -18,6 +21,13 @@ api.interceptors.request.use(
 );
 
 const sheets = {
+   putProject: (projetoId, formData) => {
+    // NÃO setar Content-Type aqui
+    return api.put(`project/${projetoId}`, formData, {
+      headers: { Accept: "application/json" },
+    });
+  },
+
   postLogin: (user) => api.post("login", user),
   postCadastro: (user) => api.post("user", user),
   getProjects: () => api.get("projects"),
@@ -111,14 +121,7 @@ const sheets = {
   paymentUserPix: (id_user, email) => api.post(`/pagamento-pix/${id_user}`, { email }),
   getPaymentPixStatus: (id_user, paymentId) => api.get(`/pagamento/pix/status/${id_user}/${paymentId}`),
 
-  putProject: (projetoId, formData) => {
-    return api.put(`project/${projetoId}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Accept: "application/json",
-      },
-    });
-  },
+
   
 
  // TENHO QUE ESTUDAR COMO FUNCIONA O "ENVIAR MULTIPLAS IMAGENS PARA O SERVIDOR"
