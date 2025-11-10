@@ -5,12 +5,14 @@ import {
   FlatList,
   Dimensions,
   ActivityIndicator,
+  Text,
 } from "react-native";
-import { useLayoutEffect, useState, useEffect } from "react";
+import { useLayoutEffect, useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native"; // Importante!
 import * as SecureStore from "expo-secure-store";
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
-import api from "../axios/axios";
+import sheets from "../axios/axios";
 import Card from "../components/Card";
 
 const screenHeight = Dimensions.get("window").height;
@@ -25,92 +27,87 @@ export default function Portifolio({ navigation }) {
   const [user, setUser] = useState({
     imagem: "",
     tipo_imagem: "",
-  })
+  });
 
   useLayoutEffect(() => {
     StatusBar.setBarStyle("dark-content");
     StatusBar.setBackgroundColor("transparent");
   }, []);
 
-  const toggleVisibleFalse = () => {
-    setIsVisible(false);
-  };
-  const toggleVisibleTrue = () => {
-    setIsVisible(true);
-  };
+  const toggleVisibleFalse = () => setIsVisible(false);
+  const toggleVisibleTrue = () => setIsVisible(true);
 
-  async function searchProjects(text) {
+  // Função para buscar projetos (agora acessível pelo useFocusEffect)
+  async function getProjects(uname) {
+    if (!uname) return;
     try {
-      const response = await api.searchProjects(text);
+      // Opcional: setLoading(true) se quiser mostrar o loading toda vez que focar
+      const response = await sheets.getProjectsByUser(uname);
       setProjects(response.data.profile_projeto);
     } catch (error) {
-      console.log("Erro completo:", error);
-      const errorMessage =
-        error?.response?.data?.message?.error ||
-        error?.message ||
-        "Erro desconhecido";
-      console.log("Erro na busca:", errorMessage);
+      console.log("Erro ao buscar projetos do portfólio:", error);
     }
   }
-  async function getUser(username) {
+
+  async function getUser(uname) {
     try {
-      const response = await api.getUserByName(username);
-      const tipoImagemBuffer = response.data.profile.tipo_imagem;
-      const imagemBuffer = response.data.profile.imagem;
+      const response = await sheets.getUserByName(uname);
       setUser({
-        tipo_imagem: tipoImagemBuffer,
-        imagem: imagemBuffer
-      })
+        tipo_imagem: response.data.profile.tipo_imagem,
+        imagem: response.data.profile.imagem,
+      });
     } catch (error) {
-      console.log("Erro na requisição:", error.data.message.error);
-    }
-  }
-  async function searchProjects() {
-    setLoading(true);
-    if (search === "") {
-      getProjects(username);
-      setLoading(false);
-    } else {
-      try {
-        const response = await api.searchProjects(String(search));
-        setProjects(response.data);
-      } catch (error) {
-        console.log("Erro completo:", error);
-      } finally {
-        setLoading(false);
-      }
+      console.log("Erro na requisição getUser:", error);
     }
   }
 
-  async function getProjects(username) {
-    try {
-      const response = await api.getProjectsByUser(username);
-      setProjects(response.data.profile_projeto);
-    } catch (error) {
-      console.log("Erro completo:", error);
-      const errorMessage =
-        error?.response?.data?.message?.error ||
-        error?.message ||
-        "Erro desconhecido";
-      console.log("Erro na requisição:", errorMessage);
-    }
-  }
+  // >>> ATUALIZAÇÃO AUTOMÁTICA AO ENTRAR EM FOCO <<<
+  useFocusEffect(
+    useCallback(() => {
+      if (username) {
+        getProjects(username);
+        getUser(username); // Opcional: atualizar dados do usuário também
+      }
+    }, [username]) // Recarrega se o username mudar (login diferente, por exemplo)
+  );
+
+  // Carga inicial
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const storedUsername = await SecureStore.getItemAsync("username");
         setUsername(storedUsername);
-
         if (storedUsername) {
           await getProjects(storedUsername);
           await getUser(storedUsername);
         }
       } catch (error) {
-        console.log("Erro ao buscar username ou projetos:", error);
+        console.log("Erro inicial:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
   }, []);
+
+  async function handleSearch() {
+    setLoading(true);
+    if (search === "") {
+      await getProjects(username);
+      setLoading(false);
+    } else {
+      try {
+        const response = await sheets.searchProjects(String(search));
+        // Nota: Idealmente, filtre aqui para mostrar apenas os projetos DO USUÁRIO se a API retornar todos.
+        setProjects(response.data);
+      } catch (error) {
+        console.log("Erro na busca:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -119,7 +116,7 @@ export default function Portifolio({ navigation }) {
         toggleVisible={toggleVisibleTrue}
         text={search}
         setText={setSearch}
-        getFunction={searchProjects}
+        getFunction={handleSearch}
         user={user}
       />
 
@@ -128,7 +125,7 @@ export default function Portifolio({ navigation }) {
       ) : (
         <FlatList
           data={projects}
-          keyExtractor={(item) => item.ID_projeto}
+          keyExtractor={(item) => String(item.ID_projeto)}
           renderItem={({ item }) => {
             const uriImage =
               "data:" + item.tipo_imagem + ";base64," + item.imagem;
@@ -147,6 +144,13 @@ export default function Portifolio({ navigation }) {
             paddingHorizontal: 10,
             paddingBottom: 25,
           }}
+          ListEmptyComponent={
+            !loading && (
+              <Text style={{ marginTop: 20, color: "#666" }}>
+                Você ainda não tem projetos.
+              </Text>
+            )
+          }
         />
       )}
 
@@ -180,10 +184,5 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 5,
     marginTop: 75,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
   },
 });
