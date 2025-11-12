@@ -176,7 +176,6 @@ export default function ProjetoInfo({ route, navigation }) {
       if (!user?.username) return;
       try {
         const username = user.username;
-        console.log("username");
         const response = await sheets.getUserByName(username);
         setUser({
           ...user,

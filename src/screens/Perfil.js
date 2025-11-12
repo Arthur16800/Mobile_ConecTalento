@@ -15,6 +15,7 @@ import BarraLateral from "../components/BarraLateral";
 import { ScrollView } from "react-native-gesture-handler";
 import api from "../axios/axios";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function Perfil({ route, navigation }) {
@@ -147,6 +148,17 @@ export default function Perfil({ route, navigation }) {
           <Text style={styles.name} numberOfLines={0}>
             {user.username || "Usuário"}
           </Text>
+          {emailAtual === user.email && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PerfilEdit")}
+            >
+              <MaterialCommunityIcons
+                name="pencil-outline"
+                size={30}
+                color="black"
+              />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Biografia */}
@@ -208,17 +220,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   nomeWrapper: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
+    flex:1,
+    flexDirection:"row",
+    width:"100%",
+    alignItems:"center",
+    justifyContent:"center",
     marginBottom: 15,
-  },
-  editIconWrapper: {
-    position: "absolute",
-    right: 5,
-    top: "50%",
-    transform: [{ translateY: -13 }],
   },
   title: {
     fontSize: 30,
@@ -228,7 +235,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 40,
     fontWeight: "bold",
-    textAlign: "center",
+    alignSelf:"center",
+    margin:"20"
   },
   subtitle: {
     fontSize: 20,

@@ -10,7 +10,7 @@ import {
   StatusBar,
   Alert,
 } from "react-native";
-import { useLayoutEffect, useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "../axios/axios";
 import backgroundImage from "../../assets/backgroundLogin.png";
 import Header from "../components/Header";
@@ -21,13 +21,32 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BarraLateral from "../components/BarraLateral";
 import ModalMudarSenha from "../components/ModalMudarSenha";
 import * as SecureStore from "expo-secure-store";
-import { Image as RNImage } from "react-native";
+import ModalConfirmEmail from "../components/ModalConfirmEmail";
+import * as ImagePicker from "expo-image-picker";
 
 export default function PerfilEdit({ navigation }) {
-  const imageDefaultUri = RNImage.resolveAssetSource(
-    require("../../assets/logo.png")
-  ).uri;
   const [email, setEmail] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const [contatosVisible, setContatosVisible] = useState(false);
+  const [senhaModal, setSenhaModal] = useState(false);
+  const [controlLoad, setControlLoad] = useState(false);
+  const [modalEmail, setModalEmail] = useState(false);
+
+  const [user, setUser] = useState({
+    ID_user: "",
+    name: "",
+    username: "",
+    email: "",
+    biografia: "",
+    imagem: "",
+    tipo_imagem: "",
+    code: "",
+  });
+  const [passwords, setPasswords] = useState({
+    passwordNow: "",
+    passwordNew: "",
+    confirmPassword: "",
+  });
   const [contatos, setContatos] = useState([
     { id: 0, type: "instagram", value: "@instagramteste" },
     { id: 1, type: "email", value: "EmailTeste" },
@@ -36,42 +55,20 @@ export default function PerfilEdit({ navigation }) {
     { id: 4, type: "twitter", value: "TwitterTeste" },
   ]);
 
-  useLayoutEffect(() => {
-    StatusBar.setBarStyle("dark-content");
-    StatusBar.setBackgroundColor("transparent");
-  }, []);
+    // INICIO DAS FUNÇÕES DE ESTADO
 
-  const [user, setUser] = useState({
-    email: "",
-    biografia: "",
-    username: "",
-    name: "",
-    imagem: null,
-  });
-  const [passwords, setPasswords] = useState({
-    passwordNow: "",
-    passwordNew: "",
-    confirmPassword: "",
-  });
+  const toggleVisibleFalse = () => setIsVisible(false);
+  const toggleVisibleTrue = () => setIsVisible(true);
 
-  // Modal BarraLateral;
-  const [isVisible, setIsVisible] = useState(false);
-  const toggleVisibleFalse = () => {
-    setIsVisible(false);
-  };
-  const toggleVisibleTrue = () => {
-    setIsVisible(true);
-  };
-  // Fim Modal
+  const toggleContatosModalFalse = () => setContatosVisible(false);
+  const toggleContatosModalTrue = () => setContatosVisible(true);
 
-  // Modal AddContatos
-  const [contatosVisible, setContatosVisible] = useState(false);
-  const toggleContatosModalFalse = () => {
-    setContatosVisible(false);
-  };
-  const toggleContatosModalTrue = () => {
-    setContatosVisible(true);
-  };
+  const toggleSenhaModalFalse = () => setSenhaModal(false);
+  const toggleSenhaModalTrue = () => setSenhaModal(true);
+
+  const toggleModalEmailTrue = () => setModalEmail(true);
+  const toggleModalEmailFalse = () => setModalEmail(false);
+
   const addcont = (id, plataforma, valor) => {
     setContatos((contatos) => [
       ...contatos,
@@ -93,59 +90,8 @@ export default function PerfilEdit({ navigation }) {
     setContatos(contatos.filter((contato) => contato.id !== id));
     toggleContatosModalFalse();
   };
-  // Fim Modal;
 
-  // Modal MudarSenha
-  const [senhaModal, setSenhaModal] = useState(false);
-  const toggleSenhaModalFalse = () => {
-    setSenhaModal(false);
-  };
-  const toggleSenhaModalTrue = () => {
-    setSenhaModal(true);
-  };
-  // Fim Modal
-
-  async function putSenha() {
-    if (passwords.confirmPassword !== passwords.passwordNew) {
-      Alert.alert("Digite e confirme a mesma nova senha!");
-    } else {
-      console.log(passwords);
-      try {
-        const response = await api.updatePassword(
-          user.ID_user,
-          passwords.passwordNow,
-          passwords.passwordNew
-        );
-        Alert.alert(response.data.message);
-        toggleSenhaModalFalse();
-      } catch (error) {
-        console.log("Erro na requisição:", error.data.message.error);
-      }
-    }
-  }
-
-  async function putUser() {
-    try {
-      const userId = SecureStore.getItemAsync("id");
-      const response = await api.putUser(userId, {
-        email: user.email,
-        biografia: user.biografia,
-        username: user.username,
-        name: user.name,
-        imagens: user.imagem,
-      });
-      Alert.alert(response.data.message);
-      navigation.navigate("Perfil");
-    } catch (error) {
-      console.log("Erro na requisição:", error);
-      console.log({
-        email: user.email,
-        biografia: user.biografia,
-        username: user.username,
-        name: user.name,
-      });
-    }
-  }
+  // INICIO DAS FUNÇÕES
 
   async function getEmail() {
     setEmail(await SecureStore.getItemAsync("email"));
@@ -155,8 +101,8 @@ export default function PerfilEdit({ navigation }) {
     try {
       const uname = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(uname);
-      console.log(response.data.profile);
       setUser(response.data.profile);
+      console.log("setou")
     } catch (error) {
       console.log("Erro na requisição:", error);
     }
@@ -167,13 +113,148 @@ export default function PerfilEdit({ navigation }) {
     getUser();
   }, []);
 
+  async function pickImage() {
+    // Pedir permissão
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permission.status !== "granted") {
+      Alert.alert(
+        "Permissão negada",
+        "Permita o acesso à galeria para escolher uma imagem."
+      );
+      return;
+    }
+
+    // Abrir a galeria
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1], // recorte quadrado (perfil)
+      quality: 1,
+    });
+
+    // Se o usuário não cancelou
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      const type = result.assets[0].mimeType || "image/jpeg"; // tipo da imagem
+      console.log("Imagem selecionada:", imageUri, type);
+
+      // Atualiza o estado do usuário com a nova imagem
+      setUser((prevUser) => ({
+        ...prevUser,
+        imagem: imageUri,
+        tipo_imagem: type,
+      }));
+    }
+  }
+
+  async function updateUser() {
+    setControlLoad(true);
+    try {
+      const fd = new FormData();
+
+      const biografiaToSend =
+        !user.biografia || user.biografia.trim() === ""
+          ? "Nenhuma biografia cadastrada."
+          : user.biografia;
+
+      fd.append("email", user.email);
+      fd.append("biografia", biografiaToSend);
+      fd.append("username_", user.username);
+      fd.append("name", user.name);
+
+      let imageToSend = user.imagem;
+      if (imageToSend && typeof imageToSend === "string") {
+        imageToSend = base64ToFile(imageToSend, "perfil_atual.jpg");
+      }
+      if (imageToSend) fd.append("imagens", imageToSend);
+
+      const emailMudou = user.email !== email;
+
+      const temCodigo = (user.code || "").trim() !== "";
+
+      if (emailMudou && !temCodigo) {
+        const res = await api.updateUser(user.ID_user, fd);
+        toggleModalEmailTrue();
+        setControlLoad(false);
+        return;
+      }
+
+      if (temCodigo) {
+        fd.append("code", formData.code);
+      }
+
+      const response = await api.updateUser(user.ID_user, fd);
+
+      const img = response.data?.profile?.imagem;
+      let updatedAvatar = null;
+
+      if (img) {
+        const isBase64 = img.startsWith("data:image");
+        const base64Src = isBase64 ? img : `data:image/jpeg;base64,${img}`;
+        updatedAvatar = base64Src;
+      }
+
+      setUser((prev) => ({
+        ...prev,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        biografia: biografiaToSend,
+        code: "",
+        imagem: updatedAvatar,
+      }));
+
+      if (emailMudou) {
+        setEmail(user.email);
+        await SecureStore.setItemAsync("email", user.email);
+      }
+      Alert.alert(response.data.message || "Perfil atualizado com sucesso!")
+      setEditing(false); 
+      toggleModalEmailTrue();
+      saveInfo(response.data.token, user);
+      navigation.navigate("Perfil", {username:user.username});
+
+    } catch (error) {
+      console.error("Erro no updateUser:", error);
+      Alert.alert("Um Erro Ocorreu", error.response?.data?.error || "Erro ao atualizar perfil.");
+    } finally {
+      setControlLoad(false);
+    }
+  }
+
+  async function putSenha() {
+    if (passwords.confirmPassword !== passwords.passwordNew) {
+      Alert.alert("Digite e confirme a mesma nova senha!");
+    } else {
+      try {
+        const response = await api.updatePassword(
+          user.ID_user,
+          passwords.passwordNow,
+          passwords.passwordNew
+        );
+        Alert.alert(response.data.message);
+      } catch (error) {
+        console.log("Erro na requisição:", error.data.message.error);
+      }
+    }
+  }
+
+  async function saveInfo(token, userP) {
+    await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync("username", userP.username);
+    await SecureStore.setItemAsync("email", userP.email);
+    await SecureStore.setItemAsync("id", userP.ID_user.toString());
+  }
+  
+  const URIProfile = `data:${user.tipo_imagem};base64,${user.imagem}`;
+
   return (
     <KeyboardAvoidingView
       style={styles.wrapper}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      <StatusBar hidden={false} backgroundColor="#fff" />
       <ScrollView contentContainerStyle={styles.container}>
-        <StatusBar hidden={false} backgroundColor="#fff" />
         <Header toggleVisible={toggleVisibleTrue} user={user} />
 
         <View style={styles.painel}>
@@ -181,7 +262,16 @@ export default function PerfilEdit({ navigation }) {
 
           <View style={styles.lineUser}>
             <View style={styles.backIcon}>
-              <IoniconsUser name="person" size={45} color="#949599" />
+              <TouchableOpacity onPress={pickImage}>
+                {URIProfile ? (
+                  <Image
+                    source={{ uri: URIProfile }}
+                    style={styles.profileImage}
+                  />
+                ) : (
+                  <IoniconsUser name="person" size={100} color="#949599" />
+                )}
+              </TouchableOpacity>
             </View>
             <Text style={styles.title}>{user.username}</Text>
             <MaterialIcons name="do-not-disturb-on" size={35} color="red" />
@@ -189,7 +279,7 @@ export default function PerfilEdit({ navigation }) {
 
           <TouchableOpacity
             style={[styles.button, { marginBottom: "2%", width: "95%" }]}
-            onPress={() => putUser()}
+            onPress={() => updateUser()}
           >
             <Text style={styles.buttonText}>Salvar Perfil</Text>
           </TouchableOpacity>
@@ -202,15 +292,6 @@ export default function PerfilEdit({ navigation }) {
             atributo={"Nome"}
             variavel={"name"}
             texto={user.name}
-            obj={user}
-            setobj={setUser}
-            style={styles.input}
-          />
-
-          <InputUser
-            atributo={"Username"}
-            variavel={"username"}
-            texto={user.username}
             obj={user}
             setobj={setUser}
             style={styles.input}
@@ -272,9 +353,19 @@ export default function PerfilEdit({ navigation }) {
       <ModalMudarSenha
         modal={senhaModal}
         fechamodal={toggleSenhaModalFalse}
-        user={passwords}
-        setUser={setPasswords}
+        user={user}
+        setUser={setUser}
         putSenha={putSenha}
+      />
+
+      <ModalConfirmEmail
+        fechamodal={toggleModalEmailFalse}
+        code={"code"}
+        user={user}
+        setuser={setUser}
+        handle={updateUser}
+        modal={modalEmail}
+        clickable={controlLoad}
       />
     </KeyboardAvoidingView>
   );
@@ -362,4 +453,10 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
   },
+  profileImage: {
+    width: 65,
+    height: 65,
+    borderRadius: 9999,
+    resizeMode: "cover",
+  },  
 });

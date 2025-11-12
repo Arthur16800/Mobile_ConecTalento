@@ -23,33 +23,15 @@ const sheets = {
   getProjects: () => api.get("projects"),
   searchProjects: (text) => api.get(`project/search`, { params: { q: text } }),
   getUserByName: (username) => api.get(`user/${username}`),
-  putUser: (
-    userId,
-    user,
-    imageUri = "http://192.168.100.10:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
-  ) => {
-    const data = new FormData();
-
-    for (let key in user) {
-      data.append(key, user[key]);
-    }
-
-    if (imageUri) {
-      const filename = imageUri.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image";
-      data.append("imagem", {
-        uri: imageUri,
-        name: filename,
-        type: type,
-      });
-    }
-
-    return api.put(`user/${userId}`, data, {
+  updateUser: (id_user, user) => {
+    const isForm = typeof FormData !== "undefined" && user instanceof FormData;
+    const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        ...(isForm ? { "Content-Type": "multipart/form-data" } : {}),
+        Accept: "application/json",
       },
-    });
+    };
+    return api.put(`user/${id_user}`, user, config);
   },
   deleteUser: (id) => api.delete(`user/${id}`),
   updatePassword: (id, oldPassword, newPassword) =>
@@ -60,7 +42,12 @@ const sheets = {
   getProjectsByUser: (username) => api.get(`projects/${username}`),
   getProjectById: async (id) => {
     // Try a few possible endpoints because backend routes may vary between 'project', 'projects' or 'projectdetail'
-    const candidates = [`project/${id}`, `projects/${id}`, `projectdetail/${id}`, `project/${id}/details`];
+    const candidates = [
+      `project/${id}`,
+      `projects/${id}`,
+      `projectdetail/${id}`,
+      `project/${id}/details`,
+    ];
     for (const path of candidates) {
       try {
         const res = await api.get(path);
@@ -73,7 +60,7 @@ const sheets = {
       }
     }
     // If none matched, throw a not found like axios would
-    const e = new Error('Not Found');
+    const e = new Error("Not Found");
     e.response = { status: 404 };
     throw e;
   },
@@ -108,8 +95,10 @@ const sheets = {
       },
     });
   },
-  paymentUserPix: (id_user, email) => api.post(`/pagamento-pix/${id_user}`, { email }),
-  getPaymentPixStatus: (id_user, paymentId) => api.get(`/pagamento/pix/status/${id_user}/${paymentId}`),
+  paymentUserPix: (id_user, email) =>
+    api.post(`/pagamento-pix/${id_user}`, { email }),
+  getPaymentPixStatus: (id_user, paymentId) =>
+    api.get(`/pagamento/pix/status/${id_user}/${paymentId}`),
 
   putProject: async (projeto, imageUri, id) => {
     const data = new FormData();
@@ -149,7 +138,7 @@ const sheets = {
       ID_user: Number(userId),
     });
   },
-  
+
   // >>> ROTA DE EXCLUSÃO ADICIONADA <<<
   deleteProject: (projectId, userId) => {
     if (!projectId || !userId) {
