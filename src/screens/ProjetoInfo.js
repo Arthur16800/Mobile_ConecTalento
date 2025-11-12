@@ -109,7 +109,7 @@ export default function ProjetoInfo({ route, navigation }) {
       } catch (err) {}
     }
     getUserAndLikeStatus();
-  }, [itemState, routeId]);
+  }, []);
 
   useEffect(() => {
     if (!itemState) return;
@@ -173,9 +173,10 @@ export default function ProjetoInfo({ route, navigation }) {
 
   useEffect(() => {
     async function fetchData() {
-      if (!itemState?.username) return;
+      if (!user?.username) return;
       try {
-        const username = itemState.username;
+        const username = user.username;
+        console.log("username");
         const response = await sheets.getUserByName(username);
         setUser({
           ...user,
@@ -185,7 +186,7 @@ export default function ProjetoInfo({ route, navigation }) {
       } catch (error) {}
     }
     fetchData();
-  }, [itemState.username]);
+  }, [user.username]);
 
   // --- FUNÇÕES DE AÇÃO ---
 

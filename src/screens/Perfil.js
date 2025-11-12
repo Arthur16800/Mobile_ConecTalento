@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useLayoutEffect, useState, useEffect } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Header from "../components/Header";
@@ -24,6 +23,10 @@ export default function Perfil({ route, navigation }) {
   const usernameParam = params.username || null;
 
   const [emailAtual, setEmail] = useState("");
+  const [iconUser, setIconUser] = useState({
+    imagem: null,
+    tipo_imagem: null,
+  });
   const [user, setUser] = useState({
     extrainfo: {
       link_insta: null,
@@ -57,11 +60,15 @@ export default function Perfil({ route, navigation }) {
         //  perfil de outro usuário
         const response = await api.getUserByName(usernameParam);
         setUser(response.data.profile || response.data);
-      } else {
         //  perfil do usuário logado
+        const name = await SecureStore.getItemAsync("username");
+        const response2 = await api.getUserByName(name);
+        setIconUser(response2.data.profile || response2.data);
+      } else {
         const name = await SecureStore.getItemAsync("username");
         const response = await api.getUserByName(name);
         setUser(response.data.profile || response.data);
+        setIconUser(response.data.profile || response.data);
       }
     } catch (error) {
       console.log("Erro na requisição:", error);
@@ -108,10 +115,12 @@ export default function Perfil({ route, navigation }) {
     }
   };
 
+  const URIProfile = `data:${user.tipo_imagem};base64,${user.imagem}`;
+
   return (
     <View style={styles.container}>
       <StatusBar hidden backgroundColor="#fff" />
-      <Header toggleVisible={toggleVisibleTrue} user={user} />
+      <Header toggleVisible={toggleVisibleTrue} user={iconUser} />
 
       <ScrollView
         style={styles.scrollContainer}
@@ -123,10 +132,10 @@ export default function Perfil({ route, navigation }) {
       >
         {/* Imagem do usuário */}
         <View style={styles.fundoUser}>
-          {user.imagem ? (
+          {URIProfile ? (
             <Image
-              source={{ uri: `data:${user.tipo_imagem};base64,${user.imagem}` }}
-              style={styles.profileImage}
+              source={{ uri:URIProfile }}
+              style={{ width: "100%", height: "100%", borderRadius: 9999 }}
             />
           ) : (
             <IoniconsUser name="person" size={100} color="#949599" />
@@ -138,7 +147,6 @@ export default function Perfil({ route, navigation }) {
           <Text style={styles.name} numberOfLines={0}>
             {user.username || "Usuário"}
           </Text>
-          
         </View>
 
         {/* Biografia */}
