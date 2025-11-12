@@ -1,7 +1,7 @@
 import HeaderK from "../components/HeaderKeyboard";
 import BarraLateral from "../components/BarraLateral";
 // Adicione useCallback aqui e remova useEffect da lista se não for usar mais para projetos
-import React, { useLayoutEffect, useState, useEffect, useCallback } from "react";
+import { useLayoutEffect, useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -47,11 +47,14 @@ export default function Home({ navigation }) {
     try {
       setLoading(true);
       // Certifique-se de usar 'sheets' se renomeou a importação
-      const response = await sheets.getProjects(); 
+      const response = await sheets.getProjects();
       setProjects(response.data.profile_projeto);
     } catch (error) {
       // Adicionei uma verificação para evitar erro se error.data não existir
-      console.log("Erro na requisição:", error.response?.data?.message?.error || error.message);
+      console.log(
+        "Erro na requisição:",
+        error.response?.data?.message?.error || error.message
+      );
     } finally {
       setLoading(false);
       // Se quiser resetar os filtros toda vez que volta para Home, mantenha estas linhas.
@@ -100,7 +103,10 @@ export default function Home({ navigation }) {
         imagem: imagemBuffer,
       }));
     } catch (error) {
-        console.log("Erro na requisição de usuário:", error.response?.data?.message?.error || error.message);
+      console.log(
+        "Erro na requisição de usuário:",
+        error.response?.data?.message?.error || error.message
+      );
     }
   }
 
@@ -148,16 +154,16 @@ export default function Home({ navigation }) {
 
     // Só atualiza se a ordem realmente mudou para evitar renders desnecessários
     // (Uma comparação profunda seria ideal, mas para este caso simples pode bastar)
-    // setProjects(ordenados); 
+    // setProjects(ordenados);
     // NOTA: Chamar setProjects aqui dentro de um useEffect que depende de 'whichFilter'
     // E TAMBÉM altera 'projects' pode causar loops se não tomar cuidado.
     // O ideal seria ter um estado para 'projetosOriginais' e outro para 'projetosExibidos'.
     // Mas se estava funcionando para você, vou manter, apenas alertando.
-     setProjects(ordenados);
-
+    setProjects(ordenados);
   }, [whichFilter]); // Adicionar 'projects' aqui causaria loop infinito.
 
-  async function searchProjectsFn() { // Renomeei para evitar conflito com o estado 'search'
+  async function searchProjectsFn() {
+    // Renomeei para evitar conflito com o estado 'search'
     if (search === "") {
       getProjects();
     } else {
@@ -166,7 +172,7 @@ export default function Home({ navigation }) {
         const response = await sheets.searchProjects(String(search));
         setProjects(response.data.profile_projeto);
       } catch (error) {
-          console.log("Erro na busca:", error);
+        console.log("Erro na busca:", error);
       } finally {
         setLoading(false);
         setFilter(false);
@@ -247,6 +253,9 @@ export default function Home({ navigation }) {
           data={projects}
           keyExtractor={(item) => String(item.ID_projeto)} // Garante que a chave seja string
           renderItem={({ item }) => {
+            if (projects.lenght === 0) {
+              return <Text>Nenhum Projeto Encontrado!</Text>;
+            }
             const uriImage =
               "data:" + item.tipo_imagem + ";base64," + item.imagem;
 

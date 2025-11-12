@@ -54,11 +54,11 @@ export default function Perfil({ route, navigation }) {
   async function getUser() {
     try {
       if (usernameParam) {
-        // 👇 perfil de outro usuário
+        //  perfil de outro usuário
         const response = await api.getUserByName(usernameParam);
         setUser(response.data.profile || response.data);
       } else {
-        // 👇 perfil do usuário logado
+        //  perfil do usuário logado
         const name = await SecureStore.getItemAsync("username");
         const response = await api.getUserByName(name);
         setUser(response.data.profile || response.data);
@@ -138,18 +138,7 @@ export default function Perfil({ route, navigation }) {
           <Text style={styles.name} numberOfLines={0}>
             {user.username || "Usuário"}
           </Text>
-          {emailAtual === user.email && (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("PerfilEdit")}
-              style={styles.editIconWrapper}
-            >
-              <MaterialCommunityIcons
-                name="pencil-outline"
-                size={30}
-                color="black"
-              />
-            </TouchableOpacity>
-          )}
+          
         </View>
 
         {/* Biografia */}

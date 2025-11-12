@@ -441,16 +441,6 @@ export default function ProjetoInfo({ route, navigation }) {
                   >
                     <Feather name="trash-2" size={22} color="#FF4D4D" />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={handleEdit}
-                    style={styles.actionButton}
-                  >
-                    <MaterialCommunityIcons
-                      name="pencil-outline"
-                      size={24}
-                      color="#7A2CF6"
-                    />
-                  </TouchableOpacity>
                 </>
               )}
 
