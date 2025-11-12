@@ -1,21 +1,8 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-function base64ToFile(base64, filename) {
-    if (!base64) return null;
-    const arr = base64.split(",");
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  }
-
 const api = axios.create({
-  baseURL: "http://10.89.240.90:5000/api/v1/",
+  baseURL: "https://api-conectalento.eastus2.cloudapp.azure.com:5000/api/v1/",
   headers: { accept: "application/json" },
 });
 
@@ -34,35 +21,36 @@ const sheets = {
   postLogin: (user) => api.post("login", user),
   postCadastro: (user) => api.post("user", user),
   getProjects: () => api.get("projects"),
-  searchProjects: (text) => api.post("project/search", text),
+  searchProjects: (text) => api.get(`project/search`, { params: { q: text } }),
   getUserByName: (username) => api.get(`user/${username}`),
   putUser: (
-    userId, 
-    user
+    userId,
+    user,
+    imageUri = "http://192.168.100.10:8081/assets/?unstable_path=.%2Fassets%2Flogo.png&platform=android&hash=a1795b20601d2a4a709395162c0a58be"
   ) => {
     const data = new FormData();
 
-  for (let key in user) {
-    data.append(key, user[key]);
-  }
-  let imageToSend = data.imagens
-  if (imageToSend && typeof imageToSend === "string") { 
-    imageToSend = base64ToFile(imageToSend, "perfil_atual.jpg");
-  }
+    for (let key in user) {
+      data.append(key, user[key]);
+    }
 
-  if(imageToSend) {
-    data.append("imagens", imageToSend);
-  }
+    if (imageUri) {
+      const filename = imageUri.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : "image";
+      data.append("imagem", {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      });
+    }
 
-const isForm = typeof FormData !== "undefined" && user instanceof FormData;
-    const config = {
+    return api.put(`user/${userId}`, data, {
       headers: {
-        ...(isForm ? { "Content-Type": "multipart/form-data" } : {}),
-        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
       },
-    };
-    return api.put(`/user/${userId}`, user, config);
-},
+    });
+  },
   deleteUser: (id) => api.delete(`user/${id}`),
   updatePassword: (id, oldPassword, newPassword) =>
     api.put(`user/newpassword/${id}`, {
@@ -70,33 +58,59 @@ const isForm = typeof FormData !== "undefined" && user instanceof FormData;
       nova_senha: newPassword,
     }),
   getProjectsByUser: (username) => api.get(`projects/${username}`),
-  postProject: async (projeto, imageUri, idUser) => {
+  getProjectById: async (id) => {
+    // Try a few possible endpoints because backend routes may vary between 'project', 'projects' or 'projectdetail'
+    const candidates = [`project/${id}`, `projects/${id}`, `projectdetail/${id}`, `project/${id}/details`];
+    for (const path of candidates) {
+      try {
+        const res = await api.get(path);
+        return res;
+      } catch (err) {
+        // continue to next candidate on 404 or other errors
+        // if it's a network/auth error, rethrow
+        if (err.response && err.response.status === 404) continue;
+        throw err;
+      }
+    }
+    // If none matched, throw a not found like axios would
+    const e = new Error('Not Found');
+    e.response = { status: 404 };
+    throw e;
+  },
+
+  createProjeto: (form, imagens, userId) => {
     const data = new FormData();
-
-    for (let key in projeto) {
-      data.append(key, projeto[key]);
+    for (let key in form) {
+      data.append(key, form[key]);
     }
 
-    if (imageUri) {
-      imageUri.map((image)=>{
-        const filename = image.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image";
-      data.append("imagem", {
-        uri: image,
-        name: filename,
-        type: type,
-      });
-      })
-      
-    }
+    if (imagens) {
+      try {
+        imagens.forEach((imagem) => {
+          const filename = imagem.split("/").pop();
+          const match = /\.(\w+)$/.exec(filename);
+          const type = match ? `image/${match[1]}` : "image";
 
-    return api.post(`projects/${idUser}`, projeto, {
+          data.append("imagens", {
+            uri: imagem,
+            name: filename,
+            type: type,
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    return api.post(`/project/${userId}`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Accept: "application/json",
       },
     });
-  }, // TENHO QUE ESTUDAR COMO FUNCIONA O "ENVIAR MULTIPLAS IMAGENS PARA O SERVIDOR"
+  },
+  paymentUserPix: (id_user, email) => api.post(`/pagamento-pix/${id_user}`, { email }),
+  getPaymentPixStatus: (id_user, paymentId) => api.get(`/pagamento/pix/status/${id_user}/${paymentId}`),
+
   putProject: async (projeto, imageUri, id) => {
     const data = new FormData();
 
@@ -121,6 +135,31 @@ const isForm = typeof FormData !== "undefined" && user instanceof FormData;
       },
     });
   }, // TENHO QUE ESTUDAR COMO FUNCIONA O "ENVIAR MULTIPLAS IMAGENS PARA O SERVIDOR"
+  getProjectsLikedUser: (userId) => {
+    if (!userId) return Promise.reject(new Error("User ID ausente"));
+    return api.get(`/projectsliked/${userId}`);
+  },
+
+  likeProject: (projectId, userId) => {
+    if (!projectId || !userId) {
+      return Promise.reject(new Error("Project ID ou User ID ausente"));
+    }
+    return api.post("/like_dislike_projects", {
+      ID_projeto: Number(projectId),
+      ID_user: Number(userId),
+    });
+  },
+  
+  // >>> ROTA DE EXCLUSÃO ADICIONADA <<<
+  deleteProject: (projectId, userId) => {
+    if (!projectId || !userId) {
+      return Promise.reject(new Error("Project ID ou User ID ausente"));
+    }
+    // Rota: router.delete("/project/:ID_projeto") e espera ID_user no body
+    return api.delete(`project/${projectId}`, {
+      data: { ID_user: Number(userId) },
+    });
+  },
 };
 
 export default sheets;

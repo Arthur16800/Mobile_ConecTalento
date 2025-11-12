@@ -50,11 +50,7 @@ Rode o comando para iniciar a aplicação:
 
 ## Funções que faltam implementar:
 
-- **Pesquisa_por_Texto**: Implementar com API
 - **Contatos_do_Perfil**: Implementar com API
-- **Atualizar_Perfil**: Implementar com API
-- **Mostrar_Projetos_Portifolio**: Implementar com API
-- **Criar_Projeto**: Implementar com API
 - **Pagina_do_Projeto**: Tudo sobre
 - **Filtro_de_Pesquisa**: Tudo sobre
 - **Imagem_do_Usuario**: Tudo sobre

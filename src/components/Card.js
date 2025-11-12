@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -6,26 +6,66 @@ import {
   Text,
   TouchableOpacity,
   Animated,
+  Dimensions,
 } from "react-native";
+// local badge (avoid additional dependency)
 import { Ionicons } from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
+import api from "../axios/axios"
+import { useNavigation } from '@react-navigation/native';
 
-const Card = ({ imageSource, title, onLike, styleCard }) => {
+const screenWidth = Dimensions.get("window").width;
+
+const Card = ({ imageSource, item, styleCard }) => {
+  const [userId, setUserId] = useState("");
   const [liked, setLiked] = useState(false);
   const [scale] = useState(new Animated.Value(1));
-  const [count, setCount] = useState(0); // Para contar as curtidas
+  const [likesCount, setLikesCount] = useState(item.total_curtidas);
+  const navigation = useNavigation();
 
-  const handleLike = () => {
-    const newLikedState = !liked;
-    setLiked(newLikedState);
-    if (newLikedState) {
-      setCount(count + 1); // Incrementa o contador quando curtir
-    } else {
-      setCount(count - 1); // Decrementa o contador se desfizer o like
+  useEffect(() => {
+    if (userId) {
+      api
+        .getProjectsLikedUser(userId)
+        .then((res) => {
+          const likedProjects = res.data.profile_projeto.map(
+            (p) => p.ID_projeto
+          );
+          if (likedProjects.includes(item.ID_projeto)) setLiked(true);
+        });
     }
+  }, [item.ID_projeto, userId]);
 
-    // Chama a função onLike se fornecida
-    if (onLike) {
-      onLike(newLikedState);
+  useEffect(()=>{
+    async function getIdUser(){
+      setUserId(await SecureStore.getItemAsync("id"));
+    }
+    getIdUser();
+  },[])
+
+  const handleLikeAPI = async () => {
+    try {
+      const res = await api.likeProject(item.ID_projeto, userId);
+
+      if (res.data.curtido) {
+        setLiked(true);
+        setLikesCount((prev) => prev + 1);
+      } else {
+        setLiked(false);
+        setLikesCount((prev) => Math.max(prev - 1, 0));
+      }
+    } catch (err) {
+      console.error("Erro ao curtir:", err);
+      if (err.response) {
+        console.log("Status:", err.response.status);
+        console.log("Dados do erro:", err.response.data);
+      }
+  }
+}
+
+  const handleLike = () => {    
+    if (handleLikeAPI) {
+      handleLikeAPI();
     }
 
     // Animação do coração
@@ -43,7 +83,11 @@ const Card = ({ imageSource, title, onLike, styleCard }) => {
   };
 
   return (
-    <View style={styleCard}>
+    <TouchableOpacity
+      style={styleCard}
+      activeOpacity={0.9}
+      onPress={() => navigation.navigate('ProjetoInfo', { item })}
+    >
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageSource }} style={styles.imagem} />
 
@@ -55,18 +99,21 @@ const Card = ({ imageSource, title, onLike, styleCard }) => {
               color={liked ? "red" : "black"}
             />
           </Animated.View>
+          <View style={styles.localBadge}>
+            <Text style={styles.localBadgeText}>{likesCount}</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.title}>{title}</Text>
-    </View>
+      <Text style={styles.item}>{item.titulo}</Text>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   imageContainer: {
-    width: "80%",
-    height: "75%",
+    width: screenWidth * 0.8,
+    height: screenWidth * 0.5,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#DADADA",
@@ -74,19 +121,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
     elevation: 5,
-    marginTop:15
+    marginTop: 20,
   },
   imagem: {
     width: "100%",
     height: "100%",
-    borderRadius: 8,
+    borderRadius: 12,
   },
   heartButton: {
     position: "absolute",
-    top: -15,
+    top: -20,
     right: -20,
     zIndex: 2,
   },
@@ -95,19 +140,35 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 1,
     borderColor: "black",
-    padding: 12,
+    padding: 14,
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
+    top: 10,
   },
-  countText: {
+  likesCountText: {
     position: "absolute",
     bottom: -1,
     fontSize: 12,
     color: "#000",
   },
-  title: {
-    marginTop: 10,
+  localBadge: {
+    marginLeft: 6,
+    backgroundColor: 'white',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  localBadgeText: {
+    fontSize: 12,
+    fontWeight: '700'
+  },
+  item: {
+    marginVertical: 5,
+    marginBottom: 12.5,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",

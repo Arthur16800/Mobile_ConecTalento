@@ -1,6 +1,5 @@
-import React, { use, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import {
-  Modal,
   View,
   Text,
   TouchableOpacity,
@@ -9,7 +8,10 @@ import {
   Image,
   ImageBackground,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import api from "../axios/axios";
 import * as SecureStore from "expo-secure-store";
@@ -21,7 +23,7 @@ import ModalConfirmEmail from "../components/ModalConfirmEmail";
 
 export default function Cadastro({ navigation }) {
   const [user, setUser] = useState({
-    name:"",
+    name: "",
     username: "",
     email: "",
     password: "",
@@ -32,92 +34,121 @@ export default function Cadastro({ navigation }) {
   });
   const [controlLoad, setControlLoad] = useState(false);
   const [modalConf, setModalConf] = useState(false);
-  const visibModal = () => {
-    setModalConf(true);
-  };
-  const fecharModal = () => {
-    setModalConf(false);
-  };
+
+  const visibModal = () => setModalConf(true);
+  const fecharModal = () => setModalConf(false);
+
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle("dark-content");
+    StatusBar.setBackgroundColor("transparent");
+  }, []);
+
   async function saveInfo(token, userP) {
     await SecureStore.setItemAsync("token", token);
     await SecureStore.setItemAsync("username", userP.username);
     await SecureStore.setItemAsync("email", userP.email);
     await SecureStore.setItemAsync("id", userP.ID_user.toString());
   }
+
   async function handleCadastro() {
-    try{
+    try {
       setControlLoad(true);
       const response = await api.postCadastro(user);
-      console.log(response.data.message);
-      if(response.data.message === "Código válido. Usuário autenticado."){
-        saveInfo(response.data.token, response.data.user);
-        setControlLoad(false);
+
+      if (response.data.message === "Código válido. Usuário autenticado.") {
+        await saveInfo(response.data.token, response.data.user);
         Alert.alert("Usuário criado com sucesso!");
         navigation.navigate("Home");
-      }else if(response.data.message === "Código reenviado ao e-mail." || "Código enviado ao e-mail."){
+      } else if (
+        response.data.message === "Código reenviado ao e-mail." ||
+        response.data.message === "Código enviado ao e-mail."
+      ) {
         visibModal();
-        setControlLoad(false);        
       }
-    }catch(error){
-      Alert.alert("Erro no cadastro", error.data.message.error)
+    } catch (error) {
+      Alert.alert(
+        "Erro no cadastro",
+        error?.data?.message?.error || "Erro desconhecido"
+      );
+    } finally {
+      setControlLoad(false);
     }
   }
+
   return (
     <View style={styles.container}>
-      <StatusBar hidden={false} backgroundColor="#fff" />
+      <StatusBar hidden backgroundColor="#fff" />
+
       <ImageBackground source={backgroundLogin} style={styles.background}>
-        <View style={styles.whiteboard}>
-          <Text style={styles.title}>Cadastro</Text>
-          <Image source={logo} style={styles.logo} />
-          <InputUser
-            atributo={"Nome"}
-            variavel={"name"}
-            texto={"Digite seu nome:"}
-            obj={user}
-            setobj={setUser}
-          />
-          <InputUser
-            atributo={"Nome de Usuário"}
-            variavel={"username"}
-            texto={"Digite seu nome de usuário:"}
-            obj={user}
-            setobj={setUser}
-          />
-          <InputUser
-            atributo={"E-mail"}
-            variavel={"email"}
-            texto={"Digite seu e-mail:"}
-            obj={user}
-            setobj={setUser}
-          />
-          <InputPassword
-            titulo={"Senha"}
-            texto={"Digite sua senha"}
-            variavel={"password"}
-            showpassword={"showPassword"}
-            obj={user}
-            setobj={setUser}
-          />
-          <InputPassword
-            titulo="Confirme sua senha"
-            texto="Digite sua senha novamente"
-            variavel="confirmPassword"
-            obj={user}
-            setobj={setUser}
-            showpassword={"showPassword2"}
-          />
-          <View>
-            <TouchableOpacity style={styles.button} onPress={()=>handleCadastro()} disabled={controlLoad}>
-            {controlLoad?<ActivityIndicator color="white" />:<Text style={styles.buttonText}>Criar Conta</Text>}
-            </TouchableOpacity>
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Já possui conta?</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text style={styles.footerLink}>Faça Login</Text>
+        <KeyboardAvoidingView behavior={"padding"} style={styles.whiteboard}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled" // permite tocar fora para fechar teclado
+          >
+            <View style={styles.whiteboard}>
+              <Image source={logo} style={styles.logo} />
+              <Text style={styles.title}>Cadastro</Text>
+
+              <InputUser
+                atributo="Nome"
+                variavel="name"
+                texto="Digite seu nome:"
+                obj={user}
+                setobj={setUser}
+              />
+              <InputUser
+                atributo="Nome de Usuário"
+                variavel="username"
+                texto="Digite seu nome de usuário:"
+                obj={user}
+                setobj={setUser}
+              />
+              <InputUser
+                atributo="E-mail"
+                variavel="email"
+                texto="Digite seu e-mail:"
+                obj={user}
+                setobj={setUser}
+              />
+              <InputPassword
+                titulo="Senha"
+                texto="Digite sua senha"
+                variavel="password"
+                showpassword="showPassword"
+                obj={user}
+                setobj={setUser}
+              />
+              <InputPassword
+                titulo="Confirme sua senha"
+                texto="Digite sua senha novamente"
+                variavel="confirmPassword"
+                obj={user}
+                setobj={setUser}
+                showpassword="showPassword2"
+                submitFunc={handleCadastro}
+              />
+
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleCadastro}
+                disabled={controlLoad}
+              >
+                {controlLoad ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.buttonText}>Criar Conta</Text>
+                )}
               </TouchableOpacity>
+
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Já possui conta?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                  <Text style={styles.footerLink}>Faça Login</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ImageBackground>
 
       <ModalConfirmEmail
@@ -132,13 +163,22 @@ export default function Cadastro({ navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFFFF", width: "100%" },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    width: "100%",
+  },
   background: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "column",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingTop:"5%"
   },
   whiteboard: {
     width: "90%",
@@ -146,25 +186,20 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "#FFFFFF",
     padding: "5%",
-    flexDirection: "column",
-    justifyContent: "center",
-    rowGap: "2%",
-    borderRadius: "3%",
+    borderRadius: 12,
   },
-  logo: { position: "absolute", right: 0, top: 10 },
+  logo: {
+    position: "absolute",
+    right: -30,
+    top: -50,
+  },
   title: {
     fontSize: 50,
     fontFamily: "serif",
     fontWeight: "700",
-    color: "#000000",
+    color: "#000",
     textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 25,
-    fontFamily: "serif",
-    color: "000000",
-    textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 10,
   },
   button: {
     backgroundColor: "#803AD6",
@@ -178,23 +213,24 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-
-  buttonText: { color: "#fff", fontWeight: "700", fontSize: 18 },
-
-  footer: { flexDirection: "row", justifyContent: "center", marginTop: 25 },
-  footerText: { color: "#555", fontSize: 16 },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 18,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 25,
+  },
+  footerText: {
+    color: "#555",
+    fontSize: 16,
+  },
   footerLink: {
     color: "#215299",
     fontWeight: "600",
     marginLeft: 6,
     fontSize: 16,
-  },
-  whitebox: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

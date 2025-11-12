@@ -1,19 +1,37 @@
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Image } from "react-native";
 import IoniconsUser from "@expo/vector-icons/Ionicons";
 import { mvs } from "react-native-size-matters"; // A função mvs é útil para escalar tamanhos de fonte.
 
-export default function Header({ toggleVisible, navigation }) {
+export default function Header({ toggleVisible, user }) {
+  const { tipo_imagem, imagem } = user;
+
+  const uriImage = "data:" + tipo_imagem + ";base64," + imagem;
+
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>
         <Text style={styles.title}>ConecTalento</Text>
 
-        <TouchableOpacity
-          onPress={() => toggleVisible()}
-          style={styles.fundoUser}
-        >
-          <IoniconsUser name="person" size={40} color="#949599" />
-        </TouchableOpacity>
+        {!imagem || !tipo_imagem ? (
+          <TouchableOpacity
+            onPress={() => toggleVisible()}
+            style={styles.fundoUser}
+          >
+            <IoniconsUser name="person" size={40} color="#949599" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              toggleVisible();
+            }}
+            style={styles.fundoUser}
+          >
+            <Image
+              source={{ uri: uriImage }}
+              style={{ width: "100%", height: "100%", borderRadius: 9999 }}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -25,7 +43,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#6a1b9a",
     paddingTop: 13,
     paddingBottom: 20,
-    marginBottom: 60,
     paddingHorizontal: 20,
     alignItems: "center",
   },

@@ -1,5 +1,6 @@
 import {
   View,
+  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
@@ -15,18 +16,36 @@ export default function Header({
   text,
   setText,
   getFunction,
+  filterFunction,
+  user,
 }) {
+  const { tipo_imagem, imagem } = user;
+  const uriImage = "data:" + tipo_imagem + ";base64," + imagem;
   return (
     <View style={styles.header}>
       <View style={styles.barraTopo}>
         <Text style={styles.title}>ConecTalento</Text>
 
-        <TouchableOpacity
-          onPress={() => toggleVisible()}
-          style={styles.fundoUser}
-        >
-          <IoniconsUser name="person" size={40} color="#949599" />
-        </TouchableOpacity>
+        {!imagem || !tipo_imagem ? (
+          <TouchableOpacity
+            onPress={() => toggleVisible()}
+            style={styles.fundoUser}
+          >
+            <IoniconsUser name="person" size={40} color="#949599" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              toggleVisible();
+            }}
+            style={styles.fundoUser}
+          >
+            <Image
+              source={{ uri: uriImage }}
+              style={{ width: "100%", height: "100%", borderRadius: 9999 }}
+            />
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.barraBot}>
         <View style={styles.barraPesquisa}>
@@ -36,23 +55,19 @@ export default function Header({
             onChangeText={(newText) => setText(newText)}
             value={text}
             enterKeyHint={"search"}
-            onSubmitEditing={(text) => {
-              getFunction(text);
+            onSubmitEditing={() => {
+              getFunction();
             }}
           />
 
           <View style={styles.icons}>
-            <TouchableOpacity
+            {filterFunction && (
+              <TouchableOpacity onPress={() => filterFunction()}>
+                <Feather name="filter" size={30} color="black" />
+              </TouchableOpacity>
+            )}
 
-            >
-              <Feather name="filter" size={30} color="black" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={(text) => {
-                getFunction(text);
-              }}
-            >
+            <TouchableOpacity onPress={() => getFunction()}>
               <Entypo name="magnifying-glass" size={30} color="black" />
             </TouchableOpacity>
           </View>
@@ -117,6 +132,8 @@ const styles = StyleSheet.create({
   icons: {
     display: "flex",
     flexDirection: "row",
-    gap: 10,
+    gap: 5,
+    padding: 15,
+    left: 10,
   },
 });
