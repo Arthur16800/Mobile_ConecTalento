@@ -28,7 +28,7 @@ const sheets = {
     const config = {
       headers: {
         ...(isForm ? { "Content-Type": "multipart/form-data" } : {}),
-        Accept: "application/json",
+        accept: "application/json",
       },
     };
     return api.put(`user/${id_user}`, user, config);

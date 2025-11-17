@@ -23,6 +23,8 @@ import ModalMudarSenha from "../components/ModalMudarSenha";
 import * as SecureStore from "expo-secure-store";
 import ModalConfirmEmail from "../components/ModalConfirmEmail";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { writeAsStringAsync } from "expo-file-system/legacy";
 
 export default function PerfilEdit({ navigation }) {
   const [email, setEmail] = useState("");
@@ -55,7 +57,7 @@ export default function PerfilEdit({ navigation }) {
     { id: 4, type: "twitter", value: "TwitterTeste" },
   ]);
 
-    // INICIO DAS FUNÇÕES DE ESTADO
+  // INICIO DAS FUNÇÕES DE ESTADO
 
   const toggleVisibleFalse = () => setIsVisible(false);
   const toggleVisibleTrue = () => setIsVisible(true);
@@ -93,16 +95,41 @@ export default function PerfilEdit({ navigation }) {
 
   // INICIO DAS FUNÇÕES
 
+  async function base64ToTempFile(base64, filename = "perfil_atual.jpg") {
+    try {
+      await writeAsStringAsync(
+        `file:///data/user/0/host.exp.exponent/cache/${filename}`,
+        base64,
+        {
+          encoding: "base64",
+        }
+      );
+
+      return `file:///data/user/0/host.exp.exponent/cache/${filename}`; // Retorna o caminho onde o arquivo foi salvo
+    } catch (error) {
+      console.log("Erro ao salvar o arquivo base64:", error);
+      return null; // Retorna null se o erro ocorrer
+    }
+  }
+
   async function getEmail() {
     setEmail(await SecureStore.getItemAsync("email"));
   }
 
   async function getUser() {
     try {
+      const userId = await SecureStore.getItemAsync("id");
       const uname = await SecureStore.getItemAsync("username");
       const response = await api.getUserByName(uname);
-      setUser(response.data.profile);
-      console.log("setou")
+      setUser({
+        ID_user: userId,
+        name: response.data.profile.name,
+        username: response.data.profile.username,
+        email: response.data.profile.email,
+        biografia: response.data.profile.biografia,
+        imagem: response.data.profile.imagem,
+        tipo_imagem: response.data.profile.tipo_imagem,
+      });
     } catch (error) {
       console.log("Erro na requisição:", error);
     }
@@ -112,6 +139,13 @@ export default function PerfilEdit({ navigation }) {
     getEmail();
     getUser();
   }, []);
+
+  useEffect(() => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      imagem: imageNow,
+    }));
+  }, [email]);
 
   async function pickImage() {
     // Pedir permissão
@@ -126,7 +160,7 @@ export default function PerfilEdit({ navigation }) {
 
     // Abrir a galeria
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: "images",
       allowsEditing: true,
       aspect: [1, 1], // recorte quadrado (perfil)
       quality: 1,
@@ -164,27 +198,39 @@ export default function PerfilEdit({ navigation }) {
 
       let imageToSend = user.imagem;
       if (imageToSend && typeof imageToSend === "string") {
-        imageToSend = base64ToFile(imageToSend, "perfil_atual.jpg");
+        if (!imageToSend.startsWith("file")) {
+          const tempUri = await base64ToTempFile(imageToSend);
+          if (tempUri) {
+            fd.append("imagens", {
+              uri: tempUri,
+              type: user.tipo_imagem,
+              name: "perfil_atual.jpg",
+            });
+          }
+        } else {
+          fd.append("imagens", {
+            uri: imageToSend,
+            type: user.tipo_imagem,
+            name: "perfil_atual.jpg",
+          });
+        }
       }
-      if (imageToSend) fd.append("imagens", imageToSend);
 
       const emailMudou = user.email !== email;
 
       const temCodigo = (user.code || "").trim() !== "";
 
       if (emailMudou && !temCodigo) {
-        const res = await api.updateUser(user.ID_user, fd);
+        const res = await api.updateUser(String(user.ID_user), fd);
         toggleModalEmailTrue();
         setControlLoad(false);
         return;
       }
-
       if (temCodigo) {
         fd.append("code", formData.code);
       }
 
       const response = await api.updateUser(user.ID_user, fd);
-
       const img = response.data?.profile?.imagem;
       let updatedAvatar = null;
 
@@ -208,15 +254,18 @@ export default function PerfilEdit({ navigation }) {
         setEmail(user.email);
         await SecureStore.setItemAsync("email", user.email);
       }
-      Alert.alert(response.data.message || "Perfil atualizado com sucesso!")
-      setEditing(false); 
-      toggleModalEmailTrue();
-      saveInfo(response.data.token, user);
-      navigation.navigate("Perfil", {username:user.username});
+      Alert.alert(response.data.message || "Perfil atualizado com sucesso!");
+      await SecureStore.setItemAsync("username", user.username);
+      await SecureStore.setItemAsync("email", user.email);
+      await SecureStore.setItemAsync("id", user.ID_user.toString());
 
+      navigation.navigate("Perfil", { username: user.username });
     } catch (error) {
       console.error("Erro no updateUser:", error);
-      Alert.alert("Um Erro Ocorreu", error.response?.data?.error || "Erro ao atualizar perfil.");
+      Alert.alert(
+        "Um Erro Ocorreu",
+        error.response?.data?.error || "Erro ao atualizar perfil."
+      );
     } finally {
       setControlLoad(false);
     }
@@ -245,8 +294,14 @@ export default function PerfilEdit({ navigation }) {
     await SecureStore.setItemAsync("email", userP.email);
     await SecureStore.setItemAsync("id", userP.ID_user.toString());
   }
-  
-  const URIProfile = `data:${user.tipo_imagem};base64,${user.imagem}`;
+
+  const isBase64 = (img) => img.endsWith("=");
+  let imageNow = "";
+  if (isBase64(user.imagem || "")) {
+    imageNow = `data:${user.tipo_imagem};base64,${user.imagem}`;
+  } else {
+    imageNow = user.imagem;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -262,14 +317,14 @@ export default function PerfilEdit({ navigation }) {
 
           <View style={styles.lineUser}>
             <View style={styles.backIcon}>
-              <TouchableOpacity onPress={pickImage}>
-                {URIProfile ? (
+              <TouchableOpacity onPress={pickImage} style={styles.fundoUser}>
+                {imageNow ? (
                   <Image
-                    source={{ uri: URIProfile }}
+                    source={{ uri: imageNow }}
                     style={styles.profileImage}
                   />
                 ) : (
-                  <IoniconsUser name="person" size={100} color="#949599" />
+                  <IoniconsUser name="person" size={40} color="#949599" />
                 )}
               </TouchableOpacity>
             </View>
@@ -292,6 +347,15 @@ export default function PerfilEdit({ navigation }) {
             atributo={"Nome"}
             variavel={"name"}
             texto={user.name}
+            obj={user}
+            setobj={setUser}
+            style={styles.input}
+          />
+
+          <InputUser
+            atributo={"Username"}
+            variavel={"username"}
+            texto={user.username}
             obj={user}
             setobj={setUser}
             style={styles.input}
@@ -415,7 +479,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 9999,
-    backgroundColor: "grey",
+    backgroundColor: "#d2d3d5",
     height: 65,
     width: 65,
   },
@@ -458,5 +522,14 @@ const styles = StyleSheet.create({
     height: 65,
     borderRadius: 9999,
     resizeMode: "cover",
-  },  
+  },
+  fundoUser: {
+    backgroundColor: "#d2d3d5",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

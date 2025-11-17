@@ -128,7 +128,7 @@ export default function Perfil({ route, navigation }) {
         contentContainerStyle={{
           paddingBottom: 80,
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "center",
         }}
       >
         {/* Imagem do usuário */}
@@ -144,9 +144,12 @@ export default function Perfil({ route, navigation }) {
         </View>
 
         {/* Nome e botão de editar */}
+        <Text style={styles.name} numberOfLines={0}>
+            {user.name || "Loading..."}
+          </Text>
         <View style={styles.nomeWrapper}>
           <Text style={styles.name} numberOfLines={0}>
-            {user.username || "Usuário"}
+            {user.username || "Loading..."}
           </Text>
           {emailAtual === user.email && (
             <TouchableOpacity
@@ -163,7 +166,7 @@ export default function Perfil({ route, navigation }) {
 
         {/* Biografia */}
         {user.biografia && (
-          <Text style={styles.subtitle}>{user.biografia}</Text>
+          <Text style={styles.subtitle}>{user.biografia || "Carregando Biografia..."}</Text>
         )}
 
         {/* Título */}
@@ -233,10 +236,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   name: {
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: "bold",
     alignSelf:"center",
-    margin:"20"
+    marginHorizontal:20
   },
   subtitle: {
     fontSize: 20,
