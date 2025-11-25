@@ -49,7 +49,10 @@ export default function CriarProjeto({ navigation }) {
         navigation.navigate("Home");
       }
     } catch (error) {
-      console.log("Erro na requisição:", error.response.data.error);
+      Alert.alert(
+        "Erro no criação",
+        error.response.data.error || "Erro desconhecido"
+      );
     } finally {
       setLoading(false);
     }
@@ -63,7 +66,10 @@ export default function CriarProjeto({ navigation }) {
         imagem: response.data.profile.imagem
       })
     } catch (error) {
-      console.log("Erro na requisição:", error.data.message.error);
+      Alert.alert(
+        "Erro na recuperação do usuário",
+        error.response.data.error || "Erro desconhecido"
+      );
     }
   }
 
@@ -76,6 +82,7 @@ export default function CriarProjeto({ navigation }) {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: "images",
+        aspect: [16, 9],
         allowsEditing: true,
         quality: 1,
       });
@@ -92,7 +99,10 @@ export default function CriarProjeto({ navigation }) {
         }
       }
     } catch (error) {
-      console.error("Erro ao selecionar imagem:", error.response?.data?.error);
+      Alert.alert(
+        "Erro na seleção",
+        error.response.data.error || "Erro desconhecido"
+      );
     }
   };
 

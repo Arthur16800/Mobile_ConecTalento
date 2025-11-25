@@ -45,7 +45,10 @@ export default function Portifolio({ navigation }) {
       const response = await sheets.getProjectsByUser(uname);
       setProjects(response.data.profile_projeto);
     } catch (error) {
-      console.log("Erro ao buscar projetos do portfólio:", error);
+      Alert.alert(
+              "Erro na recuperação dos projetos",
+              error.response.data.error || "Erro desconhecido"
+            );
     }
   }
 
@@ -57,7 +60,10 @@ export default function Portifolio({ navigation }) {
         imagem: response.data.profile.imagem,
       });
     } catch (error) {
-      console.log("Erro na requisição getUser:", error);
+      Alert.alert(
+              "Erro na recuperação do usuário",
+              error.response.data.error || "Erro desconhecido"
+            );
     }
   }
 
@@ -83,7 +89,10 @@ export default function Portifolio({ navigation }) {
           await getUser(storedUsername);
         }
       } catch (error) {
-        console.log("Erro inicial:", error);
+        Alert.alert(
+                "Erro na recuperação do usuário",
+                error.response.data.error || "Erro desconhecido"
+              );
       } finally {
         setLoading(false);
       }
@@ -102,7 +111,10 @@ export default function Portifolio({ navigation }) {
         // Nota: Idealmente, filtre aqui para mostrar apenas os projetos DO USUÁRIO se a API retornar todos.
         setProjects(response.data);
       } catch (error) {
-        console.log("Erro na busca:", error);
+        Alert.alert(
+                "Erro na busca",
+                error.response.data.error || "Erro desconhecido"
+              );
       } finally {
         setLoading(false);
       }

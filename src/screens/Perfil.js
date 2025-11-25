@@ -71,7 +71,10 @@ export default function Perfil({ route, navigation }) {
         setIconUser(response.data.profile || response.data);
       }
     } catch (error) {
-      console.log("Erro na requisição:", error);
+      Alert.alert(
+              "Erro na recuperação do usuário",
+              error.response.data.error || "Erro desconhecido"
+            );
     }
   }
 

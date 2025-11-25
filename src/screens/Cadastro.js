@@ -68,7 +68,7 @@ export default function Cadastro({ navigation }) {
     } catch (error) {
       Alert.alert(
         "Erro no cadastro",
-        error?.data?.message?.error || "Erro desconhecido"
+        error.response.data.error || "Erro desconhecido"
       );
     } finally {
       setControlLoad(false);

@@ -53,7 +53,10 @@ export default function Login({ navigation }) {
         navigation.navigate("Home");
       },
       (error) => {
-        Alert.alert(error.response.data.error);
+        Alert.alert(
+        "Erro no login",
+        error.response.data.error || "Erro desconhecido"
+      );
         setControlLoad(false);
       }
     );

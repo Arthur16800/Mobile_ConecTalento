@@ -55,7 +55,10 @@ const Card = ({ imageSource, item, styleCard }) => {
         setLikesCount((prev) => Math.max(prev - 1, 0));
       }
     } catch (err) {
-      console.error("Erro ao curtir:", err);
+      Alert.alert(
+              "Erro na ação de curtida",
+              err.response.data.error || "Erro desconhecido"
+            );
       if (err.response) {
         console.log("Status:", err.response.status);
         console.log("Dados do erro:", err.response.data);

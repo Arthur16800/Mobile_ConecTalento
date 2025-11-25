@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "MOBILE_ConecTalento",
+    "name": "ConecTalento",
     "slug": "MOBILE_ConecTalento",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,13 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.joaopedrovidal9.MOBILE_ConecTalento"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c6eff594-42ed-4fd4-a423-c342e39317a6"
+      }
+    }
   }
 }

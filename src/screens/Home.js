@@ -51,9 +51,9 @@ export default function Home({ navigation }) {
       setProjects(response.data.profile_projeto);
     } catch (error) {
       // Adicionei uma verificação para evitar erro se error.data não existir
-      console.log(
-        "Erro na requisição:",
-        error.response?.data?.message?.error || error.message
+      Alert.alert(
+        "Erro no carregamento dos projetos",
+        error.response.data.error || "Erro desconhecido"
       );
     } finally {
       setLoading(false);
@@ -103,10 +103,10 @@ export default function Home({ navigation }) {
         imagem: imagemBuffer,
       }));
     } catch (error) {
-      console.log(
-        "Erro na requisição de usuário:",
-        error.response?.data?.message?.error || error.message
-      );
+      Alert.alert(
+              "Erro na recuperação do usuário",
+              error.response.data.error || "Erro desconhecido"
+            );
     }
   }
 
@@ -172,7 +172,10 @@ export default function Home({ navigation }) {
         const response = await sheets.searchProjects(String(search));
         setProjects(response.data.profile_projeto);
       } catch (error) {
-        console.log("Erro na busca:", error);
+        Alert.alert(
+                "Erro na busca dos projetos",
+                error.response.data.error || "Erro desconhecido"
+              );
       } finally {
         setLoading(false);
         setFilter(false);

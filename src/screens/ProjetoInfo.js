@@ -183,7 +183,12 @@ export default function ProjetoInfo({ route, navigation }) {
           tipo_imagem: response.data.profile.tipo_imagem || null,
           imagem: response.data.profile.imagem || null,
         });
-      } catch (error) {}
+      } catch (error) {
+        Alert.alert(
+        "Erro na recuperação do usuário",
+        error.response.data.error || "Erro desconhecido"
+      );
+      }
     }
     fetchData();
   }, [user.username]);
@@ -196,6 +201,7 @@ export default function ProjetoInfo({ route, navigation }) {
         "Atenção",
         "Você precisa estar logado para curtir um projeto."
       );
+      navigation.navigate("Login");
       return;
     }
 
@@ -252,7 +258,10 @@ export default function ProjetoInfo({ route, navigation }) {
               const errorMessage =
                 error.response?.data?.error ||
                 "Falha ao excluir o projeto. Verifique suas permissões.";
-              Alert.alert("Erro", errorMessage);
+              Alert.alert(
+        "Erro na exclusão do projeto",
+        error.response.data.error || "Erro desconhecido"
+      );
             }
           },
           style: "destructive",
